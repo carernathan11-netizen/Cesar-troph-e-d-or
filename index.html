@@ -544,13 +544,33 @@ toast.classList.remove('show');
 }, 3500);
 }
 
-// GESTION CORRIGÉE DE L'AUTHENTIFICATION ET PERSISTANCE
-auth.onAuthStateChanged((user) => {
-if (user) {
+// GESTION ROBUSTE DE L'AUTHENTIFICATION
+// IMPORTANT : une connexion Firebase réussie ne suffit pas. On ne masque le formulaire
+// que lorsque le profil /users/<uid> a bien été chargé.
+let authLoading = false;
+
+function resetLocalUserState() {
+appData.currentUser = null;
+appData.credits = 0;
+appData.friendId = null;
+appData.friends = [];
+appData.isAdmin = false;
+appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
+appData.redeemedCodes = [];
+}
+
+async function loadFirebaseUserProfile(user) {
+if (!user) {
+resetLocalUserState();
+updateUI();
+return false;
+}
+
+try {
 const userRef = db.ref('users/' + user.uid);
-userRef.once('value').then((snapshot) => {
+const snapshot = await userRef.once('value');
 let data = snapshot.val();
-const isAdminEmail = (user.email === 'carer.nathan11@gmail.com');
+const isAdminEmail = (user.email || '').toLowerCase() === 'carer.nathan11@gmail.com';
 
 if (!data) {
 const fId = generateFriendCode(user.uid);
@@ -558,8 +578,9 @@ let freshCatalogs = JSON.parse(JSON.stringify(CATALOGS));
 if (isAdminEmail) {
 Object.keys(freshCatalogs).forEach(cat => freshCatalogs[cat].forEach(i => i.unlocked = true));
 }
+
 data = {
-username: user.email.split('@')[0],
+username: user.email ? user.email.split('@')[0] : 'Joueur',
 credits: isAdminEmail ? 999999999 : 0,
 friendId: fId,
 friends: [],
@@ -567,35 +588,60 @@ isAdmin: isAdminEmail,
 catalogs: freshCatalogs,
 redeemedCodes: []
 };
-userRef.set(data);
+await userRef.set(data);
 }
 
-appData.currentUser = { email: user.email, username: data.username || user.email.split('@')[0], uid: user.uid };
-appData.credits = data.credits !== undefined ? data.credits : 0;
-appData.friendId = data.friendId || generateFriendCode(user.uid);
-appData.friends = data.friends || [];
-appData.isAdmin = data.isAdmin || isAdminEmail;
-appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
-appData.redeemedCodes = data.redeemedCodes || [];
+const friendId = data.friendId || generateFriendCode(user.uid);
 
-db.ref('friend_codes/' + friendCodeKey(appData.friendId)).set(user.uid).catch(err => console.error('friend code:', err));
+appData.currentUser = {
+email: user.email || '',
+username: data.username || (user.email ? user.email.split('@')[0] : 'Joueur'),
+uid: user.uid
+};
+appData.credits = Number(data.credits) || 0;
+appData.friendId = friendId;
+appData.friends = Array.isArray(data.friends) ? data.friends : [];
+appData.isAdmin = data.isAdmin === true || isAdminEmail;
+appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
+appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes : [];
+// Migration des anciens codes et enregistrement de la clé Firebase valide.
+try {
+await db.ref('friend_codes/' + friendCodeKey(friendId)).set(user.uid);
+} catch (friendErr) {
+console.warn('Enregistrement ID ami impossible:', friendErr);
+// Ce bloc ne bloque PAS la connexion au compte.
+}
+
 listenToTrades();
 listenToFriendRequests();
 updateUI();
-}).catch((error) => {
-console.error("Erreur de récupération :", error);
-appData.currentUser = { email: user.email, username: user.email.split('@')[0], uid: user.uid };
+return true;
+} catch (error) {
+console.error('ERREUR CHARGEMENT PROFIL FIREBASE:', error);
+resetLocalUserState();
 updateUI();
-});
-} else {
-appData.currentUser = null;
-appData.credits = 0;
-appData.friendId = null;
-appData.friends = [];
-appData.isAdmin = false;
-appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
-updateUI();
+
+let msg = 'Impossible de charger ton profil.';
+if (error && error.code === 'PERMISSION_DENIED') {
+msg = 'Firebase refuse l’accès à ton profil. Vérifie les règles Realtime Database.';
+} else if (error && error.message) {
+msg = error.message;
 }
+showToast('❌ ' + msg, 'error');
+return false;
+}
+}
+
+// Firebase garde la session entre les actualisations. Cet écouteur ne valide
+// visuellement la connexion qu'après le chargement réel du profil.
+auth.onAuthStateChanged(async (user) => {
+if (authLoading) return;
+if (!user) {
+resetLocalUserState();
+updateUI();
+return;
+}
+await loadFirebaseUserProfile(user);
 });
 
 function generateFriendCode(uid) {
@@ -625,6 +671,7 @@ updateUI();
 
 function updateUI() {
 document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
+
 const authSec = document.getElementById('authSection');
 const profSec = document.getElementById('userProfileSection');
 const friendsSec = document.getElementById('friendsSection');
@@ -826,56 +873,84 @@ return messages[code] || (err && err.message) || 'Une erreur inconnue est surven
 
 async function handleAuth(e) {
 e.preventDefault();
+if (authLoading) return;
+
 const submitBtn = document.getElementById('authSubmitBtn');
 const email = document.getElementById('authEmail').value.trim().toLowerCase();
 const pass = document.getElementById('authPass').value;
 const username = document.getElementById('authUsername').value.trim();
 
-if (!email || !pass) return showToast('❌ E-mail et mot de passe requis.', 'error');
-if (currentAuthMode === 'register' && pass.length < 6) return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.', 'error');
+if (!email || !pass) {
+showToast('❌ E-mail et mot de passe requis.', 'error');
+return;
+}
+if (currentAuthMode === 'register' && pass.length < 6) {
+showToast('❌ Le mot de passe doit contenir au moins 6 caractères.', 'error');
+return;
+}
 
+authLoading = true;
 submitBtn.disabled = true;
 submitBtn.innerText = currentAuthMode === 'login' ? 'CONNEXION...' : 'CRÉATION...';
 
 try {
 let userCredential;
+
 if (currentAuthMode === 'login') {
 userCredential = await auth.signInWithEmailAndPassword(email, pass);
+
+// On attend explicitement que le profil Firebase soit lisible avant de dire
+// « connexion réussie ». C'était le point qui pouvait afficher le toast alors
+// que l'interface restait sur le formulaire.
+const ok = await loadFirebaseUserProfile(userCredential.user);
+if (!ok) {
+try { await auth.signOut(); } catch (_) {}
+return;
+}
 showToast('👋 Connexion réussie !', 'success');
 } else {
 userCredential = await auth.createUserWithEmailAndPassword(email, pass);
 const u = userCredential.user;
 const fId = generateFriendCode(u.uid);
 const initialCatalogs = JSON.parse(JSON.stringify(CATALOGS));
+const isAdminEmail = email === 'carer.nathan11@gmail.com';
+if (isAdminEmail) {
+Object.keys(initialCatalogs).forEach(cat => initialCatalogs[cat].forEach(i => i.unlocked = true));
+}
 const initialData = {
 username: username || email.split('@')[0],
-credits: 0,
+credits: isAdminEmail ? 999999999 : 0,
 friendId: fId,
 friends: [],
-isAdmin: false,
+isAdmin: isAdminEmail,
 catalogs: initialCatalogs,
 redeemedCodes: []
 };
 await db.ref('users/' + u.uid).set(initialData);
 await db.ref('friend_codes/' + friendCodeKey(fId)).set(u.uid);
+await loadFirebaseUserProfile(u);
 showToast('✨ Compte créé avec succès !', 'success');
 }
-
-// onAuthStateChanged charge le profil et affiche automatiquement le compte.
 } catch (err) {
 console.error('AUTH ERROR:', err);
 showToast('❌ ' + firebaseAuthErrorMessage(err), 'error');
 } finally {
+authLoading = false;
 submitBtn.disabled = false;
 submitBtn.innerText = currentAuthMode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE";
 }
 }
-function logoutUser() {
-auth.signOut().then(() => {
-appData.currentUser = null;
-showToast('Déconnexion effectuée.', 'success');
+
+async function logoutUser() {
+try {
+await auth.signOut();
+resetLocalUserState();
 updateUI();
-});
+showToast('Déconnexion effectuée.', 'success');
+} catch (err) {
+console.error('LOGOUT ERROR:', err);
+showToast('❌ Impossible de se déconnecter : ' + (err.message || err), 'error');
+}
 }
 
 // GESTION CORRIGÉE DES AMIS ET DES DEMANDES
@@ -960,6 +1035,7 @@ listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucun
 }
 });
 }
+
 function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
 if (!appData.friends.some(f => f.uid === senderUid)) {
 appData.friends.push({ uid: senderUid, username: senderName, friendId: senderFriendId });
@@ -989,7 +1065,6 @@ if (!appData.friends || appData.friends.length === 0) {
 fl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucun ami ajouté.</i>';
 return;
 }
-
 fl.innerHTML = '';
 appData.friends.forEach(f => {
 const div = document.createElement('div');
@@ -1043,6 +1118,7 @@ const trades = snapshot.val();
 const tl = document.getElementById('tradesList');
 if(!tl) return;
 tl.innerHTML = '';
+
 if (!trades) { tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>'; return; }
 
 let count = 0;
@@ -1189,6 +1265,7 @@ saveAppData();
 document.getElementById('gameArea').classList.add('active');
 const container = document.getElementById('gameCanvasContainer');
 container.innerHTML = '';
+
 if (gameType === 'reaction') runReactionGame(container);
 else if (gameType === 'connect4') runConnect4Game(container);
 else if (gameType === 'snake') runSnakeGame(container);
@@ -1365,4 +1442,4 @@ if (currentLevel >= 8) { clearInterval(currentGameInterval); rewardPlayer(50); }
 }
 </script>
 </body>
-  </html>
+</html>
