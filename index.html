@@ -108,7 +108,6 @@ border: 1px solid var(--card-border); border-radius: 14px; color: #fff; font-fam
 }
 .input-field:focus { border-color: var(--glow-magenta); box-shadow: 0 0 10px rgba(217, 70, 239, 0.3); }
 
-/* FEEDBACK NOTIFICATIONS TOAST */
 .app-toast {
 position: fixed; top: 75px; left: 50%; transform: translateX(-50%) translateY(-20px);
 background: rgba(15, 12, 29, 0.95); border: 1px solid var(--card-border-glow);
@@ -201,7 +200,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 .ad-screen { width: 100%; height: 180px; background: #000; border-radius: 16px; margin: 15px 0; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--card-border); position: relative; overflow: hidden; }
 .ad-progress { position: absolute; bottom: 0; left: 0; height: 6px; background: linear-gradient(90deg, var(--glow-violet), var(--glow-magenta)); width: 0%; transition: width 1s linear; }
 
-/* AMIS & DEMANDES INTERFACE STRUCTURE */
 .friend-badge { background: rgba(139, 92, 246, 0.15); border: 1px solid var(--card-border); padding: 12px; border-radius: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 .request-card-box { background: rgba(217, 70, 239, 0.08); border: 1px solid var(--card-border-glow); border-radius: 14px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; }
 .trade-card-box { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-bottom: 10px; }
@@ -212,8 +210,8 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="app-viewport" id="viewport">
 
 <div id="appToast" class="app-toast">
-  <span id="toastIcon">ℹ️</span>
-  <span id="toastMsg">Message</span>
+<span id="toastIcon">ℹ️</span>
+<span id="toastMsg">Message</span>
 </div>
 
 <header class="hud-header">
@@ -322,7 +320,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="btn btn-danger" style="margin-top:15px;" onclick="logoutUser()">SE DÉCONNECTER</button>
 </div>
 
-<!-- SECTION AMIS ET DEMANDES (REPENSÉE) -->
+<!-- SECTION AMIS ET DEMANDES -->
 <div id="friendsSection" class="glass-card" style="display:none;">
 <div class="card-title"><span>🤝 CENTRE D'AMIS & DEMANDES</span></div>
 <div style="display:flex; gap:8px; margin-bottom:12px;">
@@ -428,7 +426,7 @@ tiktok: [
 { id: 123, name: "Kit Ring Light Pro Max", emoji: "📸", price: 700, unlocked: false },
 { id: 124, name: "Mini Drone Follow-Me", emoji: "🚁", price: 850, unlocked: false },
 { id: 125, name: "Tapis de Danse Lumineux", emoji: "🕺", price: 440, unlocked: false }
- ],
+],
 memes: [
 { id: 201, name: "Lunettes Thug Life 8-Bit", emoji: "🕶️", price: 180, unlocked: false },
 { id: 202, name: "Statue Moaï Moaï", emoji: "🗿", price: 400, unlocked: false },
@@ -455,7 +453,7 @@ memes: [
 { id: 223, name: "Sifflet Emotional Damage", emoji: "💥", price: 290, unlocked: false },
 { id: 224, name: "Panneau 'Bruh Moment'", emoji: "🚧", price: 310, unlocked: false },
 { id: 225, name: "Costume T-Rex Gonflable", emoji: "🦖", price: 680, unlocked: false }
- ],
+],
 gaming: [
 { id: 301, name: "Manette Pro Translucide", emoji: "🎮", price: 800, unlocked: false },
 { id: 302, name: "Casque Audio Cyberpunk", emoji: "🎧", price: 1200, unlocked: false },
@@ -481,7 +479,7 @@ gaming: [
 { id: 322, name: "Lunettes Anti-Lumière Bleue Pro", emoji: "👓", price: 410, unlocked: false },
 { id: 323, name: "Volant Retour de Force GT", emoji: "🏎️", price: 2800, unlocked: false },
 { id: 324, name: "Siège Simulation Dynamique", emoji: "🏎️", price: 4500, unlocked: false }
- ],
+],
 football: [
 { id: 501, name: "Ballon Doré Vintage", emoji: "⚽", price: 300, unlocked: false },
 { id: 502, name: "Crampons à Réacteurs", emoji: "👟", price: 650, unlocked: false },
@@ -496,7 +494,7 @@ football: [
 { id: 511, name: "Carton Rouge Laser Inviolable", emoji: "🟥", price: 800, unlocked: false },
 { id: 512, name: "Filet de Cage Infrissonnable", emoji: "🕸️", price: 1100, unlocked: false },
 { id: 513, name: "Trophée Coupe du Monde (Officiel)", emoji: "🏆", price: 500000, unlocked: false }
- ],
+],
 secret: [
 { id: 401, name: "Carte VIP Gold Access", emoji: "💳", price: 5000, unlocked: false },
 { id: 402, name: "Trophée Créateur Diamant", emoji: "🏆", price: 10000, unlocked: false },
@@ -515,7 +513,7 @@ secret: [
 { id: 415, name: "Sceau Absolu de l'Infiniment Grand", emoji: "🌌", price: 600000, unlocked: false },
 { id: 416, name: "Passeport Cosmique 2027", emoji: "🛸", price: 800000, unlocked: false },
 { id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false }
- ]
+]
 };
 
 let activeCategory = 'tiktok';
@@ -532,7 +530,6 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS))
 let currentAuthMode = 'login';
 let isDropping = false;
 
-// SYSTÈME DE NOTIFICATION TOAST STRUCTURÉ
 function showToast(message, type = 'success') {
 const toast = document.getElementById('appToast');
 const msgEl = document.getElementById('toastMsg');
@@ -548,7 +545,7 @@ toast.classList.remove('show');
 }, 3500);
 }
 
-// ÉCOUTEUR DE CONNEXION FIREBASE OPTIMISÉ
+// GESTION CORRIGÉE DE L'AUTHENTIFICATION ET PERSISTANCE
 auth.onAuthStateChanged((user) => {
 if (user) {
 const userRef = db.ref('users/' + user.uid);
@@ -633,7 +630,7 @@ profSec.style.display = 'block';
 friendsSec.style.display = 'block';
 
 document.getElementById('profileName').innerText = appData.currentUser.username;
-document.getElementById('userFriendId').innerText = `ID Ami : ${appData.friendId}`;
+document.getElementById('userFriendId').innerText = 'ID Ami : ' + appData.friendId;
 
 if (appData.isAdmin) {
 document.getElementById('userStatus').innerText = "👑 ADMINISTRATEUR SYSTEME";
@@ -681,13 +678,13 @@ const currentItems = appData.catalogs[activeCategory] || [];
 
 currentItems.forEach(item => {
 const div = document.createElement('div');
-div.className = `catalog-card ${item.unlocked ? '' : 'locked'}`;
+div.className = 'catalog-card' + (item.unlocked ? '' : ' locked');
 div.innerHTML = `
 <div class="emoji">${item.emoji}</div>
 <div class="item-name">${item.name}</div>
-<div class="item-price">${item.unlocked ? 'ACQUIS' : item.price + ' 🪙'}</div>
-<button class="btn btn-secondary" style="padding:6px; font-size:0.65rem; margin-top:6px;" ${item.unlocked ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">
-${item.unlocked ? 'Déjà acquis' : 'Obtenir'}
+<div class="item-price">${item.price} 🪙</div>
+<button class="btn ${item.unlocked ? 'btn-secondary' : ''}" style="padding:6px; font-size:0.7rem; margin-top:8px;" ${item.unlocked ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">
+${item.unlocked ? 'Acquis' : 'Obtenir'}
 </button>`;
 grid.appendChild(div);
 });
@@ -704,14 +701,14 @@ if (!found) return;
 if (found.unlocked) return showToast('Article déjà débloqué !', 'error');
 
 if (!appData.isAdmin && appData.credits < found.price) {
-return showToast(`Crédits insuffisants ! Il faut ${found.price} 🪙`, 'error');
+return showToast('Crédits insuffisants ! Il faut ' + found.price + ' 🪙', 'error');
 }
 
 if (!appData.isAdmin) appData.credits -= found.price;
 found.unlocked = true;
 
 if (found.id === 2000) triggerAnnihilation();
-else showToast(`🎉 FÉLICITATIONS ! Objet obtenu : ${found.emoji} ${found.name}`, 'success');
+else showToast('🎉 FÉLICITATIONS ! Objet obtenu : ' + found.emoji + ' ' + found.name, 'success');
 saveAppData();
 }
 
@@ -768,7 +765,7 @@ btn.disabled = false;
 saveAppData();
 
 if (picked.id === 2000) triggerAnnihilation();
-else showToast(`💥 UNBOXING EXPLOSIF ! Obtenu : ${picked.emoji} ${picked.name}`, 'success');
+else showToast('💥 UNBOXING EXPLOSIF ! Obtenu : ' + picked.emoji + ' ' + picked.name, 'success');
 }, 2200);
 }
 
@@ -878,7 +875,7 @@ updateUI();
 });
 }
 
-// GESTION DES AMIS ET DES DEMANDES (ENVOI ET RÉCEPTION VIA FIREBASE)
+// GESTION CORRIGÉE DES AMIS ET DES DEMANDES
 function sendFriendRequest() {
 const code = document.getElementById('addFriendInput').value.trim().toUpperCase();
 if (!code) return showToast("❌ Veuillez entrer un ID d'ami valide !", 'error');
@@ -892,7 +889,6 @@ if (appData.friends.some(f => f.uid === targetUid)) {
 return showToast("⚠️ Cet utilisateur est déjà dans votre liste d'amis.", 'error');
 }
 
-// Vérifier si une demande existe déjà
 db.ref('friend_requests/' + targetUid).once('value').then(reqSnap => {
 const requests = reqSnap.val() || {};
 const alreadyRequested = Object.values(requests).some(r => r.senderUid === appData.currentUser.uid && r.status === 'pending');
@@ -938,7 +934,7 @@ count++;
 const div = document.createElement('div');
 div.className = 'request-card-box';
 div.innerHTML = `
-<div style="font-size:0.8rem;"><b>${req.senderName}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${req.senderFriendId})</span></div>
+<div style="font-size:0.8rem;"><b>${req.senderName}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${req.senderFriendId})</span> souhaite vous ajouter !</div>
 <div style="display:flex; gap:6px;">
 <button class="btn btn-success" style="padding:6px; font-size:0.7rem;" onclick="acceptFriendRequest('${reqId}', '${req.senderUid}', '${req.senderName}', '${req.senderFriendId}')">ACCEPTER</button>
 <button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="refuseFriendRequest('${reqId}')">REFUSER</button>
@@ -954,12 +950,10 @@ listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucun
 }
 
 function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
-// Ajouter à mes amis
 if (!appData.friends.some(f => f.uid === senderUid)) {
 appData.friends.push({ uid: senderUid, username: senderName, friendId: senderFriendId });
 }
 
-// Ajouter l'utilisateur courant chez l'ami
 db.ref('users/' + senderUid + '/friends').once('value').then(snap => {
 let friendList = snap.val() || [];
 if (!friendList.some(f => f.uid === appData.currentUser.uid)) {
@@ -968,10 +962,9 @@ db.ref('users/' + senderUid + '/friends').set(friendList);
 }
 });
 
-// Supprimer/Mettre à jour la demande
 db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove();
 saveAppData();
-showToast(`🎉 Vous êtes désormais ami avec ${senderName} !`, 'success');
+showToast('🎉 Vous êtes désormais ami avec ' + senderName + ' !', 'success');
 }
 
 function refuseFriendRequest(reqId) {
@@ -990,7 +983,9 @@ fl.innerHTML = '';
 appData.friends.forEach(f => {
 const div = document.createElement('div');
 div.className = 'friend-badge';
-div.innerHTML = `<div><b>${f.username}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${f.friendId})</span></div> <button class="btn" style="width:auto; padding:6px 10px; font-size:0.7rem;" onclick="openTradePrompt('${f.uid}', '${f.username}')">ÉCHANGER</button>`;
+div.innerHTML = `
+<div><b>${f.username}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${f.friendId})</span></div>
+<button class="btn" style="width:auto; padding:6px 12px; font-size:0.7rem;" onclick="openTradePrompt('${f.uid}', '${f.username}')">ÉCHANGER</button>`;
 fl.appendChild(div);
 });
 }
@@ -1003,7 +998,7 @@ appData.catalogs[cat].forEach(i => { if(i.unlocked) myUnlocked.push(i); });
 
 if (myUnlocked.length === 0) return showToast("Vous n'avez aucune carte débloquée à proposer !", 'error');
 
-let msg = `Proposer un échange à ${targetName} :\nEntrez l'ID de la carte que vous DONNEZ :\n` + myUnlocked.map(i => `#${i.id} : ${i.name}`).join('\n');
+let msg = "Proposer un échange à " + targetName + " :\nEntrez l'ID de la carte que vous DONNEZ :\n" + myUnlocked.map(i => '#' + i.id + ' - ' + i.name).join('\n');
 let myCardId = prompt(msg);
 if (!myCardId) return;
 
@@ -1116,12 +1111,11 @@ let adInterval = null, adTimeRemaining = 30;
 function startAdModal() {
 adTimeRemaining = 30;
 const modal = document.getElementById('adModal'), timerEl = document.getElementById('adTimer'), btn = document.getElementById('adClaimBtn'), progressBar = document.getElementById('adProgressBar');
-modal.classList.add('active'); btn.disabled = true; btn.innerText = `PATIENTEZ (${adTimeRemaining}s)...`; timerEl.innerText = `${adTimeRemaining}s`; progressBar.style.width = '0%';
+modal.classList.add('active'); btn.disabled = true; btn.innerText = 'PATIENTEZ (' + adTimeRemaining + 's)...'; timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = '0%';
 
 adInterval = setInterval(() => {
 adTimeRemaining--;
-timerEl.innerText = `${adTimeRemaining}s`; 
-progressBar.style.width = `${((30 - adTimeRemaining) / 30) * 100}%`;
+timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = ((30 - adTimeRemaining) / 30) * 100 + '%';
 if (adTimeRemaining <= 0) {
 clearInterval(adInterval); btn.disabled = false; btn.innerText = 'RÉCUPÉRER 15 🪙';
 }
@@ -1160,7 +1154,7 @@ document.getElementById('gameArea').classList.remove('active');
 }
 
 function rewardPlayer(amount) {
-showToast(`🎮 Fin de partie ! Gains : +${amount} Crédits 🪙`, 'success');
+showToast('🎮 Fin de partie ! Gains : +' + amount + ' Crédits 🪙', 'success');
 appData.credits += amount;
 saveAppData();
 closeGame();
@@ -1168,7 +1162,7 @@ closeGame();
 
 function runReactionGame(c) {
 document.getElementById('gameTitle').innerText = "Réaction Extrême";
-c.innerHTML = `<div style="text-align:center;"><div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);"><div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div><div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div></div><button class="btn" onclick="stopReaction()">STOP !</button></div>`;
+c.innerHTML = '<div style="text-align:center;"><div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);"><div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div><div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div></div><button class="btn" onclick="stopReaction()">STOP !</button></div>';
 let pos = 0, dir = 12;
 currentGameInterval = setInterval(() => {
 pos += dir; if(pos > 244 || pos < 0) dir *= -1;
@@ -1183,15 +1177,16 @@ rewardPlayer((pos >= 100 && pos <= 150) ? 50 : 10);
 
 function runConnect4Game(c) {
 document.getElementById('gameTitle').innerText = "Puissance 4 Tactique";
-c.innerHTML = `<div id="c4board" style="display:grid; grid-template-columns:repeat(7, 35px); gap:5px; background:rgba(139,92,246,0.2); padding:8px; border-radius:14px; border:1px solid var(--card-border);"></div>`;
+c.innerHTML = '<div id="c4board" style="display:grid; grid-template-columns:repeat(7, 35px); gap:5px; background:rgba(139,92,246,0.2); padding:8px; border-radius:14px; border:1px solid var(--card-border);"></div>';
 let board = Array(6).fill().map(() => Array(7).fill(0));
 function draw() {
 const b = document.getElementById('c4board'); if(!b) return; b.innerHTML = '';
 for(let r=0; r<6; r++) {
 for(let col=0; col<7; col++) {
 let cell = document.createElement('div');
-cell.style.cssText = `width:35px; height:35px; border-radius:50%; background:${board[r][col]===1?'var(--glow-magenta)':board[r][col]===2?'var(--glow-cyan)':'#050508'}`;
-cell.onclick = () => play(col); b.appendChild(cell);
+cell.style.cssText = 'width:35px; height:35px; border-radius:50%; background:' + (board[r][col]===1?'var(--glow-magenta)':board[r][col]===2?'var(--glow-cyan)':'#050508');
+cell.onclick = (function(cl) { return function() { play(cl); }; })(col);
+b.appendChild(cell);
 }
 }
 }
@@ -1220,7 +1215,7 @@ draw();
 
 function runSnakeGame(c) {
 document.getElementById('gameTitle').innerText = "Snake Néon 2027";
-c.innerHTML = `<canvas id="sc" width="240" height="240" style="background:#0a0814; border-radius:14px; border:1px solid var(--card-border);"></canvas>`;
+c.innerHTML = '<canvas id="sc" width="240" height="240" style="background:#0a0814; border-radius:14px; border:1px solid var(--card-border);"></canvas>';
 const cvs = document.getElementById('sc'), ctx = cvs.getContext('2d');
 let snake = [{x:10, y:10}], food = {x:15, y:15}, dx = 1, dy = 0, score = 0;
 cvs.ontouchstart = (e) => {
@@ -1244,12 +1239,12 @@ ctx.fillStyle = "#06b6d4"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
 function runTapGame(c) {
 document.getElementById('gameTitle').innerText = "Tap Cible (10s)";
 let score = 0, timeLeft = 10;
-c.innerHTML = `<div style="text-align:center;"><h2 id="timer">10s</h2><div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div><h3>Score : <span id="tapScore">0</span></h3></div>`;
+c.innerHTML = '<div style="text-align:center;"><h2 id="timer">10s</h2><div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div><h3>Score : <span id="tapScore">0</span></h3></div>';
 const targetEl = document.getElementById('target');
 if(targetEl) {
 targetEl.onclick = () => {
 score++; document.getElementById('tapScore').innerText = score;
-targetEl.style.transform = `translate(${(Math.random()-0.5)*120}px, ${(Math.random()-0.5)*120}px)`;
+targetEl.style.transform = 'translate(' + ((Math.random()-0.5)*120) + 'px, ' + ((Math.random()-0.5)*120) + 'px)';
 };
 }
 currentGameInterval = setInterval(() => {
@@ -1262,7 +1257,7 @@ if(timeLeft <= 0) rewardPlayer(Math.min(10 + score*2, 50));
 
 function runMemoryGame(c) {
 document.getElementById('gameTitle').innerText = "Mémoire Flash";
-c.innerHTML = `<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;"><div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div><div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div><div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div><div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div></div>`;
+c.innerHTML = '<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;"><div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div><div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div><div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div><div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div></div>';
 let seq = [Math.floor(Math.random()*4), Math.floor(Math.random()*4)], step = 0;
 function playSeq() {
 let i = 0;
@@ -1281,7 +1276,7 @@ else rewardPlayer(10);
 
 function runStackGame(c) {
 document.getElementById('gameTitle').innerText = "Stack Néon";
-c.innerHTML = `<div style="text-align:center;"><div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div><p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p><button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button></div>`;
+c.innerHTML = '<div style="text-align:center;"><div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div><p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p><button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button></div>';
 const board = document.getElementById('sboard'), BOARD_WIDTH = 200, BLOCK_HEIGHT = 20;
 let stack = [], currentWidth = 100, currentPos = 0, currentDir = 2, currentLevel = 0;
 if(board) {
@@ -1291,7 +1286,7 @@ stack.push({ left: 50, width: 100 }); renderBlock(50, 100, 0, false); currentLev
 function createMovingBlock() {
 currentPos = 0;
 const movingEl = document.createElement('div'); movingEl.id = 'movingBlock';
-movingEl.style.cssText = `width:${currentWidth}px; height:${BLOCK_HEIGHT}px; left:0px; bottom:${currentLevel * BLOCK_HEIGHT}px; position:absolute; background:var(--glow-violet); box-shadow:0 0 10px var(--glow-violet); border-radius:4px;`;
+movingEl.style.cssText = 'width:' + currentWidth + 'px; height:' + BLOCK_HEIGHT + 'px; position:absolute; background:var(--glow-violet); box-shadow:0 0 10px var(--glow-violet); border-radius:4px;';
 if(board) board.appendChild(movingEl);
 }
 currentGameInterval = setInterval(() => {
@@ -1302,7 +1297,7 @@ const m = document.getElementById('movingBlock'); if (m) m.style.left = currentP
 
 function renderBlock(left, width, level, isMoving = false) {
 const b = document.createElement('div');
-b.style.cssText = `width:${width}px; height:${BLOCK_HEIGHT}px; left:${left}px; bottom:${level * BLOCK_HEIGHT}px; position:absolute; background:${isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)'}; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;`;
+b.style.cssText = 'width:' + width + 'px; height:' + BLOCK_HEIGHT + 'px; left:' + left + 'px; bottom:' + (level * BLOCK_HEIGHT) + 'px; position:absolute; background:' + (isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)') + '; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;';
 if(board) board.appendChild(b);
 }
 
