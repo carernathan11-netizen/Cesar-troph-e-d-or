@@ -27,16 +27,9 @@
       --rarity-rare: #00f0ff;
       --rarity-epic: #ff2a6d;
       --rarity-legendary: #ffb800;
-      --rarity-iconic: #7000ff;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
 
     body {
       background-color: var(--bg-dark);
@@ -63,14 +56,9 @@
     }
 
     @media (min-width: 440px) {
-      .app-viewport {
-        border-radius: 40px;
-        height: 92vh;
-        border: 1px solid var(--card-border);
-      }
+      .app-viewport { border-radius: 40px; height: 92vh; border: 1px solid var(--card-border); }
     }
 
-    /* HUD Header */
     .hud-header {
       padding: 16px 20px;
       display: flex;
@@ -93,19 +81,9 @@
       gap: 6px;
     }
 
-    .brand-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--cyan);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--cyan);
-    }
+    .brand-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); }
 
-    .user-stats {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .user-stats { display: flex; align-items: center; gap: 10px; }
 
     .pill {
       background: rgba(255, 255, 255, 0.05);
@@ -119,31 +97,15 @@
       font-weight: 800;
       font-family: 'Space Grotesk', sans-serif;
     }
+    .pill-credits { color: var(--gold); border-color: rgba(255, 184, 0, 0.3); }
 
-    .pill-credits {
-      color: var(--gold);
-      border-color: rgba(255, 184, 0, 0.3);
-    }
-
-    .screen-container {
-      flex: 1;
-      position: relative;
-      overflow-y: auto;
-      padding: 16px;
-      scrollbar-width: none;
-    }
+    .screen-container { flex: 1; position: relative; overflow-y: auto; padding: 16px; scrollbar-width: none; }
     .screen-container::-webkit-scrollbar { display: none; }
 
-    .screen {
-      display: none;
-      animation: fadeIn 0.25s ease-out forwards;
-    }
+    .screen { display: none; animation: fadeIn 0.25s ease-out forwards; }
     .screen.active { display: block; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
     .drop-card {
       background: var(--surface-dark);
@@ -152,7 +114,6 @@
       padding: 20px;
       margin-bottom: 16px;
       position: relative;
-      overflow: hidden;
     }
 
     .card-title {
@@ -167,352 +128,82 @@
       align-items: center;
     }
 
-    .hero-drop {
-      background: radial-gradient(circle at 50% 30%, rgba(112, 0, 255, 0.25) 0%, rgba(18, 20, 29, 0.95) 70%);
-      border: 1px solid rgba(112, 0, 255, 0.4);
-      text-align: center;
-      padding: 30px 20px;
-    }
-
-    .drop-item-preview {
-      width: 140px;
-      height: 140px;
-      margin: 15px auto;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 4.5rem;
-      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
-      animation: float 4s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-10px) rotate(3deg); }
-    }
-
-    .item-number {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 900;
-      letter-spacing: 2px;
-      color: var(--cyan);
-      background: rgba(0, 240, 255, 0.1);
-      padding: 4px 12px;
-      border-radius: 12px;
-      display: inline-block;
-      margin-bottom: 8px;
-    }
-
-    .item-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: #fff;
-      margin-bottom: 4px;
-    }
-
-    .item-quote {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-style: italic;
-      margin-bottom: 20px;
-    }
-
     .btn {
       width: 100%;
-      padding: 16px;
-      border-radius: 20px;
+      padding: 14px;
+      border-radius: 18px;
       border: none;
       background: linear-gradient(135deg, var(--cyan), var(--violet));
       color: #fff;
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 900;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       letter-spacing: 1px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      box-shadow: 0 8px 25px rgba(0, 240, 255, 0.25);
-      transition: transform 0.1s, box-shadow 0.2s;
+      gap: 8px;
+      transition: transform 0.1s;
     }
     .btn:active { transform: scale(0.97); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.06); color: #fff; border: 1px solid var(--card-border); }
 
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
-      color: #fff;
-      box-shadow: none;
-      border: 1px solid var(--card-border);
-    }
-
-    .filter-scroll {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 12px;
-      scrollbar-width: none;
-      margin-bottom: 16px;
-    }
-    .filter-scroll::-webkit-scrollbar { display: none; }
-
-    .filter-chip {
-      padding: 8px 16px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    .filter-chip.active {
-      background: var(--cyan);
-      color: #000;
-      border-color: var(--cyan);
-    }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
-    .collection-item {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 14px;
-      text-align: center;
-      position: relative;
-      cursor: pointer;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-    .collection-item:hover {
-      border-color: var(--cyan);
-      transform: translateY(-2px);
-    }
-    .collection-item .emoji { font-size: 2.2rem; margin-bottom: 6px; }
-    .collection-item .name { font-size: 0.75rem; font-weight: 800; }
-    .collection-item .num { font-size: 0.65rem; color: var(--text-muted); font-family: 'Space Grotesk'; }
-
-    .rarity-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-
-    /* Auth Switcher */
-    .auth-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
+    /* AUTH & ACCOUNT */
+    .auth-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
     .auth-tab-btn {
-      flex: 1;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
-      border-radius: 12px;
-      font-weight: 800;
-      font-size: 0.8rem;
-      cursor: pointer;
+      flex: 1; padding: 10px; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border); color: var(--text-muted);
+      border-radius: 12px; font-weight: 800; font-size: 0.8rem; cursor: pointer;
     }
-    .auth-tab-btn.active {
-      background: rgba(0, 240, 255, 0.1);
-      border-color: var(--cyan);
-      color: var(--cyan);
-    }
+    .auth-tab-btn.active { background: rgba(0, 240, 255, 0.1); border-color: var(--cyan); color: var(--cyan); }
 
-    /* Auth Inputs */
     .auth-input {
-      width: 100%;
-      padding: 14px 18px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      color: #fff;
-      font-family: inherit;
-      font-size: 0.9rem;
-      margin-bottom: 12px;
-      outline: none;
+      width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border); border-radius: 14px; color: #fff;
+      font-family: inherit; font-size: 0.85rem; margin-bottom: 10px; outline: none;
     }
     .auth-input:focus { border-color: var(--cyan); }
 
-    /* Mini-jeux Styles */
-    .memory-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .memory-card {
-      height: 70px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      cursor: pointer;
-    }
-    .memory-card.flipped { background: rgba(0, 240, 255, 0.15); border-color: var(--cyan); }
-    .memory-card.matched { background: rgba(5, 255, 161, 0.15); border-color: var(--lime); }
+    /* SNAKE */
+    #snakeCanvas { background: #000; border-radius: 16px; border: 1px solid var(--card-border); display: block; margin: 0 auto 10px; }
+    .snake-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 160px; margin: 10px auto 0; }
+    .snake-btn { padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid var(--card-border); color: #fff; border-radius: 10px; font-weight: 900; text-align: center; cursor: pointer; }
 
-    /* Arena Stack */
-    .stack-arena {
-      height: 200px;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      position: relative;
-      overflow: hidden;
-    }
-    .stack-block {
-      height: 24px;
-      background: linear-gradient(90deg, var(--cyan), var(--violet));
-      border-radius: 6px;
-      position: absolute;
-      box-shadow: 0 0 10px var(--cyan);
-    }
+    /* STACK */
+    .stack-arena { height: 180px; background: #000; border: 1px solid var(--card-border); border-radius: 16px; position: relative; overflow: hidden; }
+    .stack-block { height: 20px; background: linear-gradient(90deg, var(--cyan), var(--lime)); border-radius: 4px; position: absolute; box-shadow: 0 0 8px var(--cyan); }
 
-    /* Arena Reaction */
-    .reaction-bar-bg {
-      height: 24px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      position: relative;
-      margin: 25px 0;
-      overflow: hidden;
+    /* COLLECTION GRID */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .collection-item {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 12px; text-align: center; position: relative; cursor: pointer;
     }
-    .reaction-target {
-      position: absolute;
-      left: 45%; width: 10%; height: 100%;
-      background: rgba(5, 255, 161, 0.4);
-      border-left: 2px solid var(--lime);
-      border-right: 2px solid var(--lime);
-    }
-    .reaction-pointer {
-      width: 6px; height: 100%;
-      background: #fff;
-      position: absolute;
-      left: 0;
-      box-shadow: 0 0 10px #fff;
-    }
+    .collection-item .emoji { font-size: 2rem; margin-bottom: 4px; }
+    .collection-item .name { font-size: 0.7rem; font-weight: 800; }
+    .collection-item.locked { filter: grayscale(1); opacity: 0.3; }
 
-    /* Snake Game */
-    #snakeCanvas {
-      background: rgba(0,0,0,0.5);
-      border-radius: 16px;
-      border: 1px solid var(--card-border);
-      display: block;
-      margin: 0 auto 10px;
-    }
-    .snake-controls {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      max-width: 180px;
-      margin: 10px auto 0;
-    }
-    .snake-btn {
-      padding: 12px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid var(--card-border);
-      color: #fff;
-      border-radius: 12px;
-      font-weight: 900;
-      text-align: center;
-      cursor: pointer;
-    }
-
-    /* Musée Personal Room View */
-    .room-viewport {
-      height: 220px;
-      background: linear-gradient(180deg, #181b26 0%, #0d0e14 100%);
-      border-radius: 24px;
-      border: 1px solid var(--card-border);
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-around;
-      padding: 20px;
-      overflow: hidden;
-    }
-    .pedestal {
-      width: 70px;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px 12px 0 0;
-      position: relative;
-      display: flex;
-      justify-content: center;
-    }
-    .pedestal-item {
-      position: absolute;
-      top: -35px;
-      font-size: 2.2rem;
-      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
-    }
-
-    /* Navigation Dock */
+    /* NAV DOCK */
     .nav-dock {
-      padding: 12px 16px;
-      background: rgba(10, 11, 16, 0.95);
-      backdrop-filter: blur(20px);
-      border-top: 1px solid var(--card-border);
-      display: flex;
-      justify-content: space-around;
-      z-index: 20;
+      padding: 10px 16px; background: rgba(10, 11, 16, 0.95); backdrop-filter: blur(20px);
+      border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; z-index: 20;
     }
-
     .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      color: var(--text-muted);
-      font-size: 0.65rem;
-      font-weight: 800;
-      background: none;
-      border: none;
-      cursor: pointer;
-      transition: color 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--text-muted); font-size: 0.65rem; font-weight: 800; background: none; border: none; cursor: pointer;
     }
     .nav-item.active { color: var(--cyan); }
-    .nav-icon { font-size: 1.3rem; }
+    .nav-icon { font-size: 1.2rem; }
 
-    /* Modal Fiche Objet */
+    /* MODALS */
     .modal-overlay {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(16px);
-      z-index: 50;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(16px); z-index: 50;
+      display: none; align-items: center; justify-content: center; padding: 20px;
     }
     .modal-overlay.active { display: flex; }
-
-    .modal-card {
-      background: var(--surface-dark);
-      border: 1px solid var(--cyan);
-      border-radius: 32px;
-      padding: 24px;
-      width: 100%;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 0 50px rgba(0, 240, 255, 0.2);
-    }
+    .modal-card { background: var(--surface-dark); border: 1px solid var(--cyan); border-radius: 28px; padding: 20px; width: 100%; text-align: center; }
   </style>
 </head>
 <body>
@@ -521,77 +212,49 @@
 
     <!-- Header HUD -->
     <header class="hud-header">
-      <div class="brand-logo">
-        <div class="brand-dot"></div>
-        DROP
-      </div>
+      <div class="brand-logo"><div class="brand-dot"></div>DROP</div>
       <div class="user-stats">
-        <div class="pill">
-          <span>⭐</span>
-          <span>NIV. <span id="lvlVal">17</span></span>
-        </div>
-        <div class="pill pill-credits">
-          <span>🪙</span>
-          <span id="creditVal">2 840</span>
-        </div>
+        <div class="pill pill-credits"><span>🪙</span><span id="creditVal">10</span></div>
       </div>
     </header>
 
-    <!-- Screen Router -->
+    <!-- Main Screens -->
     <main class="screen-container">
 
-      <!-- SCREEN 1: HOME -->
+      <!-- 1. HOME -->
       <section id="scr-home" class="screen active">
-        <div class="drop-card hero-drop">
-          <div class="card-title">
-            <span>TON DROP DU JOUR</span>
-            <span style="color:var(--lime); font-weight:800;">GRATUIT</span>
-          </div>
-
-          <div class="drop-item-preview" id="heroEmoji">❓</div>
-          <div class="item-number" id="heroNum">OBJET #0482</div>
-          <div class="item-name" id="heroName">Capsule Mystère</div>
-          <div class="item-quote" id="heroQuote">«« Tu n'étais pas censé tomber dessus. »»</div>
-
-          <button class="btn" id="btnDiscover" onclick="triggerDropDiscovery()">
-            <span>DÉCOUVRIR LE DROP</span>
-          </button>
+        <div class="drop-card" style="text-align:center; padding:30px 20px;">
+          <div class="card-title"><span>DROP QUOTIDIEN</span></div>
+          <div style="font-size:4rem; margin:15px 0;" id="heroEmoji">📦</div>
+          <h2 style="font-family:'Space Grotesk'; font-size:1.4rem;" id="heroTitle">Coffre Mystère</h2>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin:10px 0 20px;">Tente de débloquer un objet de collection rare.</p>
+          <button class="btn" onclick="openRandomDrop()">DÉBLOQUER UN OBJET (150 🪙)</button>
         </div>
 
         <div class="drop-card">
-          <div class="card-title">
-            <span>DÉFI QUOTIDIEN</span>
-            <span style="color:var(--gold);">+100 🪙</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-weight:800; font-size:0.9rem;">Master du Memory</div>
-              <div style="font-size:0.75rem; color:var(--text-muted);">Réalise un sans-faute</div>
-            </div>
-            <button class="btn btn-secondary" style="width:auto; padding:8px 14px; font-size:0.75rem;" onclick="switchTab('scr-games')">JOUER</button>
-          </div>
+          <div class="card-title"><span>GANAGNER DES CRÉDITS</span><span style="color:var(--lime);">+15 🪙</span></div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+            Regarde une pub de 30s pour obtenir 15 crédits.<br>
+            Restantes aujourd'hui : <strong id="adsLeft">3</strong>/3
+          </p>
+          <button class="btn btn-secondary" id="btnWatchAd" onclick="watchAd()">🎥 REGARDER UNE PUB (30s)</button>
         </div>
       </section>
 
-      <!-- SCREEN 2: MINI-JEUX -->
+      <!-- 2. MINI-JEUX -->
       <section id="scr-games" class="screen">
         
-        <!-- SNAKE GAME -->
+        <!-- SNAKE -->
         <div class="drop-card">
-          <div class="card-title">
-            <span>MINI-JEU • SNAKE NEON</span>
-            <span style="color:var(--cyan);">+10 🪙 / puce</span>
-          </div>
+          <div class="card-title"><span>SNAKE NEON</span><span style="color:var(--gold);">Coût: 25 🪙</span></div>
           <div id="snakeOverlay" style="text-align:center;">
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Mange les puces néons sans toucher les murs !</p>
-            <button class="btn" onclick="startSnakeGame()">LANCER SNAKE</button>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Gagne +10 🪙 par puce mangée.</p>
+            <button class="btn" onclick="initGame('snake')">JOUER (25 🪙)</button>
           </div>
-          <div id="snakeGameArea" style="display:none; text-align:center;">
-            <canvas id="snakeCanvas" width="240" height="180"></canvas>
+          <div id="snakeArea" style="display:none; text-align:center;">
+            <canvas id="snakeCanvas" width="220" height="160"></canvas>
             <div class="snake-controls">
-              <div></div>
-              <div class="snake-btn" onclick="setSnakeDir('UP')">▲</div>
-              <div></div>
+              <div></div><div class="snake-btn" onclick="setSnakeDir('UP')">▲</div><div></div>
               <div class="snake-btn" onclick="setSnakeDir('LEFT')">◄</div>
               <div class="snake-btn" onclick="setSnakeDir('DOWN')">▼</div>
               <div class="snake-btn" onclick="setSnakeDir('RIGHT')">►</div>
@@ -599,291 +262,153 @@
           </div>
         </div>
 
-        <!-- STACK GAME -->
+        <!-- STACK -->
         <div class="drop-card">
-          <div class="card-title">
-            <span>MINI-JEU • STACK</span>
-            <span style="color:var(--cyan);">+150 🪙</span>
-          </div>
+          <div class="card-title"><span>STACK NEON</span><span style="color:var(--gold);">Coût: 25 🪙</span></div>
           <div id="stackOverlay" style="text-align:center;">
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Empile les blocs au bon moment.</p>
-            <button class="btn" onclick="startStackGame()">LANCER STACK</button>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Empile 5 blocs sans rater ! Recompense : +50 🪙.</p>
+            <button class="btn" onclick="initGame('stack')">JOUER (25 🪙)</button>
           </div>
-          <div id="stackGameArea" style="display:none;">
+          <div id="stackArea" style="display:none;">
             <div class="stack-arena" id="stackArena"></div>
             <button class="btn" style="margin-top:10px;" onclick="placeStackBlock()">EMPILER !</button>
           </div>
         </div>
 
-        <!-- REACTION GAME -->
-        <div class="drop-card">
-          <div class="card-title">
-            <span>MINI-JEU • REACTION</span>
-            <span style="color:var(--cyan);">+120 🪙</span>
-          </div>
-          <div id="reactionOverlay" style="text-align:center;">
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Stoppe le pointeur dans la zone verte.</p>
-            <button class="btn" onclick="startReactionGame()">LANCER REACTION</button>
-          </div>
-          <div id="reactionGameArea" style="display:none; text-align:center;">
-            <div class="reaction-bar-bg">
-              <div class="reaction-target"></div>
-              <div class="reaction-pointer" id="reactionPointer"></div>
-            </div>
-            <button class="btn" onclick="stopReaction()">STOP !</button>
-          </div>
-        </div>
-
-        <!-- MEMORY GAME -->
-        <div class="drop-card">
-          <div class="card-title">
-            <span>MINI-JEU • MEMORY</span>
-            <span style="color:var(--cyan);">+100 🪙</span>
-          </div>
-          <div id="memoryOverlay" style="text-align:center;">
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Retrouve les paires d'objets.</p>
-            <button class="btn" onclick="startMemoryGame()">LANCER MEMORY</button>
-          </div>
-          <div class="memory-grid" id="memoryBoard" style="display:none;"></div>
-        </div>
-
       </section>
 
-      <!-- SCREEN 3: COLLECTION -->
+      <!-- 3. COLLECTION -->
       <section id="scr-collection" class="screen">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <span style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900;">COLLECTION</span>
-          <span style="font-family:'Space Grotesk'; font-size:0.85rem; color:var(--cyan); font-weight:800;">248 / 2 000</span>
+          <span style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900;">MES OBJETS</span>
+          <span style="font-size:0.8rem; color:var(--cyan); font-weight:800;" id="colCount">0 / 6</span>
         </div>
-
-        <div class="filter-scroll">
-          <div class="filter-chip active" onclick="filterCollection('ALL', this)">TOUS</div>
-          <div class="filter-chip" onclick="filterCollection('RETRO', this)">📼 RETRO</div>
-          <div class="filter-chip" onclick="filterCollection('FOOD', this)">🍔 FOOD</div>
-          <div class="filter-chip" onclick="filterCollection('ABSURD', this)">😂 ABSURD</div>
-          <div class="filter-chip" onclick="filterCollection('TECH', this)">📱 TECH</div>
-        </div>
-
         <div class="grid-3" id="collectionGrid"></div>
       </section>
 
-      <!-- SCREEN 4: MY DROP -->
-      <section id="scr-mydrop" class="screen">
-        <div class="drop-card">
-          <div class="card-title">
-            <span>GALERIE PERSONNEL • ROOM 01</span>
-            <span style="color:var(--violet); font-weight:800;">FAVORITES</span>
-          </div>
-
-          <div class="room-viewport">
-            <div class="pedestal">
-              <div class="pedestal-item">📼</div>
-            </div>
-            <div class="pedestal">
-              <div class="pedestal-item">🪩</div>
-            </div>
-            <div class="pedestal">
-              <div class="pedestal-item">🍩</div>
-            </div>
-          </div>
-
-          <div style="margin-top:16px; display:flex; gap:10px;">
-            <button class="btn btn-secondary" style="font-size:0.8rem;" onclick="playSound('click'); alert('Décoration enregistrée !')">🎨 DÉCORER</button>
-            <button class="btn btn-secondary" style="font-size:0.8rem;" onclick="playSound('click'); alert('Lien copié !')">🔗 PARTAGER</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- SCREEN 5: PROFIL / AUTHENTIFICATION -->
-      <section id="scr-profile" class="screen">
-        
-        <!-- PROFIL ACTIF -->
-        <div class="drop-card" style="text-align:center;">
-          <div style="width:70px; height:70px; background:linear-gradient(135deg, var(--cyan), var(--violet)); border-radius:24px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:900;" id="profAvatar">?</div>
-          <h3 style="font-family:'Space Grotesk'; font-size:1.2rem;" id="profName">Joueur Invité</h3>
-          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;" id="profStatus">MODE HORS-LIGNE</p>
-
-          <div class="grid-2" style="text-align:left; margin-bottom:16px;">
-            <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:16px;">
-              <div style="font-size:0.7rem; color:var(--text-muted);">Objets Totaux</div>
-              <div style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900; color:var(--cyan);">248</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:16px;">
-              <div style="font-size:0.7rem; color:var(--text-muted);">Collections</div>
-              <div style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900; color:var(--lime);">14</div>
-            </div>
-          </div>
-
-          <button class="btn btn-secondary" id="btnLogout" style="display:none; margin-top:10px;" onclick="logout()">SE DÉCONNECTER</button>
+      <!-- 4. ESPACE COMPTE -->
+      <section id="scr-account" class="screen">
+        <!-- VUE CONNECTÉ -->
+        <div class="drop-card" id="userProfileView" style="display:none; text-align:center;">
+          <div style="width:60px; height:60px; background:linear-gradient(135deg, var(--cyan), var(--violet)); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:900;" id="uAvatar">?</div>
+          <h3 id="uName" style="font-family:'Space Grotesk';">Joueur</h3>
+          <p id="uEmail" style="font-size:0.75rem; color:var(--text-muted); margin-bottom:15px;"></p>
+          <button class="btn btn-secondary" onclick="logout()">SE DÉCONNECTER</button>
         </div>
 
-        <!-- FORMULAIRE AUTHENTIFICATION -->
-        <div class="drop-card" id="authSection">
+        <!-- FORMULAIRES -->
+        <div class="drop-card" id="authBox">
           <div class="auth-tabs">
-            <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthMode('login')">CONNEXION</button>
-            <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthMode('register')">INSCRIPTION</button>
+            <button class="auth-tab-btn active" id="btnTabLogin" onclick="toggleAuth('login')">CONNEXION</button>
+            <button class="auth-tab-btn" id="btnTabRegister" onclick="toggleAuth('register')">INSCRIPTION</button>
           </div>
 
-          <!-- LOGIN -->
           <form id="formLogin" onsubmit="handleLogin(event)">
             <input type="email" id="loginEmail" class="auth-input" placeholder="Adresse e-mail" required>
             <input type="password" id="loginPass" class="auth-input" placeholder="Mot de passe" required>
             <button type="submit" class="btn">SE CONNECTER</button>
           </form>
 
-          <!-- REGISTER -->
           <form id="formRegister" style="display:none;" onsubmit="handleRegister(event)">
-            <input type="text" id="regName" class="auth-input" placeholder="Pseudo de collectionneur" required>
+            <input type="text" id="regName" class="auth-input" placeholder="Pseudo" required>
             <input type="email" id="regEmail" class="auth-input" placeholder="Adresse e-mail" required>
-            <input type="password" id="regPass" class="auth-input" placeholder="Créer un mot de passe" required>
-            <button type="submit" class="btn">CRÉER MON COMPTE</button>
+            <input type="password" id="regPass" class="auth-input" placeholder="Mot de passe" required>
+            <button type="submit" class="btn">CRÉER COMPTE (+10 🪙)</button>
           </form>
         </div>
-
       </section>
 
     </main>
 
-    <!-- Navigation Dock -->
+    <!-- Navigation -->
     <nav class="nav-dock">
-      <button class="nav-item active" onclick="switchTab('scr-home', this)">
-        <span class="nav-icon">⚡</span>
-        <span>HOME</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('scr-games', this)">
-        <span class="nav-icon">🎮</span>
-        <span>JOUER</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('scr-collection', this)">
-        <span class="nav-icon">🗃️</span>
-        <span>COLLECTION</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('scr-mydrop', this)">
-        <span class="nav-icon">🏛️</span>
-        <span>MY DROP</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('scr-profile', this)">
-        <span class="nav-icon">👤</span>
-        <span>PROFIL</span>
-      </button>
+      <button class="nav-item active" onclick="switchTab('scr-home', this)"><span class="nav-icon">⚡</span><span>HOME</span></button>
+      <button class="nav-item" onclick="switchTab('scr-games', this)"><span class="nav-icon">🎮</span><span>JEUX</span></button>
+      <button class="nav-item" onclick="switchTab('scr-collection', this)"><span class="nav-icon">🗃️</span><span>COLLECTION</span></button>
+      <button class="nav-item" onclick="switchTab('scr-account', this)"><span class="nav-icon">👤</span><span>COMPTE</span></button>
     </nav>
 
-    <!-- Modal Fiche Objet -->
-    <div class="modal-overlay" id="itemModal">
+    <!-- PUB MODAL -->
+    <div class="modal-overlay" id="adModal">
       <div class="modal-card">
-        <div style="font-size:4rem; margin-bottom:10px;" id="mEmoji">📼</div>
-        <div class="item-number" id="mNum">OBJET #012</div>
-        <div class="item-name" id="mName">Cassette VHS Rétro</div>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin:10px 0 20px;" id="mStory">Contient un enregistrement amateur d'une fête de l'an 2000.</p>
-        <button class="btn" onclick="closeModal()">FERMER</button>
+        <h3 style="font-family:'Space Grotesk';">PUBLICITÉ PARTENAIRE</h3>
+        <div style="font-size:3rem; margin:20px 0;">📺</div>
+        <p style="font-size:0.8rem; color:var(--text-muted);">Gagne tes crédits dans :</p>
+        <div style="font-family:'Space Grotesk'; font-size:2rem; font-weight:900; color:var(--cyan); margin:10px 0;" id="adTimer">30s</div>
       </div>
     </div>
 
   </div>
 
   <script>
-    /* 1. AUDIO ENGINE */
-    let audioCtx = null;
-    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    function playSound(type) {
-      try {
-        initAudio();
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
+    /* DATABASE & STATE */
+    const defaultItems = [
+      { id: 1, name: 'Canette Rétro', emoji: '🥤', unlocked: false },
+      { id: 2, name: 'Cassette VHS', emoji: '📼', unlocked: false },
+      { id: 3, name: 'Boule Disco', emoji: '🪩', unlocked: false },
+      { id: 4, name: 'Console Portable', emoji: '🎮', unlocked: false },
+      { id: 5, name: 'Donut Néon', emoji: '🍩', unlocked: false },
+      { id: 6, name: 'Glaçon Éternel', emoji: '🧊', unlocked: false }
+    ];
 
-        if (type === 'click') {
-          osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-          osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-        } else if (type === 'drop') {
-          osc.type = 'triangle'; osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.3);
-          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-          osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-        } else if (type === 'win') {
-          osc.type = 'sine'; osc.frequency.setValueAtTime(523, audioCtx.currentTime);
-          osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
-          osc.frequency.setValueAtTime(783, audioCtx.currentTime + 0.2);
-          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-          osc.start(); osc.stop(audioCtx.currentTime + 0.4);
-        }
-      } catch (e) {}
-    }
-
-    /* 2. GAME STATE & AUTOMATIC SAVE & AUTH SYSTEM */
-    let gameState = {
-      credits: 2840,
-      level: 17,
-      dropDiscovered: false,
-      userAccount: null // { name, email, pass }
+    let userState = {
+      credits: 10,
+      adsLeft: 3,
+      items: JSON.parse(JSON.stringify(defaultItems)),
+      currentUser: null
     };
 
-    function saveState() {
-      localStorage.setItem('drop_gamestate', JSON.stringify(gameState));
-      if (gameState.userAccount) {
-        localStorage.setItem('drop_user_' + gameState.userAccount.email, JSON.stringify(gameState));
-      }
+    function loadData() {
+      const saved = localStorage.getItem('drop_user_session');
+      if (saved) userState = JSON.parse(saved);
+      updateUI();
     }
 
-    function loadState() {
-      const saved = localStorage.getItem('drop_gamestate');
-      if (saved) {
-        gameState = Object.assign(gameState, JSON.parse(saved));
-        updateUI();
+    function saveData() {
+      localStorage.setItem('drop_user_session', JSON.stringify(userState));
+      if (userState.currentUser) {
+        localStorage.setItem('drop_account_' + userState.currentUser.email, JSON.stringify(userState));
       }
+      updateUI();
     }
 
     function updateUI() {
-      document.getElementById('creditVal').innerText = gameState.credits.toLocaleString('fr-FR');
-      document.getElementById('lvlVal').innerText = gameState.level;
-
-      if (gameState.dropDiscovered) {
-        document.getElementById('heroEmoji').innerText = '🪩';
-        document.getElementById('heroName').innerText = 'Boule Disco 1979';
-        document.getElementById('heroQuote').innerText = '«« Épicentre d\'une nuit sans fin. »»';
-        const btn = document.getElementById('btnDiscover');
-        btn.innerText = 'VOIR DANS LA COLLECTION';
-        btn.className = 'btn btn-secondary';
-        btn.onclick = () => switchTab('scr-collection');
-      }
-
-      if (gameState.userAccount) {
-        document.getElementById('profName').innerText = gameState.userAccount.name;
-        document.getElementById('profAvatar').innerText = gameState.userAccount.name.charAt(0).toUpperCase();
-        document.getElementById('profStatus').innerText = 'COMPTE SYNCHRONISÉ (' + gameState.userAccount.email + ')';
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('btnLogout').style.display = 'block';
+      document.getElementById('creditVal').innerText = userState.credits;
+      document.getElementById('adsLeft').innerText = userState.adsLeft;
+      
+      // Update account view
+      if (userState.currentUser) {
+        document.getElementById('authBox').style.display = 'none';
+        document.getElementById('userProfileView').style.display = 'block';
+        document.getElementById('uName').innerText = userState.currentUser.name;
+        document.getElementById('uEmail').innerText = userState.currentUser.email;
+        document.getElementById('uAvatar').innerText = userState.currentUser.name.charAt(0).toUpperCase();
       } else {
-        document.getElementById('profName').innerText = 'Joueur Invité';
-        document.getElementById('profAvatar').innerText = '?';
-        document.getElementById('profStatus').innerText = 'MODE HORS-LIGNE';
-        document.getElementById('authSection').style.display = 'block';
-        document.getElementById('btnLogout').style.display = 'none';
+        document.getElementById('authBox').style.display = 'block';
+        document.getElementById('userProfileView').style.display = 'none';
       }
+
+      renderCollection();
     }
 
-    function addCredits(amount) {
-      gameState.credits += amount;
-      updateUI();
-      saveState();
+    /* ROUTING */
+    function switchTab(id, btn) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (btn) btn.classList.add('active');
     }
 
-    /* AUTHENTICATION HANDLERS */
-    function switchAuthMode(mode) {
-      playSound('click');
+    /* AUTH SYSTEM */
+    function toggleAuth(mode) {
       if (mode === 'login') {
-        document.getElementById('tabLoginBtn').classList.add('active');
-        document.getElementById('tabRegisterBtn').classList.remove('active');
+        document.getElementById('btnTabLogin').classList.add('active');
+        document.getElementById('btnTabRegister').classList.remove('active');
         document.getElementById('formLogin').style.display = 'block';
         document.getElementById('formRegister').style.display = 'none';
       } else {
-        document.getElementById('tabRegisterBtn').classList.add('active');
-        document.getElementById('tabLoginBtn').classList.remove('active');
+        document.getElementById('btnTabRegister').classList.add('active');
+        document.getElementById('btnTabLogin').classList.remove('active');
         document.getElementById('formRegister').style.display = 'block';
         document.getElementById('formLogin').style.display = 'none';
       }
@@ -891,339 +416,237 @@
 
     function handleRegister(e) {
       e.preventDefault();
-      playSound('win');
       const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim().toLowerCase();
       const pass = document.getElementById('regPass').value;
 
-      gameState.userAccount = { name, email, pass };
-      saveState();
-      updateUI();
-      alert('Compte créé avec succès ! Vos progressions sont synchronisées.');
+      userState.currentUser = { name, email, pass };
+      saveData();
+      alert('Compte créé ! Vous commencez avec 10 Crédits.');
     }
 
     function handleLogin(e) {
       e.preventDefault();
-      playSound('win');
       const email = document.getElementById('loginEmail').value.trim().toLowerCase();
       const pass = document.getElementById('loginPass').value;
 
-      const savedAccountData = localStorage.getItem('drop_user_' + email);
-      if (savedAccountData) {
-        const loadedData = JSON.parse(savedAccountData);
-        if (loadedData.userAccount && loadedData.userAccount.pass === pass) {
-          gameState = loadedData;
-          saveState();
-          updateUI();
-          alert('Bon retour parmi nous, ' + gameState.userAccount.name + ' !');
-        } else {
-          alert('Mot de passe incorrect !');
-        }
-      } else {
-        alert('Aucun compte trouvé avec cet e-mail. Créez un compte via Inscription.');
-      }
+      const acc = localStorage.getItem('drop_account_' + email);
+      if (acc) {
+        const parsed = JSON.parse(acc);
+        if (parsed.currentUser && parsed.currentUser.pass === pass) {
+          userState = parsed;
+          saveData();
+          alert('Ravi de vous revoir ' + userState.currentUser.name);
+        } else alert('Mot de passe incorrect.');
+      } else alert('Compte introuvable.');
     }
 
     function logout() {
-      playSound('click');
-      gameState.userAccount = null;
-      saveState();
-      updateUI();
+      userState.currentUser = null;
+      saveData();
     }
 
-    /* 3. CATALOG DATA */
-    const itemsData = [
-      { num: '#001', name: 'Canette Rétro', cat: 'FOOD', emoji: '🥤', rarity: 'var(--rarity-common)', story: 'Encore pétillante après 30 ans passés dans un grenier.' },
-      { num: '#012', name: 'Cassette VHS', cat: 'RETRO', emoji: '📼', rarity: 'var(--rarity-rare)', story: 'Bande magnétique usée. Contient un anniversaire de 1998.' },
-      { num: '#048', name: 'Boule Disco', cat: 'RETRO', emoji: '🪩', rarity: 'var(--rarity-epic)', story: 'Réfracte la lumière et transforme chaque pièce en samedi soir.' },
-      { num: '#099', name: 'Donut Absurde', cat: 'FOOD', emoji: '🍩', rarity: 'var(--rarity-common)', story: 'Glaçage bleu néon. Goût totalement indéterminé.' },
-      { num: '#104', name: 'Console Portable', cat: 'TECH', emoji: '🎮', rarity: 'var(--rarity-legendary)', story: 'Écran monochrome. Le bouton B doit être pressé très fort.' },
-      { num: '#202', name: 'Glaçon Éternel', cat: 'ABSURD', emoji: '🧊', rarity: 'var(--rarity-iconic)', story: 'Ne fond jamais, même au centre du soleil.' },
-      { num: '#310', name: 'Canard Plastique', cat: 'ABSURD', emoji: '🦆', rarity: 'var(--rarity-common)', story: 'Semble vous fixer avec une sagesse ancestrale.' },
-      { num: '#412', name: 'Casque Studio', cat: 'TECH', emoji: '🎧', rarity: 'var(--rarity-rare)', story: 'Isole à 100% du bruit du monde extérieur.' }
-    ];
+    /* PUBS SYSTEM */
+    function watchAd() {
+      if (userState.adsLeft <= 0) return alert('Limite de 3 pubs par jour atteinte !');
+      
+      const modal = document.getElementById('adModal');
+      const timerEl = document.getElementById('adTimer');
+      modal.classList.add('active');
+      
+      let timeLeft = 30;
+      timerEl.innerText = timeLeft + 's';
 
-    function switchTab(screenId, btnEl) {
-      playSound('click');
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
-      if (btnEl) btnEl.classList.add('active');
-    }
-
-    function renderCollection(filter = 'ALL') {
-      const grid = document.getElementById('collectionGrid');
-      grid.innerHTML = '';
-      itemsData.forEach(item => {
-        if (filter !== 'ALL' && item.cat !== filter) return;
-        const div = document.createElement('div');
-        div.className = 'collection-item';
-        div.onclick = () => openModal(item);
-        div.innerHTML = `
-          <div class="rarity-dot" style="background:${item.rarity};"></div>
-          <div class="emoji">${item.emoji}</div>
-          <div class="name">${item.name}</div>
-          <div class="num">${item.num}</div>
-        `;
-        grid.appendChild(div);
-      });
-    }
-
-    function filterCollection(cat, chip) {
-      playSound('click');
-      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      renderCollection(cat);
-    }
-
-    function triggerDropDiscovery() {
-      if (gameState.dropDiscovered) return;
-      playSound('drop');
-      const btn = document.getElementById('btnDiscover');
-      btn.innerText = 'RÉVÉLATION...';
-      setTimeout(() => {
-        playSound('win');
-        gameState.dropDiscovered = true;
-        addCredits(250);
+      const interval = setInterval(() => {
+        timeLeft--;
+        timerEl.innerText = timeLeft + 's';
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          modal.classList.remove('active');
+          userState.credits += 15;
+          userState.adsLeft--;
+          saveData();
+          alert('Pub terminée ! +15 Crédits ajoutés.');
+        }
       }, 1000);
     }
 
-    /* 4. SNAKE GAME */
-    let snakeInterval = null;
-    let snake = [];
-    let food = { x: 0, y: 0 };
-    let snakeDir = 'RIGHT';
-    const gridTile = 12;
-
-    function startSnakeGame() {
-      playSound('click');
-      document.getElementById('snakeOverlay').style.display = 'none';
-      document.getElementById('snakeGameArea').style.display = 'block';
-      const canvas = document.getElementById('snakeCanvas');
+    /* DROPS SYSTEM */
+    function openRandomDrop() {
+      if (userState.credits < 150) return alert('Il vous faut 150 crédits !');
       
-      snake = [{ x: 5, y: 5 }, { x: 4, y: 5 }];
-      snakeDir = 'RIGHT';
-      spawnSnakeFood();
+      const lockedItems = userState.items.filter(i => !i.unlocked);
+      if (lockedItems.length === 0) return alert('Vous possédez déjà tous les objets !');
 
-      clearInterval(snakeInterval);
-      snakeInterval = setInterval(updateSnake, 120);
+      userState.credits -= 150;
+      const picked = lockedItems[Math.floor(Math.random() * lockedItems.length)];
+      picked.unlocked = true;
+
+      saveData();
+      alert(`BRAVO ! Vous avez débloqué : ${picked.emoji} ${picked.name}`);
+    }
+
+    function renderCollection() {
+      const grid = document.getElementById('collectionGrid');
+      grid.innerHTML = '';
+      let count = 0;
+
+      userState.items.forEach(item => {
+        if (item.unlocked) count++;
+        const div = document.createElement('div');
+        div.className = 'collection-item ' + (item.unlocked ? '' : 'locked');
+        div.innerHTML = `
+          <div class="emoji">${item.emoji}</div>
+          <div class="name">${item.unlocked ? item.name : '???'}</div>
+        `;
+        grid.appendChild(div);
+      });
+      document.getElementById('colCount').innerText = `${count} / ${userState.items.length}`;
+    }
+
+    /* GAMES CONTROLLER */
+    function initGame(game) {
+      if (userState.credits < 25) return alert('25 Crédits requis pour jouer !');
+      userState.credits -= 25;
+      saveData();
+
+      if (game === 'snake') startSnake();
+      if (game === 'stack') startStack();
+    }
+
+    /* SNAKE GAME (FIXED) */
+    let snakeLoop = null;
+    let snake = [], food = {}, snakeDir = 'RIGHT';
+
+    function startSnake() {
+      document.getElementById('snakeOverlay').style.display = 'none';
+      document.getElementById('snakeArea').style.display = 'block';
+
+      snake = [{x: 5, y: 5}, {x: 4, y: 5}];
+      snakeDir = 'RIGHT';
+      spawnFood();
+
+      clearInterval(snakeLoop);
+      snakeLoop = setInterval(updateSnake, 130);
     }
 
     function setSnakeDir(dir) {
-      playSound('click');
       if (dir === 'UP' && snakeDir !== 'DOWN') snakeDir = 'UP';
       if (dir === 'DOWN' && snakeDir !== 'UP') snakeDir = 'DOWN';
       if (dir === 'LEFT' && snakeDir !== 'RIGHT') snakeDir = 'LEFT';
       if (dir === 'RIGHT' && snakeDir !== 'LEFT') snakeDir = 'RIGHT';
     }
 
-    function spawnSnakeFood() {
-      food = {
-        x: Math.floor(Math.random() * (240 / gridTile)),
-        y: Math.floor(Math.random() * (180 / gridTile))
-      };
+    function spawnFood() {
+      food = { x: Math.floor(Math.random() * 22), y: Math.floor(Math.random() * 16) };
     }
 
     function updateSnake() {
       const canvas = document.getElementById('snakeCanvas');
       const ctx = canvas.getContext('2d');
-      const head = { ...snake[0] };
 
+      let head = { ...snake[0] };
       if (snakeDir === 'UP') head.y--;
       if (snakeDir === 'DOWN') head.y++;
       if (snakeDir === 'LEFT') head.x--;
       if (snakeDir === 'RIGHT') head.x++;
 
-      // Collision murs ou corps
-      if (head.x < 0 || head.x >= 240 / gridTile || head.y < 0 || head.y >= 180 / gridTile || snake.some(s => s.x === head.x && s.y === head.y)) {
-        clearInterval(snakeInterval);
-        alert('GAME OVER ! Score : ' + ((snake.length - 2) * 10) + ' Credits');
+      // Collision Check
+      if (head.x < 0 || head.x >= 22 || head.y < 0 || head.y >= 16 || snake.some(s => s.x === head.x && s.y === head.y)) {
+        clearInterval(snakeLoop);
+        alert('GAME OVER !');
         document.getElementById('snakeOverlay').style.display = 'block';
-        document.getElementById('snakeGameArea').style.display = 'none';
+        document.getElementById('snakeArea').style.display = 'none';
         return;
       }
 
       snake.unshift(head);
 
       if (head.x === food.x && head.y === food.y) {
-        playSound('win');
-        addCredits(10);
-        spawnSnakeFood();
+        userState.credits += 10;
+        saveData();
+        spawnFood();
       } else {
         snake.pop();
       }
 
-      // Rendu
-      ctx.fillStyle = '#0a0b10';
-      ctx.fillRect(0, 0, 240, 180);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, 220, 160);
 
-      // Dessin Nourriture
-      ctx.fillStyle = '#00f0ff';
-      ctx.fillRect(food.x * gridTile, food.y * gridTile, gridTile - 1, gridTile - 1);
+      ctx.fillStyle = '#ff2a6d';
+      ctx.fillRect(food.x * 10, food.y * 10, 9, 9);
 
-      // Dessin Serpent
       ctx.fillStyle = '#05ffa1';
-      snake.forEach(part => {
-        ctx.fillRect(part.x * gridTile, part.y * gridTile, gridTile - 1, gridTile - 1);
-      });
+      snake.forEach(part => ctx.fillRect(part.x * 10, part.y * 10, 9, 9));
     }
 
-    /* 5. MEMORY GAME */
-    const memoryEmojis = ['🥤', '📼', '🍩', '🎮', '🥤', '📼', '🍩', '🎮'];
-    let flippedCards = [];
-    let matchedPairs = 0;
+    /* STACK GAME (FIXED PRECISE ALIGNMENT) */
+    let stackLoop = null, stackX = 0, stackWidth = 100, stackLevel = 0, lastX = 60, stackDir = 3;
 
-    function startMemoryGame() {
-      playSound('click');
-      document.getElementById('memoryOverlay').style.display = 'none';
-      const board = document.getElementById('memoryBoard');
-      board.style.display = 'grid'; board.innerHTML = '';
-      flippedCards = []; matchedPairs = 0;
-
-      const shuffled = [...memoryEmojis].sort(() => Math.random() - 0.5);
-      shuffled.forEach(emoji => {
-        const card = document.createElement('div');
-        card.className = 'memory-card';
-        card.dataset.emoji = emoji;
-        card.onclick = () => flipMemoryCard(card);
-        board.appendChild(card);
-      });
-    }
-
-    function flipMemoryCard(card) {
-      if (flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) return;
-      playSound('click');
-      card.classList.add('flipped'); card.innerText = card.dataset.emoji;
-      flippedCards.push(card);
-
-      if (flippedCards.length === 2) {
-        if (flippedCards[0].dataset.emoji === flippedCards[1].dataset.emoji) {
-          setTimeout(() => {
-            playSound('win');
-            flippedCards[0].classList.add('matched');
-            flippedCards[1].classList.add('matched');
-            flippedCards = []; matchedPairs++;
-
-            if (matchedPairs === 4) {
-              alert('VICTOIRE ! +100 DROP Credits !');
-              addCredits(100);
-              document.getElementById('memoryOverlay').style.display = 'block';
-              document.getElementById('memoryBoard').style.display = 'none';
-            }
-          }, 300);
-        } else {
-          setTimeout(() => {
-            flippedCards[0].classList.remove('flipped'); flippedCards[0].innerText = '';
-            flippedCards[1].classList.remove('flipped'); flippedCards[1].innerText = '';
-            flippedCards = [];
-          }, 800);
-        }
-      }
-    }
-
-    /* 6. STACK GAME */
-    let stackInterval = null;
-    let stackPos = 0;
-    let stackDir = 3;
-    let stackLevel = 0;
-
-    function startStackGame() {
-      playSound('click');
+    function startStack() {
       document.getElementById('stackOverlay').style.display = 'none';
-      document.getElementById('stackGameArea').style.display = 'block';
+      document.getElementById('stackArea').style.display = 'block';
       const arena = document.getElementById('stackArena');
-      arena.innerHTML = ''; stackLevel = 0;
-      spawnStackBlock();
+      arena.innerHTML = '';
+      stackLevel = 0; stackWidth = 100; lastX = 60;
+      spawnStack();
     }
 
-    function spawnStackBlock() {
+    function spawnStack() {
       const arena = document.getElementById('stackArena');
       const block = document.createElement('div');
       block.className = 'stack-block';
-      block.id = 'activeBlock';
-      block.style.width = '100px';
-      block.style.bottom = (stackLevel * 26) + 'px';
+      block.id = 'curStack';
+      block.style.width = stackWidth + 'px';
+      block.style.bottom = (stackLevel * 22) + 'px';
       arena.appendChild(block);
 
-      stackPos = 0;
-      clearInterval(stackInterval);
-      stackInterval = setInterval(() => {
-        stackPos += stackDir;
-        if (stackPos > 240 || stackPos < 0) stackDir *= -1;
-        block.style.left = stackPos + 'px';
-      }, 20);
-    }
-
-    function placeStackBlock() {
-      playSound('click');
-      clearInterval(stackInterval);
-      const block = document.getElementById('activeBlock');
-      block.id = '';
-      stackLevel++;
-
-      if (stackLevel >= 5) {
-        playSound('win');
-        alert('EXCELLENT ! Empilement réussi ! +150 DROP Credits');
-        addCredits(150);
-        document.getElementById('stackOverlay').style.display = 'block';
-        document.getElementById('stackGameArea').style.display = 'none';
-      } else {
-        spawnStackBlock();
-      }
-    }
-
-    /* 7. REACTION GAME */
-    let reactInterval = null;
-    let reactPos = 0;
-    let reactDir = 4;
-
-    function startReactionGame() {
-      playSound('click');
-      document.getElementById('reactionOverlay').style.display = 'none';
-      document.getElementById('reactionGameArea').style.display = 'block';
-      const ptr = document.getElementById('reactionPointer');
-      reactPos = 0;
-
-      clearInterval(reactInterval);
-      reactInterval = setInterval(() => {
-        reactPos += reactDir;
-        if (reactPos > 95 || reactPos < 0) reactDir *= -1;
-        ptr.style.left = reactPos + '%';
+      stackX = 0;
+      clearInterval(stackLoop);
+      stackLoop = setInterval(() => {
+        stackX += stackDir;
+        if (stackX > (220 - stackWidth) || stackX < 0) stackDir *= -1;
+        block.style.left = stackX + 'px';
       }, 15);
     }
 
-    function stopReaction() {
-      playSound('click');
-      clearInterval(reactInterval);
+    function placeStackBlock() {
+      clearInterval(stackLoop);
+      const cur = document.getElementById('curStack');
+      cur.id = '';
 
-      if (reactPos >= 42 && reactPos <= 54) {
-        playSound('win');
-        alert('PERFECT ! +120 DROP Credits !');
-        addCredits(120);
-      } else {
-        alert('Raté ! Retente ta chance.');
+      if (stackLevel > 0) {
+        const diff = stackX - lastX;
+        const overlap = stackWidth - Math.abs(diff);
+
+        if (overlap <= 0) {
+          alert('GAME OVER ! Alignement raté.');
+          document.getElementById('stackOverlay').style.display = 'block';
+          document.getElementById('stackArea').style.display = 'none';
+          return;
+        }
+
+        stackWidth = overlap;
+        cur.style.width = stackWidth + 'px';
+        if (diff < 0) cur.style.left = lastX + 'px';
       }
-      document.getElementById('reactionOverlay').style.display = 'block';
-      document.getElementById('reactionGameArea').style.display = 'none';
+
+      lastX = parseFloat(cur.style.left || stackX);
+      stackLevel++;
+
+      if (stackLevel >= 5) {
+        alert('VICTOIRE ! +50 Crédits !');
+        userState.credits += 50;
+        saveData();
+        document.getElementById('stackOverlay').style.display = 'block';
+        document.getElementById('stackArea').style.display = 'none';
+      } else {
+        spawnStack();
+      }
     }
 
-    /* MODAL */
-    function openModal(item) {
-      playSound('click');
-      document.getElementById('mEmoji').innerText = item.emoji;
-      document.getElementById('mNum').innerText = `OBJET ${item.num}`;
-      document.getElementById('mName').innerText = item.name;
-      document.getElementById('mStory').innerText = item.story;
-      document.getElementById('itemModal').classList.add('active');
-    }
-    function closeModal() {
-      playSound('click');
-      document.getElementById('itemModal').classList.remove('active');
-    }
-
-    // Init
-    loadState();
-    renderCollection();
+    // Initialize
+    loadData();
   </script>
 </body>
 </html>
