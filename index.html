@@ -96,6 +96,11 @@ html, body {
 .collection-item.locked { filter: grayscale(1); opacity: 0.2; }
 .rarity-dot { width: 6px; height: 6px; border-radius: 50%; position: absolute; top: 6px; right: 6px; }
 
+/* TOGGLE TABS AUTH */
+.auth-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.auth-tab { flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-align: center; }
+.auth-tab.active { background: rgba(0, 242, 254, 0.15); border-color: var(--primary-cyan); color: #fff; }
+
 /* FIX DU NAV DOCK (MENU DU BAS) */
 .nav-dock { 
   height: 65px; 
@@ -207,18 +212,31 @@ html, body {
       <div class="grid-3" id="collectionGrid"></div>
     </section>
 
-    <!-- 5. COMPTE & CODES -->
+    <!-- 5. COMPTE (INSCRIPTION / CONNEXION UNIQUE) -->
     <section id="scr-account" class="screen">
-      <div class="glass-card" style="text-align:center;">
-        <h3 style="font-family:'Space Grotesk';">Espace Compte</h3>
-        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" id="userStatus">Joueur Standard</p>
+      <!-- SI NON CONNECTÉ -->
+      <div id="authSection" class="glass-card">
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="tabLogin" onclick="setAuthMode('login')">CONNEXION</div>
+          <div class="auth-tab" id="tabRegister" onclick="setAuthMode('register')">INSCRIPTION</div>
+        </div>
+
+        <form id="authForm" onsubmit="handleAuth(event)">
+          <div id="usernameBox" style="display:none;">
+            <input type="text" id="authUsername" class="input-field" placeholder="Nom d'utilisateur">
+          </div>
+          <input type="email" id="authEmail" class="input-field" placeholder="Adresse e-mail" required>
+          <input type="password" id="authPass" class="input-field" placeholder="Mot de passe" required>
+          <button type="submit" class="btn" id="authSubmitBtn">SE CONNECTER</button>
+        </form>
       </div>
 
-      <div class="glass-card">
-        <div class="card-title"><span>CONNEXION GERANT</span></div>
-        <input type="email" id="adminEmail" class="input-field" placeholder="Identifiant">
-        <input type="password" id="adminPass" class="input-field" placeholder="Mot de passe">
-        <button class="btn btn-secondary" onclick="loginAdmin()">ACCÈS BASE DE DONNÉES</button>
+      <!-- SI CONNECTÉ -->
+      <div id="userProfileSection" class="glass-card" style="display:none; text-align:center;">
+        <div style="font-size:3rem; margin-bottom:5px;">👤</div>
+        <h3 style="font-family:'Space Grotesk';" id="profileName">Joueur</h3>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" id="userStatus">Joueur Standard</p>
+        <button class="btn btn-danger" style="margin-top:15px;" onclick="logoutUser()">SE DÉCONNECTER</button>
       </div>
 
       <div class="glass-card">
@@ -272,9 +290,12 @@ for(let i=10; i<=50; i++) {
 let appData = {
   credits: 100,
   redeemedCodes: [],
+  currentUser: null,
   isAdmin: false,
   items: JSON.parse(JSON.stringify(itemsDB))
 };
+
+let currentAuthMode = 'login';
 
 function loadAppData() {
   const saved = localStorage.getItem('drop_app_mobile_v2');
@@ -289,10 +310,27 @@ function saveAppData() {
 
 function updateUI() {
   document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
-  if(appData.isAdmin) {
-    document.getElementById('userStatus').innerText = "👑 ADMINISTRATEUR SYSTEME (Accès Illimité)";
-    document.getElementById('userStatus').style.color = "var(--primary-cyan)";
+  
+  const authSec = document.getElementById('authSection');
+  const profSec = document.getElementById('userProfileSection');
+
+  if (appData.currentUser) {
+    authSec.style.display = 'none';
+    profSec.style.display = 'block';
+    document.getElementById('profileName').innerText = appData.currentUser.username;
+
+    if (appData.isAdmin) {
+      document.getElementById('userStatus').innerText = "👑 ADMINISTRATEUR SYSTEME (Accès Illimité)";
+      document.getElementById('userStatus').style.color = "var(--primary-cyan)";
+    } else {
+      document.getElementById('userStatus').innerText = "🎮 Joueur Standard";
+      document.getElementById('userStatus').style.color = "var(--text-muted)";
+    }
+  } else {
+    authSec.style.display = 'block';
+    profSec.style.display = 'none';
   }
+
   renderCollection();
 }
 
@@ -303,20 +341,42 @@ function switchTab(id, btn) {
   if (btn) btn.classList.add('active');
 }
 
-/* AUTHENTIFICATION GERANT */
-function loginAdmin() {
-  const email = document.getElementById('adminEmail').value.trim();
-  const pass = document.getElementById('adminPass').value.trim();
+/* GESTION COMPTE (INSCRIPTION & CONNEXION) */
+function setAuthMode(mode) {
+  currentAuthMode = mode;
+  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+  document.getElementById('usernameBox').style.display = mode === 'register' ? 'block' : 'none';
+  document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE";
+}
 
+function handleAuth(e) {
+  e.preventDefault();
+  const email = document.getElementById('authEmail').value.trim();
+  const pass = document.getElementById('authPass').value.trim();
+  const username = document.getElementById('authUsername').value.trim() || email.split('@')[0];
+
+  // VÉRIFICATION COMPTE GÉRANT AUTOMATIQUE
   if (email === 'carer.nathan11@gmail.com' && pass === 'dropadministrator20262027acces') {
     appData.isAdmin = true;
     appData.credits = 999999999;
     appData.items.forEach(i => i.unlocked = true);
+    appData.currentUser = { email, username: username || 'Gérant System' };
     saveAppData();
-    alert('⚡ ACCÈS GÉRANT ACCORDÉ : Base de données débloquée !');
+    alert('⚡ CONNEXION GÉRANT DÉTECTÉE : Accès Administrateur accordé !');
   } else {
-    alert('❌ Identifiants incorrects.');
+    appData.isAdmin = false;
+    appData.currentUser = { email, username };
+    saveAppData();
+    alert(currentAuthMode === 'login' ? '✅ Connexion réussie !' : '🎉 Compte créé avec succès !');
   }
+}
+
+function logoutUser() {
+  appData.currentUser = null;
+  appData.isAdmin = false;
+  saveAppData();
+  alert('Vous êtes déconnecté.');
 }
 
 /* CODE SECRET A USAGE UNIQUE */
