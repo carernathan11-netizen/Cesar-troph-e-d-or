@@ -305,7 +305,45 @@
       right: 10px;
     }
 
-    /* Styles Mini-jeux */
+    /* Auth Switcher */
+    .auth-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .auth-tab-btn.active {
+      background: rgba(0, 240, 255, 0.1);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* Auth Inputs */
+    .auth-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .auth-input:focus { border-color: var(--cyan); }
+
+    /* Mini-jeux Styles */
     .memory-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -328,16 +366,12 @@
 
     /* Arena Stack */
     .stack-arena {
-      height: 220px;
+      height: 200px;
       background: rgba(0,0,0,0.3);
       border: 1px solid var(--card-border);
       border-radius: 20px;
       position: relative;
       overflow: hidden;
-      display: flex;
-      flex-direction: column-reverse;
-      align-items: center;
-      padding-bottom: 10px;
     }
     .stack-block {
       height: 24px;
@@ -372,6 +406,32 @@
       box-shadow: 0 0 10px #fff;
     }
 
+    /* Snake Game */
+    #snakeCanvas {
+      background: rgba(0,0,0,0.5);
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      display: block;
+      margin: 0 auto 10px;
+    }
+    .snake-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      max-width: 180px;
+      margin: 10px auto 0;
+    }
+    .snake-btn {
+      padding: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      border-radius: 12px;
+      font-weight: 900;
+      text-align: center;
+      cursor: pointer;
+    }
+
     /* Musée Personal Room View */
     .room-viewport {
       height: 220px;
@@ -401,21 +461,6 @@
       font-size: 2.2rem;
       filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
     }
-
-    /* Formulaires Auth */
-    .auth-input {
-      width: 100%;
-      padding: 14px 18px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      color: #fff;
-      font-family: inherit;
-      font-size: 0.9rem;
-      margin-bottom: 12px;
-      outline: none;
-    }
-    .auth-input:focus { border-color: var(--cyan); }
 
     /* Navigation Dock */
     .nav-dock {
@@ -492,7 +537,7 @@
       </div>
     </header>
 
-    <!-- Ecran Router -->
+    <!-- Screen Router -->
     <main class="screen-container">
 
       <!-- SCREEN 1: HOME -->
@@ -531,20 +576,30 @@
       <!-- SCREEN 2: MINI-JEUX -->
       <section id="scr-games" class="screen">
         
-        <!-- MODULE MEMORY -->
+        <!-- SNAKE GAME -->
         <div class="drop-card">
           <div class="card-title">
-            <span>MINI-JEU • MEMORY</span>
-            <span style="color:var(--cyan);">+100 🪙</span>
+            <span>MINI-JEU • SNAKE NEON</span>
+            <span style="color:var(--cyan);">+10 🪙 / puce</span>
           </div>
-          <div id="memoryOverlay" style="text-align:center;">
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Retrouve les paires d'objets.</p>
-            <button class="btn" onclick="startMemoryGame()">LANCER MEMORY</button>
+          <div id="snakeOverlay" style="text-align:center;">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Mange les puces néons sans toucher les murs !</p>
+            <button class="btn" onclick="startSnakeGame()">LANCER SNAKE</button>
           </div>
-          <div class="memory-grid" id="memoryBoard" style="display:none;"></div>
+          <div id="snakeGameArea" style="display:none; text-align:center;">
+            <canvas id="snakeCanvas" width="240" height="180"></canvas>
+            <div class="snake-controls">
+              <div></div>
+              <div class="snake-btn" onclick="setSnakeDir('UP')">▲</div>
+              <div></div>
+              <div class="snake-btn" onclick="setSnakeDir('LEFT')">◄</div>
+              <div class="snake-btn" onclick="setSnakeDir('DOWN')">▼</div>
+              <div class="snake-btn" onclick="setSnakeDir('RIGHT')">►</div>
+            </div>
+          </div>
         </div>
 
-        <!-- MODULE STACK -->
+        <!-- STACK GAME -->
         <div class="drop-card">
           <div class="card-title">
             <span>MINI-JEU • STACK</span>
@@ -560,7 +615,7 @@
           </div>
         </div>
 
-        <!-- MODULE REACTION -->
+        <!-- REACTION GAME -->
         <div class="drop-card">
           <div class="card-title">
             <span>MINI-JEU • REACTION</span>
@@ -577,6 +632,19 @@
             </div>
             <button class="btn" onclick="stopReaction()">STOP !</button>
           </div>
+        </div>
+
+        <!-- MEMORY GAME -->
+        <div class="drop-card">
+          <div class="card-title">
+            <span>MINI-JEU • MEMORY</span>
+            <span style="color:var(--cyan);">+100 🪙</span>
+          </div>
+          <div id="memoryOverlay" style="text-align:center;">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Retrouve les paires d'objets.</p>
+            <button class="btn" onclick="startMemoryGame()">LANCER MEMORY</button>
+          </div>
+          <div class="memory-grid" id="memoryBoard" style="display:none;"></div>
         </div>
 
       </section>
@@ -626,12 +694,14 @@
         </div>
       </section>
 
-      <!-- SCREEN 5: PROFIL / SYNCHRO CLOUD -->
+      <!-- SCREEN 5: PROFIL / AUTHENTIFICATION -->
       <section id="scr-profile" class="screen">
+        
+        <!-- PROFIL ACTIF -->
         <div class="drop-card" style="text-align:center;">
-          <div style="width:70px; height:70px; background:linear-gradient(135deg, var(--cyan), var(--violet)); border-radius:24px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:900;" id="profAvatar">N</div>
+          <div style="width:70px; height:70px; background:linear-gradient(135deg, var(--cyan), var(--violet)); border-radius:24px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:900;" id="profAvatar">?</div>
           <h3 style="font-family:'Space Grotesk'; font-size:1.2rem;" id="profName">Joueur Invité</h3>
-          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;" id="profStatus">COMPTE LOCAL (NON SAUVEGARDÉ EN LIGNE)</p>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;" id="profStatus">MODE HORS-LIGNE</p>
 
           <div class="grid-2" style="text-align:left; margin-bottom:16px;">
             <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:16px;">
@@ -639,23 +709,37 @@
               <div style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900; color:var(--cyan);">248</div>
             </div>
             <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:16px;">
-              <div style="font-size:0.7rem; color:var(--text-muted);">Collections Complètes</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">Collections</div>
               <div style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900; color:var(--lime);">14</div>
             </div>
           </div>
+
+          <button class="btn btn-secondary" id="btnLogout" style="display:none; margin-top:10px;" onclick="logout()">SE DÉCONNECTER</button>
         </div>
 
-        <!-- SYNCHRO / LOGIN CARD -->
+        <!-- FORMULAIRE AUTHENTIFICATION -->
         <div class="drop-card" id="authSection">
-          <div class="card-title">
-            <span>SYNCHRONISATION MULTI-APPAREILS</span>
+          <div class="auth-tabs">
+            <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthMode('login')">CONNEXION</button>
+            <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthMode('register')">INSCRIPTION</button>
           </div>
-          <form onsubmit="handleAuth(event)">
-            <input type="email" id="authEmail" class="auth-input" placeholder="Ton e-mail" required>
-            <input type="password" id="authPass" class="auth-input" placeholder="Ton mot de passe" required>
-            <button type="submit" class="btn" style="margin-top:6px;">SE CONNECTER / S'INSCRIRE</button>
+
+          <!-- LOGIN -->
+          <form id="formLogin" onsubmit="handleLogin(event)">
+            <input type="email" id="loginEmail" class="auth-input" placeholder="Adresse e-mail" required>
+            <input type="password" id="loginPass" class="auth-input" placeholder="Mot de passe" required>
+            <button type="submit" class="btn">SE CONNECTER</button>
+          </form>
+
+          <!-- REGISTER -->
+          <form id="formRegister" style="display:none;" onsubmit="handleRegister(event)">
+            <input type="text" id="regName" class="auth-input" placeholder="Pseudo de collectionneur" required>
+            <input type="email" id="regEmail" class="auth-input" placeholder="Adresse e-mail" required>
+            <input type="password" id="regPass" class="auth-input" placeholder="Créer un mot de passe" required>
+            <button type="submit" class="btn">CRÉER MON COMPTE</button>
           </form>
         </div>
+
       </section>
 
     </main>
@@ -698,11 +782,9 @@
   </div>
 
   <script>
-    /* 1. MOTEUR AUDIO */
+    /* 1. AUDIO ENGINE */
     let audioCtx = null;
-    function initAudio() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
     function playSound(type) {
       try {
         initAudio();
@@ -733,19 +815,18 @@
       } catch (e) {}
     }
 
-    /* 2. SYSTÈME DE SAUVEGARDE AUTO ET COMPTE EN LIGNE */
+    /* 2. GAME STATE & AUTOMATIC SAVE & AUTH SYSTEM */
     let gameState = {
       credits: 2840,
       level: 17,
       dropDiscovered: false,
-      userEmail: null
+      userAccount: null // { name, email, pass }
     };
 
     function saveState() {
       localStorage.setItem('drop_gamestate', JSON.stringify(gameState));
-      if (gameState.userEmail) {
-        // Enregistre également la sauvegarde par e-mail dans la base locale (simulation cloud)
-        localStorage.setItem('drop_cloud_' + gameState.userEmail, JSON.stringify(gameState));
+      if (gameState.userAccount) {
+        localStorage.setItem('drop_user_' + gameState.userAccount.email, JSON.stringify(gameState));
       }
     }
 
@@ -771,11 +852,18 @@
         btn.onclick = () => switchTab('scr-collection');
       }
 
-      if (gameState.userEmail) {
-        document.getElementById('profName').innerText = gameState.userEmail.split('@')[0];
-        document.getElementById('profAvatar').innerText = gameState.userEmail.charAt(0).toUpperCase();
-        document.getElementById('profStatus').innerText = 'COMPTE SYNCHRONISÉ EN LIGNE';
+      if (gameState.userAccount) {
+        document.getElementById('profName').innerText = gameState.userAccount.name;
+        document.getElementById('profAvatar').innerText = gameState.userAccount.name.charAt(0).toUpperCase();
+        document.getElementById('profStatus').innerText = 'COMPTE SYNCHRONISÉ (' + gameState.userAccount.email + ')';
         document.getElementById('authSection').style.display = 'none';
+        document.getElementById('btnLogout').style.display = 'block';
+      } else {
+        document.getElementById('profName').innerText = 'Joueur Invité';
+        document.getElementById('profAvatar').innerText = '?';
+        document.getElementById('profStatus').innerText = 'MODE HORS-LIGNE';
+        document.getElementById('authSection').style.display = 'block';
+        document.getElementById('btnLogout').style.display = 'none';
       }
     }
 
@@ -785,25 +873,65 @@
       saveState();
     }
 
-    function handleAuth(e) {
+    /* AUTHENTICATION HANDLERS */
+    function switchAuthMode(mode) {
+      playSound('click');
+      if (mode === 'login') {
+        document.getElementById('tabLoginBtn').classList.add('active');
+        document.getElementById('tabRegisterBtn').classList.remove('active');
+        document.getElementById('formLogin').style.display = 'block';
+        document.getElementById('formRegister').style.display = 'none';
+      } else {
+        document.getElementById('tabRegisterBtn').classList.add('active');
+        document.getElementById('tabLoginBtn').classList.remove('active');
+        document.getElementById('formRegister').style.display = 'block';
+        document.getElementById('formLogin').style.display = 'none';
+      }
+    }
+
+    function handleRegister(e) {
       e.preventDefault();
       playSound('win');
-      const email = document.getElementById('authEmail').value.trim().toLowerCase();
-      
-      // Recherche si des données existent déjà pour cet e-mail
-      const cloudData = localStorage.getItem('drop_cloud_' + email);
-      if (cloudData) {
-        gameState = JSON.parse(cloudData);
-        alert('Compte synchronisé ! Tes données ont été restaurées sur cet appareil.');
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('regPass').value;
+
+      gameState.userAccount = { name, email, pass };
+      saveState();
+      updateUI();
+      alert('Compte créé avec succès ! Vos progressions sont synchronisées.');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      playSound('win');
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('loginPass').value;
+
+      const savedAccountData = localStorage.getItem('drop_user_' + email);
+      if (savedAccountData) {
+        const loadedData = JSON.parse(savedAccountData);
+        if (loadedData.userAccount && loadedData.userAccount.pass === pass) {
+          gameState = loadedData;
+          saveState();
+          updateUI();
+          alert('Bon retour parmi nous, ' + gameState.userAccount.name + ' !');
+        } else {
+          alert('Mot de passe incorrect !');
+        }
       } else {
-        gameState.userEmail = email;
-        alert('Compte créé ! Tes données sont désormais sauvegardées sous cet e-mail.');
+        alert('Aucun compte trouvé avec cet e-mail. Créez un compte via Inscription.');
       }
+    }
+
+    function logout() {
+      playSound('click');
+      gameState.userAccount = null;
       saveState();
       updateUI();
     }
 
-    /* 3. CATALOGUE */
+    /* 3. CATALOG DATA */
     const itemsData = [
       { num: '#001', name: 'Canette Rétro', cat: 'FOOD', emoji: '🥤', rarity: 'var(--rarity-common)', story: 'Encore pétillante après 30 ans passés dans un grenier.' },
       { num: '#012', name: 'Cassette VHS', cat: 'RETRO', emoji: '📼', rarity: 'var(--rarity-rare)', story: 'Bande magnétique usée. Contient un anniversaire de 1998.' },
@@ -860,7 +988,87 @@
       }, 1000);
     }
 
-    /* 4. MINI-JEU MEMORY */
+    /* 4. SNAKE GAME */
+    let snakeInterval = null;
+    let snake = [];
+    let food = { x: 0, y: 0 };
+    let snakeDir = 'RIGHT';
+    const gridTile = 12;
+
+    function startSnakeGame() {
+      playSound('click');
+      document.getElementById('snakeOverlay').style.display = 'none';
+      document.getElementById('snakeGameArea').style.display = 'block';
+      const canvas = document.getElementById('snakeCanvas');
+      
+      snake = [{ x: 5, y: 5 }, { x: 4, y: 5 }];
+      snakeDir = 'RIGHT';
+      spawnSnakeFood();
+
+      clearInterval(snakeInterval);
+      snakeInterval = setInterval(updateSnake, 120);
+    }
+
+    function setSnakeDir(dir) {
+      playSound('click');
+      if (dir === 'UP' && snakeDir !== 'DOWN') snakeDir = 'UP';
+      if (dir === 'DOWN' && snakeDir !== 'UP') snakeDir = 'DOWN';
+      if (dir === 'LEFT' && snakeDir !== 'RIGHT') snakeDir = 'LEFT';
+      if (dir === 'RIGHT' && snakeDir !== 'LEFT') snakeDir = 'RIGHT';
+    }
+
+    function spawnSnakeFood() {
+      food = {
+        x: Math.floor(Math.random() * (240 / gridTile)),
+        y: Math.floor(Math.random() * (180 / gridTile))
+      };
+    }
+
+    function updateSnake() {
+      const canvas = document.getElementById('snakeCanvas');
+      const ctx = canvas.getContext('2d');
+      const head = { ...snake[0] };
+
+      if (snakeDir === 'UP') head.y--;
+      if (snakeDir === 'DOWN') head.y++;
+      if (snakeDir === 'LEFT') head.x--;
+      if (snakeDir === 'RIGHT') head.x++;
+
+      // Collision murs ou corps
+      if (head.x < 0 || head.x >= 240 / gridTile || head.y < 0 || head.y >= 180 / gridTile || snake.some(s => s.x === head.x && s.y === head.y)) {
+        clearInterval(snakeInterval);
+        alert('GAME OVER ! Score : ' + ((snake.length - 2) * 10) + ' Credits');
+        document.getElementById('snakeOverlay').style.display = 'block';
+        document.getElementById('snakeGameArea').style.display = 'none';
+        return;
+      }
+
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        playSound('win');
+        addCredits(10);
+        spawnSnakeFood();
+      } else {
+        snake.pop();
+      }
+
+      // Rendu
+      ctx.fillStyle = '#0a0b10';
+      ctx.fillRect(0, 0, 240, 180);
+
+      // Dessin Nourriture
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(food.x * gridTile, food.y * gridTile, gridTile - 1, gridTile - 1);
+
+      // Dessin Serpent
+      ctx.fillStyle = '#05ffa1';
+      snake.forEach(part => {
+        ctx.fillRect(part.x * gridTile, part.y * gridTile, gridTile - 1, gridTile - 1);
+      });
+    }
+
+    /* 5. MEMORY GAME */
     const memoryEmojis = ['🥤', '📼', '🍩', '🎮', '🥤', '📼', '🍩', '🎮'];
     let flippedCards = [];
     let matchedPairs = 0;
@@ -897,7 +1105,7 @@
             flippedCards = []; matchedPairs++;
 
             if (matchedPairs === 4) {
-              alert('VICTOIRE ! +100 DROP Credits gagnés !');
+              alert('VICTOIRE ! +100 DROP Credits !');
               addCredits(100);
               document.getElementById('memoryOverlay').style.display = 'block';
               document.getElementById('memoryBoard').style.display = 'none';
@@ -913,7 +1121,7 @@
       }
     }
 
-    /* 5. MINI-JEU STACK */
+    /* 6. STACK GAME */
     let stackInterval = null;
     let stackPos = 0;
     let stackDir = 3;
@@ -924,8 +1132,7 @@
       document.getElementById('stackOverlay').style.display = 'none';
       document.getElementById('stackGameArea').style.display = 'block';
       const arena = document.getElementById('stackArena');
-      arena.innerHTML = '';
-      stackLevel = 0;
+      arena.innerHTML = ''; stackLevel = 0;
       spawnStackBlock();
     }
 
@@ -956,7 +1163,7 @@
 
       if (stackLevel >= 5) {
         playSound('win');
-        alert('EXCELLENT ! Empilement parfait ! +150 DROP Credits');
+        alert('EXCELLENT ! Empilement réussi ! +150 DROP Credits');
         addCredits(150);
         document.getElementById('stackOverlay').style.display = 'block';
         document.getElementById('stackGameArea').style.display = 'none';
@@ -965,7 +1172,7 @@
       }
     }
 
-    /* 6. MINI-JEU REACTION */
+    /* 7. REACTION GAME */
     let reactInterval = null;
     let reactPos = 0;
     let reactDir = 4;
@@ -991,10 +1198,10 @@
 
       if (reactPos >= 42 && reactPos <= 54) {
         playSound('win');
-        alert('PERFECT ! Réflexe incroyable ! +120 DROP Credits');
+        alert('PERFECT ! +120 DROP Credits !');
         addCredits(120);
       } else {
-        alert('Aïe ! Hors zone. Réessaie !');
+        alert('Raté ! Retente ta chance.');
       }
       document.getElementById('reactionOverlay').style.display = 'block';
       document.getElementById('reactionGameArea').style.display = 'none';
@@ -1014,7 +1221,7 @@
       document.getElementById('itemModal').classList.remove('active');
     }
 
-    // Initialisation
+    // Init
     loadState();
     renderCollection();
   </script>
