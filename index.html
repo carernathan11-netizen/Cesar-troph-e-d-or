@@ -43,9 +43,9 @@ html, body {
 
 /* HUD HEADER */
 .hud-header {
-  height: 60px; padding: 0 16px;
+  height: 60px; min-height: 60px; padding: 0 16px;
   display: flex; justify-content: space-between; align-items: center;
-  background: rgba(8, 9, 12, 0.8); backdrop-filter: blur(12px);
+  background: rgba(8, 9, 12, 0.9); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--card-border); z-index: 10;
 }
 .brand-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
@@ -55,7 +55,9 @@ html, body {
 /* CONTAINER CONTENU SCROLLABLE */
 .screen-container { flex: 1; overflow-y: auto; padding: 12px; scrollbar-width: none; }
 .screen-container::-webkit-scrollbar { display: none; }
-.screen { display: none; height: 100%; }
+
+/* FIX DES ECRANS */
+.screen { display: none; width: 100%; }
 .screen.active { display: flex; flex-direction: column; gap: 12px; }
 
 /* CARDS & UI COMPONENTS */
@@ -74,7 +76,6 @@ html, body {
 /* GAME CANVAS & MODALS */
 .game-modal { position: absolute; inset: 0; background: rgba(8, 9, 12, 0.98); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 16px; }
 .game-modal.active { display: flex; }
-canvas { background: #10141e; border-radius: 12px; border: 1px solid var(--card-border); }
 
 /* COLLECTION GRID */
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -85,10 +86,17 @@ canvas { background: #10141e; border-radius: 12px; border: 1px solid var(--card-
 .rarity-dot { width: 6px; height: 6px; border-radius: 50%; position: absolute; top: 6px; right: 6px; }
 
 /* NAV DOCK FOOTER */
-.nav-dock { height: 65px; background: rgba(8, 9, 12, 0.9); backdrop-filter: blur(20px); border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center; z-index: 10; }
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-muted); font-size: 0.6rem; font-weight: 700; background: none; border: none; width: 20%; }
+.nav-dock { 
+  height: 65px; min-height: 65px; 
+  background: rgba(8, 9, 12, 0.95); 
+  backdrop-filter: blur(20px); 
+  border-top: 1px solid var(--card-border); 
+  display: flex; justify-content: space-around; align-items: center; 
+  z-index: 10; 
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 20%; cursor: pointer; }
 .nav-item.active { color: var(--primary-cyan); }
-.nav-item .nav-icon { font-size: 1.1rem; }
+.nav-item .nav-icon { font-size: 1.2rem; }
 
 /* ANIMATION D'ANEANTISSEMENT (DROP ADMIN) */
 @keyframes glitchAnnihilate {
@@ -134,8 +142,8 @@ canvas { background: #10141e; border-radius: 12px; border: 1px solid var(--card-
     <!-- 2. MINI-JEUX -->
     <section id="scr-games" class="screen">
       <div class="glass-card">
-        <div class="card-title"><span>ARCADE — GANX DE CRÉDITS</span></div>
-        <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:10px;">Coût : 25 🪙 | Gain : 10 à 50 🪙 selon ton score.</p>
+        <div class="card-title"><span>ARCADE — GAIN DE CRÉDITS</span></div>
+        <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:10px;">Coût : 25 🪙 | Gain : 10 à 50 🪙</p>
         
         <div style="display:flex; flex-direction:column; gap:8px;">
           <div class="game-card">
@@ -228,9 +236,7 @@ canvas { background: #10141e; border-radius: 12px; border: 1px solid var(--card-
 </div>
 
 <script>
-/* ===================================================
-BASE DE DONNÉES DE 51 OBJETS
-=================================================== */
+/* BASE DE DONNÉES DE 51 OBJETS */
 const itemsDB = [
   { id: 1, name: 'Doge', cat: 'meme', emoji: '🐕', rarity: 'rare', unlocked: false },
   { id: 2, name: 'Gigachad', cat: 'meme', emoji: '🗿', rarity: 'epic', unlocked: false },
@@ -241,11 +247,9 @@ const itemsDB = [
   { id: 7, name: 'Sabre Laser', cat: 'pop', emoji: '⚔️', rarity: 'epic', unlocked: false },
   { id: 8, name: 'Couronne', cat: 'legendary', emoji: '👑', rarity: 'legendary', unlocked: false },
   { id: 9, name: 'Diamant', cat: 'legendary', emoji: '💎', rarity: 'legendary', unlocked: false },
-  // Objet HYPER RARE - 1 MILLION DE CREDITS
   { id: 51, name: 'DROP Administrateur', cat: 'god', emoji: '⚡', rarity: 'admin', unlocked: false, price: 1000000 }
 ];
 
-// Complétion automatique à 50 objets standards
 for(let i=10; i<=50; i++) {
   itemsDB.push({ id: i, name: `Objet #${i}`, cat: 'common', emoji: '🎁', rarity: 'common', unlocked: false });
 }
@@ -258,20 +262,20 @@ let appData = {
 };
 
 function loadAppData() {
-  const saved = localStorage.getItem('drop_app_mobile_v1');
+  const saved = localStorage.getItem('drop_app_mobile_v2');
   if (saved) appData = JSON.parse(saved);
   updateUI();
 }
 
 function saveAppData() {
-  localStorage.setItem('drop_app_mobile_v1', JSON.stringify(appData));
+  localStorage.setItem('drop_app_mobile_v2', JSON.stringify(appData));
   updateUI();
 }
 
 function updateUI() {
   document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
   if(appData.isAdmin) {
-    document.getElementById('userStatus').innerText = "👑 ADMINISTRAEUR SYSTEME (Accès Illimité)";
+    document.getElementById('userStatus').innerText = "👑 ADMINISTRATEUR SYSTEME (Accès Illimité)";
     document.getElementById('userStatus').style.color = "var(--primary-cyan)";
   }
   renderCollection();
@@ -284,7 +288,7 @@ function switchTab(id, btn) {
   if (btn) btn.classList.add('active');
 }
 
-/* AUTHENTIFICATION GERANT AUTOMATIQUE */
+/* AUTHENTIFICATION GERANT */
 function loginAdmin() {
   const email = document.getElementById('adminEmail').value.trim();
   const pass = document.getElementById('adminPass').value.trim();
@@ -294,7 +298,7 @@ function loginAdmin() {
     appData.credits = 999999999;
     appData.items.forEach(i => i.unlocked = true);
     saveAppData();
-    alert('⚡ ACCÈS GÉRANT ACCORDÉ : Base de données débloquée, crédits illimités !');
+    alert('⚡ ACCÈS GÉRANT ACCORDÉ : Base de données débloquée !');
   } else {
     alert('❌ Identifiants incorrects.');
   }
@@ -306,7 +310,7 @@ function redeemSecretCode() {
   if (!code) return;
 
   if (appData.redeemedCodes.includes(code)) {
-    alert('⚠️ Ce code a déjà été utilisé sur ce téléphone !');
+    alert('⚠️ Ce code a déjà été utilisé !');
     return;
   }
 
@@ -321,7 +325,7 @@ function redeemSecretCode() {
   }
 }
 
-/* DROPS ET DEBLOCAGE */
+/* DROPS */
 function openRandomDrop() {
   if (!appData.isAdmin && appData.credits < 150) return alert('150 Crédits requis !');
   const locked = appData.items.filter(i => !i.unlocked && i.id !== 51);
@@ -332,7 +336,6 @@ function openRandomDrop() {
 
   if (!appData.isAdmin) appData.credits -= 150;
   
-  // Si assez de crédit pour l'objet rare de 1 Million
   let picked;
   if (!appData.isAdmin && appData.credits >= 1000000 && !appData.items.find(i=>i.id===51).unlocked) {
     picked = appData.items.find(i=>i.id===51);
@@ -350,7 +353,7 @@ function openRandomDrop() {
   }
 }
 
-/* EFFET ANEANTISSEMENT SITE (DROP ADMINISTRATEUR) */
+/* EFFET ANEANTISSEMENT SITE */
 function triggerAnnihilation() {
   const vp = document.getElementById('viewport');
   vp.classList.add('annihilate');
@@ -360,7 +363,7 @@ function triggerAnnihilation() {
     appData.credits = 999999999;
     appData.items.forEach(i => i.unlocked = true);
     saveAppData();
-    alert('💥 LE SITE SE RÉGÉNÈRE... VOUS AVEZ DÉBLOQUÉ LE STATUT D\'ADMINISTRATEUR ULTIME ! ACCÈS ILLIMITÉ RÉTABLI.');
+    alert('💥 LE SITE SE RÉGÉNÈRE... ACCÈS ADMINISTRATEUR ULTIME DÉBLOQUÉ !');
   }, 2500);
 }
 
@@ -389,9 +392,7 @@ function watchAd() {
   alert('Pub visionnée ! +15 Crédits.');
 }
 
-/* ===================================================
-MODULE MINI-JEUX
-=================================================== */
+/* MINI-JEUX */
 let currentGameInterval = null;
 
 function startGame(gameType) {
@@ -446,7 +447,7 @@ function runReactionGame(c) {
   };
 }
 
-/* 2. PUISSANCE 4 (VS AI) */
+/* 2. PUISSANCE 4 */
 function runConnect4Game(c) {
   document.getElementById('gameTitle').innerText = "Puissance 4 VS Robot";
   c.innerHTML = `<div id="c4board" style="display:grid; grid-template-columns:repeat(7, 35px); gap:5px; background:#00d2ff; padding:8px; border-radius:10px;"></div>`;
@@ -496,7 +497,7 @@ function runConnect4Game(c) {
 /* 3. SNAKE */
 function runSnakeGame(c) {
   document.getElementById('gameTitle').innerText = "Snake Néon";
-  c.innerHTML = `<canvas id="sc" width="240" height="240"></canvas>`;
+  c.innerHTML = `<canvas id="sc" width="240" height="240" style="background:#10141e; border-radius:12px;"></canvas>`;
   const cvs = document.getElementById('sc'), ctx = cvs.getContext('2d');
   let snake = [{x:10, y:10}], food = {x:15, y:15}, dx = 1, dy = 0, score = 0;
   
@@ -534,7 +535,7 @@ function runTapGame(c) {
   const move = () => {
     const t = document.getElementById('target');
     if(t) {
-      t.style.transform = `translate(${(Math.random()-0.5)*150}px, ${(Math.random()-0.5)*150}px)`;
+      t.style.transform = `translate(${(Math.random()-0.5)*120}px, ${(Math.random()-0.5)*120}px)`;
     }
   };
   document.getElementById('target').onclick = () => { score++; document.getElementById('tapScore').innerText = score; move(); };
@@ -582,7 +583,7 @@ function runMemoryGame(c) {
 function runStackGame(c) {
   document.getElementById('gameTitle').innerText = "Stack Néon";
   c.innerHTML = `<div style="text-align:center;">
-    <div id="sboard" style="width:200px; height:250px; background:#08090c; border:1px solid #333; position:relative; overflow:hidden;">
+    <div id="sboard" style="width:200px; height:200px; background:#08090c; border:1px solid #333; position:relative; overflow:hidden;">
       <div id="sblock" style="width:80px; height:20px; background:var(--primary-cyan); position:absolute; bottom:0; left:0;"></div>
     </div>
     <button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button>
