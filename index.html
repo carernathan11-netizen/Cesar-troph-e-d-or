@@ -297,15 +297,15 @@ animation: particleFly 0.8s ease-out forwards;
 <div class="drop-stage">
 <div class="particle-burst" id="particleBurst"></div>
 <div class="drop-card-3d" id="dropCard">
-  <div class="drop-card-face drop-card-back">
-    <div style="font-size:3.5rem; color:var(--glow-violet); font-weight:900; font-family:'Space Grotesk';">?</div>
-    <div style="font-size:0.65rem; color:var(--text-muted); margin-top:5px; text-transform:uppercase; letter-spacing:1px;">Mystère</div>
-  </div>
-  <div class="drop-card-face drop-card-front" id="cardFront">
-    <div style="font-size:3rem; margin-bottom:5px;" id="dropCardEmoji">🔮</div>
-    <h4 style="font-size:0.85rem; font-family:'Space Grotesk';" id="dropCardName">Objet Mystère</h4>
-    <p style="font-size:0.65rem; color:var(--glow-cyan); margin-top:4px;" id="dropCardRarity">Rareté</p>
-  </div>
+<div class="drop-card-face drop-card-back">
+<div style="font-size:3.5rem; color:var(--glow-violet); font-weight:900; font-family:'Space Grotesk';">?</div>
+<div style="font-size:0.65rem; color:var(--text-muted); margin-top:5px; text-transform:uppercase; letter-spacing:1px;">Mystère</div>
+</div>
+<div class="drop-card-face drop-card-front" id="cardFront">
+<div style="font-size:3rem; margin-bottom:5px;" id="dropCardEmoji">🔮</div>
+<h4 style="font-size:0.85rem; font-family:'Space Grotesk';" id="dropCardName">Objet Mystère</h4>
+<p style="font-size:0.65rem; color:var(--glow-cyan); margin-top:4px;" id="dropCardRarity">Rareté</p>
+</div>
 </div>
 </div>
 
@@ -405,7 +405,7 @@ animation: particleFly 0.8s ease-out forwards;
 
 <div class="glass-card">
 <div class="card-title"><span>ACTIVER VOTRE CODE REÇU</span></div>
-<input type="text" id="shopCodeInput" class="input-field" placeholder="Ex: DROP-CREDIT-XXXX..." style="text-transform:uppercase;">
+<input type="text" id="shopCodeInput" class="input-field" placeholder="Ex: DROP-XXXX-XXXX-DROP..." style="text-transform:uppercase;">
 <button class="btn" onclick="redeemShopCode()">VALIDER MON CODE</button>
 </div>
 </section>
@@ -486,18 +486,32 @@ Pour obtenir ce pack, veuillez :<br><br>
 
 <script>
 
-/* GENERATION AUTOMATIQUE DE 5000 CODES UNIQUS POUR LES CREDITS */
+/* GENERATION AUTOMATIQUE ET ALEATOIRE DE 5000 CODES UNIQUES */
 const GENERATED_5000_CODES = {};
-(function generate5000Codes() {
-  for (let i = 1; i <= 5000; i++) {
-    // Génère des codes variés (entre 500 et 20000 crédits)
-    const creditAmount = (i % 5 === 0) ? 10000 : (i % 2 === 0) ? 2000 : 1000;
-    const code = "DROP-CREDIT-" + (100000 + i);
-    GENERATED_5000_CODES[code] = creditAmount;
-  }
+
+function getRandomChunk(len) {
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+let res = '';
+for(let i = 0; i < len; i++) {
+res += chars.charAt(Math.floor(Math.random() * chars.length));
+}
+return res;
+}
+
+(function generate5000RandomCodes() {
+for (let i = 1; i <= 5000; i++) {
+// Génération d'un code unique sous le format DROP-XXXX-XXXX-DROP
+let uniqueCode = `DROP-${getRandomChunk(4)}-${getRandomChunk(4)}-DROP`;
+while (GENERATED_5000_CODES[uniqueCode]) {
+uniqueCode = `DROP-${getRandomChunk(4)}-${getRandomChunk(4)}-DROP`;
+}
+// Montants variés attribués aux codes
+const creditAmount = (i % 10 === 0) ? 20000 : (i % 5 === 0) ? 10000 : (i % 2 === 0) ? 2000 : 1000;
+GENERATED_5000_CODES[uniqueCode] = creditAmount;
+}
 })();
 
-/* CATALOGUES MASSIFS ET STRUCTURES EN CLASSEUR */
+/* CATALOGUES MASSIFS ET STRUCTURES EN CLASSEUR (+30 NOUVELLES CARTES) */
 const CATALOGS = {
 tiktok: [
 { id: 101, name: "Anneau Lumineux LED", emoji: "💡", price: 200, unlocked: false },
@@ -513,8 +527,17 @@ tiktok: [
 { id: 111, name: "Sac Banane Holographique", emoji: "🎒", price: 280, unlocked: false },
 { id: 112, name: "Veilleuse Pain de Mie", emoji: "🍞", price: 190, unlocked: false },
 { id: 113, name: "Projecteur de poche 4K", emoji: "📹", price: 600, unlocked: false },
-{ id: 114, name: "Support Smartphone Flex", emoji: "📱", price: 170, unlocked: false }
- ],
+{ id: 114, name: "Support Smartphone Flex", emoji: "📱", price: 170, unlocked: false },
+// NOUVELLES CARTES TIKTOK
+{ id: 115, name: "Lampe Plasma Cyber", emoji: "🔮", price: 340, unlocked: false },
+{ id: 116, name: "Enceinte Flottante LED", emoji: "🛸", price: 550, unlocked: false },
+{ id: 117, name: "Masque LED Personnalisable", emoji: "🎭", price: 480, unlocked: false },
+{ id: 118, name: "Bandeau Audio Sommeil", emoji: "🎧", price: 210, unlocked: false },
+{ id: 119, name: "Stylo d'Impression 3D", emoji: "🖊️", price: 390, unlocked: false },
+{ id: 120, name: "Distributeur de Bonbons Sensor", emoji: "🍬", price: 260, unlocked: false },
+{ id: 121, name: "Réveil Vague Rétro", emoji: "⏰", price: 310, unlocked: false },
+{ id: 122, name: "Cadre Photo Numérique HD", emoji: "🖼️", price: 620, unlocked: false }
+],
 memes: [
 { id: 201, name: "Lunettes Thug Life 8-Bit", emoji: "🕶️", price: 180, unlocked: false },
 { id: 202, name: "Statue Moaï Moaï", emoji: "🗿", price: 400, unlocked: false },
@@ -529,8 +552,17 @@ memes: [
 { id: 211, name: "Tapis Froggy Peepo", emoji: "🐸", price: 290, unlocked: false },
 { id: 212, name: "Mug 'Fine Dog' Fire", emoji: "☕", price: 210, unlocked: false },
 { id: 213, name: "Trompette Doot Doot", emoji: "🎺", price: 330, unlocked: false },
-{ id: 214, name: "Costume Inflatable Alien", emoji: "👽", price: 520, unlocked: false }
- ],
+{ id: 214, name: "Costume Inflatable Alien", emoji: "👽", price: 520, unlocked: false },
+// NOUVELLES CARTES MEMES
+{ id: 215, name: "Bouton Noice Sound", emoji: "🔊", price: 170, unlocked: false },
+{ id: 216, name: "Canard en Caoutchouc Géant", emoji: "🦆", price: 280, unlocked: false },
+{ id: 217, name: "Affiche Nyan Cat Gold", emoji: "🌈", price: 450, unlocked: false },
+{ id: 218, name: "Horloge Meme 'It's Wednesday'", emoji: "🐸", price: 380, unlocked: false },
+{ id: 219, name: "Marteau de Juge 'Bonk'", emoji: "🔨", price: 230, unlocked: false },
+{ id: 220, name: "Figurine Stonks Up", emoji: "📈", price: 510, unlocked: false },
+{ id: 221, name: "Plaque d'Égout Pepe", emoji: "🛡️", price: 600, unlocked: false },
+{ id: 222, name: "Trophée NPC Officiel", emoji: "👤", price: 340, unlocked: false }
+],
 gaming: [
 { id: 301, name: "Manette Pro Translucide", emoji: "🎮", price: 800, unlocked: false },
 { id: 302, name: "Casque Audio Cyberpunk", emoji: "🎧", price: 1200, unlocked: false },
@@ -545,8 +577,17 @@ gaming: [
 { id: 311, name: "Câble Lumineux Fast Charge", emoji: "🔌", price: 210, unlocked: false },
 { id: 312, name: "Finger Sleeves Pro", emoji: "🖐️", price: 120, unlocked: false },
 { id: 313, name: "Chaise Gaming Quantum", emoji: "💺", price: 3200, unlocked: false },
-{ id: 314, name: "Microphone Studio Pro", emoji: "🎙️", price: 1400, unlocked: false }
- ],
+{ id: 314, name: "Microphone Studio Pro", emoji: "🎙️", price: 1400, unlocked: false },
+// NOUVELLES CARTES GAMING
+{ id: 315, name: "Souris de Jeu Ultra-Légère", emoji: "🖱️", price: 750, unlocked: false },
+{ id: 316, name: "Gants Retrogaming Tactiles", emoji: "🧤", price: 320, unlocked: false },
+{ id: 317, name: "Support Écran Triple Bras", emoji: "🖥️", price: 1600, unlocked: false },
+{ id: 318, name: "Coussin Ergonomique Gamer", emoji: "🛏️", price: 290, unlocked: false },
+{ id: 319, name: "Boîtier PC Verre Trempé RGB", emoji: "💻", price: 2100, unlocked: false },
+{ id: 320, name: "Carte d'Acquisition 4K60", emoji: "📹", price: 1750, unlocked: false },
+{ id: 321, name: "Eclairage Ambilight Écran", emoji: "🌈", price: 890, unlocked: false },
+{ id: 322, name: "Lunettes Anti-Lumière Bleue Pro", emoji: "👓", price: 410, unlocked: false }
+],
 secret: [
 { id: 401, name: "Carte VIP Gold Access", emoji: "💳", price: 5000, unlocked: false },
 { id: 402, name: "Trophée Créateur Diamant", emoji: "🏆", price: 10000, unlocked: false },
@@ -559,8 +600,14 @@ secret: [
 { id: 409, name: "Puce Cyber-Augmentée", emoji: "🦾", price: 45000, unlocked: false },
 { id: 410, name: "Couronne Holographique", emoji: "👑", price: 75000, unlocked: false },
 { id: 411, name: "Trophée Rubis Exclusif", emoji: "💎", price: 100000, unlocked: false },
+// NOUVELLES CARTES ULTRA RARES
+{ id: 412, name: "Orbe d'Énergie Quantique", emoji: "🔮", price: 150000, unlocked: false },
+{ id: 413, name: "Sceptre du Créateur", emoji: "🪄", price: 250000, unlocked: false },
+{ id: 414, name: "Carte de Crédit Obsidienne", emoji: "🖤", price: 400000, unlocked: false },
+{ id: 415, name: "Sceau Absolu de l'Infiniment Grand", emoji: "🌌", price: 600000, unlocked: false },
+{ id: 416, name: "Passeport Cosmique 2027", emoji: "🛸", price: 800000, unlocked: false },
 { id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false }
- ]
+]
 };
 
 let activeCategory = 'tiktok';
@@ -700,18 +747,18 @@ let isUltraRare = roll < 0.1; // 10% de chance (1/10)
 
 let pool = [];
 if (isUltraRare) {
-  appData.catalogs.secret.forEach(i => { if(!i.unlocked) pool.push(i); });
+appData.catalogs.secret.forEach(i => { if(!i.unlocked) pool.push(i); });
 } else {
-  ['tiktok', 'memes', 'gaming'].forEach(cat => {
-    appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
-  });
+['tiktok', 'memes', 'gaming'].forEach(cat => {
+appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+});
 }
 
 // Fallback si la catégorie est vide
 if (pool.length === 0) {
-  Object.keys(appData.catalogs).forEach(cat => {
-    appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
-  });
+Object.keys(appData.catalogs).forEach(cat => {
+appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+});
 }
 
 if (pool.length === 0) return alert('Félicitations, tout le classeur est déjà débloqué !');
@@ -739,44 +786,44 @@ document.getElementById('dropCardRarity').style.color = isUltraRare ? "var(--glo
 
 // Étape 1 : Rotation lente
 setTimeout(() => {
-  card.classList.add('revealed');
+card.classList.add('revealed');
 }, 300);
 
 // Étape 2 : Explosion et particules
 setTimeout(() => {
-  card.classList.add('exploding');
-  createExplosionParticles();
+card.classList.add('exploding');
+createExplosionParticles();
 }, 1400);
 
 // Étape 3 : Révélation finale et sauvegarde
 setTimeout(() => {
-  isDropping = false;
-  btn.disabled = false;
-  saveAppData();
+isDropping = false;
+btn.disabled = false;
+saveAppData();
 
-  if (picked.id === 2000) {
-    triggerAnnihilation();
-  } else {
-    alert(`💥 UNBOXING EXPLOSIF ! Tu as obtenu : ${picked.emoji} ${picked.name}`);
-  }
+if (picked.id === 2000) {
+triggerAnnihilation();
+} else {
+alert(`💥 UNBOXING EXPLOSIF ! Tu as obtenu : ${picked.emoji} ${picked.name}`);
+}
 }, 2200);
 }
 
 function createExplosionParticles() {
-  const container = document.getElementById('particleBurst');
-  container.innerHTML = '';
-  for (let i = 0; i < 30; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle active';
-    const angle = Math.random() * Math.PI * 2;
-    const dist = 80 + Math.random() * 120;
-    const dx = Math.cos(angle) * dist + 'px';
-    const dy = Math.sin(angle) * dist + 'px';
-    p.style.setProperty('--dx', dx);
-    p.style.setProperty('--dy', dy);
-    p.style.background = (i % 2 === 0) ? 'var(--glow-magenta)' : 'var(--glow-cyan)';
-    container.appendChild(p);
-  }
+const container = document.getElementById('particleBurst');
+container.innerHTML = '';
+for (let i = 0; i < 30; i++) {
+const p = document.createElement('div');
+p.className = 'particle active';
+const angle = Math.random() * Math.PI * 2;
+const dist = 80 + Math.random() * 120;
+const dx = Math.cos(angle) * dist + 'px';
+const dy = Math.sin(angle) * dist + 'px';
+p.style.setProperty('--dx', dx);
+p.style.setProperty('--dy', dy);
+p.style.background = (i % 2 === 0) ? 'var(--glow-magenta)' : 'var(--glow-cyan)';
+container.appendChild(p);
+}
 }
 
 function triggerAnnihilation() {
@@ -804,22 +851,25 @@ function closePaymentModal() {
 document.getElementById('payModal').classList.remove('active');
 }
 
-/* VALIDATION DES CODES DE BOUTIQUE (5000 CODES) */
+/* VALIDATION STRICTE DES CODES DE BOUTIQUE A USAGE UNIQUE */
 function redeemShopCode() {
 const code = document.getElementById('shopCodeInput').value.trim().toUpperCase();
 if (!code) return;
 
-if (appData.redeemedCodes.includes(code)) return alert('⚠️ Ce code a déjà été débloqué !');
+// Vérification de la validité et de l'état d'utilisation
+if (appData.redeemedCodes.includes(code)) {
+return alert('❌ Code déjà utilisé ou invalide.');
+}
 
 if (GENERATED_5000_CODES[code]) {
 const amount = GENERATED_5000_CODES[code];
 appData.credits += amount;
-appData.redeemedCodes.push(code);
+appData.redeemedCodes.push(code); // Marque le code comme utilisé définitivement
 saveAppData();
 document.getElementById('shopCodeInput').value = '';
 alert(`🎉 CODE DE BOUTIQUE CONFIRMÉ ! +${amount.toLocaleString()} Crédits ajoutés à votre compte !`);
 } else {
-alert('❌ Code invalide ou inexistant.');
+alert('❌ Code déjà utilisé ou invalide.');
 }
 }
 
@@ -866,7 +916,7 @@ function redeemSecretCode() {
 const code = document.getElementById('secretCodeInput').value.trim().toUpperCase();
 if (!code) return;
 
-if (appData.redeemedCodes.includes(code)) return alert('⚠️ Code déjà utilisé !');
+if (appData.redeemedCodes.includes(code)) return alert('❌ Code déjà utilisé ou invalide.');
 
 if (code === 'DROPDROP2627GIVEFREE10000') {
 appData.credits += 10000;
@@ -875,7 +925,7 @@ saveAppData();
 document.getElementById('secretCodeInput').value = '';
 alert('🎉 CODE VALIDE ! +10 000 Crédits.');
 } else {
-alert('❌ Code invalide.');
+alert('❌ Code déjà utilisé ou invalide.');
 }
 }
 
@@ -919,7 +969,13 @@ closeGame();
 
 function runReactionGame(c) {
 document.getElementById('gameTitle').innerText = "Réaction Néon";
-c.innerHTML = `<div style="text-align:center;"> <div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);"> <div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div> <div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div> </div> <button class="btn" onclick="stopReaction()">STOP !</button> </div>`;
+c.innerHTML = `<div style="text-align:center;">
+<div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);">
+<div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div>
+<div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div>
+</div>
+<button class="btn" onclick="stopReaction()">STOP !</button>
+</div>`;
 let pos = 0, dir = 3;
 currentGameInterval = setInterval(() => {
 pos += dir;
@@ -1004,7 +1060,11 @@ ctx.fillStyle = "#06b6d4"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
 function runTapGame(c) {
 document.getElementById('gameTitle').innerText = "Tap Cible (10s)";
 let score = 0, timeLeft = 10;
-c.innerHTML = `<div style="text-align:center;"> <h2 id="timer">10s</h2> <div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div> <h3>Score : <span id="tapScore">0</span></h3> </div>`;
+c.innerHTML = `<div style="text-align:center;">
+<h2 id="timer">10s</h2>
+<div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div>
+<h3>Score : <span id="tapScore">0</span></h3>
+</div>`;
 
 document.getElementById('target').onclick = () => {
 score++;
@@ -1021,7 +1081,12 @@ if(timeLeft <= 0) rewardPlayer(Math.min(10 + score*2, 50));
 
 function runMemoryGame(c) {
 document.getElementById('gameTitle').innerText = "Mémoire Flash";
-c.innerHTML = `<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;"> <div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div> <div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div> <div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div> <div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div> </div>`;
+c.innerHTML = `<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;">
+<div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div>
+<div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div>
+<div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div>
+<div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div>
+</div>`;
 let seq = [Math.floor(Math.random()*4), Math.floor(Math.random()*4)], step = 0;
 
 function playSeq() {
@@ -1047,7 +1112,12 @@ rewardPlayer(10);
 
 function runStackGame(c) {
 document.getElementById('gameTitle').innerText = "Stack Néon";
-c.innerHTML = `<div style="text-align:center;"> <div id="sboard" style="width:200px; height:200px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px;"> <div id="sblock" style="width:80px; height:20px; background:var(--glow-violet); position:absolute; bottom:0; left:0; box-shadow:0 0 10px var(--glow-violet);"></div> </div> <button class="btn" style="margin-top:12px;" onclick="stackDrop()">EMPILER</button> </div>`;
+c.innerHTML = `<div style="text-align:center;">
+<div id="sboard" style="width:200px; height:200px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px;">
+<div id="sblock" style="width:80px; height:20px; background:var(--glow-violet); position:absolute; bottom:0; left:0; box-shadow:0 0 10px var(--glow-violet);"></div>
+</div>
+<button class="btn" style="margin-top:12px;" onclick="stackDrop()">EMPILER</button>
+</div>`;
 let pos = 0, dir = 4, score = 0;
 currentGameInterval = setInterval(() => {
 pos += dir;
