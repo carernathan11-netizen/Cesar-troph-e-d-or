@@ -525,6 +525,20 @@ appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
 db.ref('friend_codes/' + appData.friendId).set(user.uid);
 listenToTrades();
 updateUI();
+} else {
+// Si le compte existe dans Auth mais pas dans Database, on l'initialise
+const fId = generateFriendCode(user.uid);
+const initialData = {
+username: user.email.split('@')[0],
+credits: user.email === 'carer.nathan11@gmail.com' ? 999999999 : 0,
+friendId: fId,
+isAdmin: user.email === 'carer.nathan11@gmail.com',
+catalogs: JSON.parse(JSON.stringify(CATALOGS))
+};
+if(user.email === 'carer.nathan11@gmail.com') {
+Object.keys(initialData.catalogs).forEach(cat => initialData.catalogs[cat].forEach(i => i.unlocked = true));
+}
+userRef.set(initialData);
 }
 });
 } else {
@@ -758,24 +772,51 @@ if (currentAuthMode === 'register') {
 auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
 const u = userCredential.user;
 const fId = generateFriendCode(u.uid);
-db.ref('users/' + u.uid).set({
+const initialData = {
 username: username || email.split('@')[0],
 credits: appData.isAdmin ? 999999999 : 0,
 friendId: fId,
 isAdmin: appData.isAdmin,
 catalogs: appData.catalogs
+};
+db.ref('users/' + u.uid).set(initialData).then(() => {
+appData.currentUser = { email: u.email, username: initialData.username, uid: u.uid };
+updateUI();
 });
-alert('🎉 Compte enregistré sur les serveurs originaux !');
 }).catch(err => alert('❌ Erreur : ' + err.message));
 } else {
-auth.signInWithEmailAndPassword(email, pass).then(() => {
-alert('✅ Connexion globale réussie !');
+auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
+const u = userCredential.user;
+db.ref('users/' + u.uid).once('value').then(snapshot => {
+let data = snapshot.val();
+if (!data) {
+data = {
+username: u.email.split('@')[0],
+credits: appData.isAdmin ? 999999999 : 0,
+friendId: generateFriendCode(u.uid),
+isAdmin: appData.isAdmin,
+catalogs: appData.catalogs
+};
+db.ref('users/' + u.uid).set(data);
+}
+appData.currentUser = { email: u.email, username: data.username, uid: u.uid };
+appData.credits = data.credits || 0;
+appData.friendId = data.friendId || generateFriendCode(u.uid);
+appData.friends = data.friends || [];
+appData.isAdmin = data.isAdmin || appData.isAdmin;
+appData.catalogs = data.catalogs || appData.catalogs;
+updateUI();
+});
 }).catch(err => alert('❌ Erreur : ' + err.message));
 }
 }
 
 function logoutUser() {
-auth.signOut().then(() => alert('Déconnexion effectuée.'));
+auth.signOut().then(() => {
+appData.currentUser = null;
+updateUI();
+alert('Déconnexion effectuée.');
+});
 }
 
 /* SYSTÈME AMIS & ÉCHANGES */
@@ -858,7 +899,7 @@ if (!trades) { tl.innerHTML = '<i>Aucune offre en cours.</i>'; return; }
 let count = 0;
 Object.keys(trades).forEach(tid => {
 const t = trades[tid];
-if ((t.receiverUid === appData.currentUser.uid || t.senderUid === appData.currentUser.uid) && t.status === 'pending') {
+if (appData.currentUser && (t.receiverUid === appData.currentUser.uid || t.senderUid === appData.currentUser.uid) && t.status === 'pending') {
 count++;
 const div = document.createElement('div');
 div.className = 'trade-card-box';
