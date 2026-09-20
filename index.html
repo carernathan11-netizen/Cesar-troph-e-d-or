@@ -544,10 +544,20 @@ toast.classList.remove('show');
 }, 3500);
 }
 
-// GESTION ROBUSTE DE L'AUTHENTIFICATION
-// IMPORTANT : une connexion Firebase réussie ne suffit pas. On ne masque le formulaire
-// que lorsque le profil /users/<uid> a bien été chargé.
+// AUTHENTIFICATION ROBUSTE : l'authentification ne doit JAMAIS être bloquée par la base de données.
 let authLoading = false;
+let profileLoadToken = 0;
+
+function withTimeout(promise, ms, label) {
+return Promise.race([
+promise,
+new Promise((_, reject) => setTimeout(() => {
+const err = new Error(label || 'Délai dépassé.');
+err.code = 'timeout';
+reject(err);
+}, ms))
+]);
+}
 
 function resetLocalUserState() {
 appData.currentUser = null;
@@ -566,18 +576,37 @@ updateUI();
 return false;
 }
 
+const token = ++profileLoadToken;
+const isAdminEmail = (user.email || '').toLowerCase() === 'carer.nathan11@gmail.com';
+const fallbackFriendId = generateFriendCode(user.uid);
+
+// IMPORTANT : on affiche le compte dès que Firebase Authentication a validé
+// l'identité. La Realtime Database ne doit jamais pouvoir bloquer la connexion.
+appData.currentUser = {
+email: user.email || '',
+username: user.email ? user.email.split('@')[0] : 'Joueur',
+uid: user.uid
+};
+appData.friendId = fallbackFriendId;
+appData.credits = isAdminEmail ? 999999999 : 0;
+appData.friends = [];
+appData.isAdmin = isAdminEmail;
+appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
+appData.redeemedCodes = [];
+updateUI();
+
 try {
 const userRef = db.ref('users/' + user.uid);
-const snapshot = await userRef.once('value');
-let data = snapshot.val();
-const isAdminEmail = (user.email || '').toLowerCase() === 'carer.nathan11@gmail.com';
+const snapshot = await withTimeout(userRef.once('value'), 5000, 'La base de données Firebase ne répond pas.');
 
+// Si une autre connexion s'est produite entre-temps, ne pas écraser son état.
+if (token !== profileLoadToken || !auth.currentUser || auth.currentUser.uid !== user.uid) return true;
+
+let data = snapshot.val();
 if (!data) {
-const fId = generateFriendCode(user.uid);
-let freshCatalogs = JSON.parse(JSON.stringify(CATALOGS));
-if (isAdminEmail) {
-Object.keys(freshCatalogs).forEach(cat => freshCatalogs[cat].forEach(i => i.unlocked = true));
-}
+const fId = fallbackFriendId;
+const freshCatalogs = JSON.parse(JSON.stringify(CATALOGS));
+if (isAdminEmail) Object.keys(freshCatalogs).forEach(cat => freshCatalogs[cat].forEach(i => i.unlocked = true));
 
 data = {
 username: user.email ? user.email.split('@')[0] : 'Joueur',
@@ -588,55 +617,67 @@ isAdmin: isAdminEmail,
 catalogs: freshCatalogs,
 redeemedCodes: []
 };
-await userRef.set(data);
+
+// Écriture non bloquante : une panne de Realtime Database ne déconnecte pas le joueur.
+userRef.set(data).catch(err => console.warn('Création profil DB:', err));
 }
 
-const friendId = data.friendId || generateFriendCode(user.uid);
-
-appData.currentUser = {
-email: user.email || '',
-username: data.username || (user.email ? user.email.split('@')[0] : 'Joueur'),
-uid: user.uid
-};
+appData.currentUser.username = data.username || appData.currentUser.username;
 appData.credits = Number(data.credits) || 0;
-appData.friendId = friendId;
+appData.friendId = data.friendId || fallbackFriendId;
 appData.friends = Array.isArray(data.friends) ? data.friends : [];
 appData.isAdmin = data.isAdmin === true || isAdminEmail;
 appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes : [];
-// Migration des anciens codes et enregistrement de la clé Firebase valide.
-try {
-await db.ref('friend_codes/' + friendCodeKey(friendId)).set(user.uid);
-} catch (friendErr) {
-console.warn('Enregistrement ID ami impossible:', friendErr);
-// Ce bloc ne bloque PAS la connexion au compte.
-}
+
+// Écriture secondaire, elle aussi non bloquante.
+db.ref('friend_codes/' + friendCodeKey(appData.friendId)).set(user.uid)
+.catch(err => console.warn('Enregistrement ID ami:', err));
 
 listenToTrades();
 listenToFriendRequests();
 updateUI();
+
+// Cache local pour que l'interface reste utilisable même si Firebase DB tombe
+// momentanément lors de la prochaine connexion.
+try { localStorage.setItem('drop2027_profile_' + user.uid, JSON.stringify({
+username: appData.currentUser.username, credits: appData.credits, friendId: appData.friendId,
+friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, redeemedCodes: appData.redeemedCodes
+})); } catch (_) {}
+
 return true;
 } catch (error) {
-console.error('ERREUR CHARGEMENT PROFIL FIREBASE:', error);
-resetLocalUserState();
+console.warn('Realtime Database indisponible pendant la connexion:', error);
+
+// On tente le dernier profil local connu.
+try {
+const cached = JSON.parse(localStorage.getItem('drop2027_profile_' + user.uid) || 'null');
+if (cached) {
+appData.currentUser.username = cached.username || appData.currentUser.username;
+appData.credits = Number(cached.credits) || 0;
+appData.friendId = cached.friendId || fallbackFriendId;
+appData.friends = Array.isArray(cached.friends) ? cached.friends : [];
+appData.isAdmin = cached.isAdmin === true || isAdminEmail;
+appData.catalogs = cached.catalogs || appData.catalogs;
+appData.redeemedCodes = Array.isArray(cached.redeemedCodes) ? cached.redeemedCodes : [];
 updateUI();
+} } catch (_) {}
 
-let msg = 'Impossible de charger ton profil.';
-if (error && error.code === 'PERMISSION_DENIED') {
-msg = 'Firebase refuse l’accès à ton profil. Vérifie les règles Realtime Database.';
-} else if (error && error.message) {
-msg = error.message;
-}
-showToast('❌ ' + msg, 'error');
-return false;
+// Surtout : NE PAS faire auth.signOut() ici. L'identité Firebase est valide.
+// L'utilisateur reste connecté même si la DB est temporairement inaccessible.
+listenToTrades();
+listenToFriendRequests();
+updateUI();
+showToast('⚠️ Connecté. Firebase Data ne répond pas pour le moment.', 'error');
+return true;
 }
 }
 
-// Firebase garde la session entre les actualisations. Cet écouteur ne valide
-// visuellement la connexion qu'après le chargement réel du profil.
+// La session Firebase est restaurée automatiquement.
 auth.onAuthStateChanged(async (user) => {
 if (authLoading) return;
 if (!user) {
+profileLoadToken++;
 resetLocalUserState();
 updateUI();
 return;
@@ -647,7 +688,6 @@ await loadFirebaseUserProfile(user);
 function generateFriendCode(uid) {
 return '#DROP-' + uid.substring(0, 8).toUpperCase();
 }
-
 // Firebase interdit # dans les clés Realtime Database.
 // On affiche #DROP-XXXXXXXX à l'écran, mais on stocke DROP-XXXXXXXX comme clé.
 function friendCodeKey(code) {
@@ -668,7 +708,6 @@ redeemedCodes: appData.redeemedCodes
 }
 updateUI();
 }
-
 function updateUI() {
 document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
 
@@ -880,55 +919,51 @@ const email = document.getElementById('authEmail').value.trim().toLowerCase();
 const pass = document.getElementById('authPass').value;
 const username = document.getElementById('authUsername').value.trim();
 
-if (!email || !pass) {
-showToast('❌ E-mail et mot de passe requis.', 'error');
-return;
-}
-if (currentAuthMode === 'register' && pass.length < 6) {
-showToast('❌ Le mot de passe doit contenir au moins 6 caractères.', 'error');
-return;
-}
+if (!email || !pass) return showToast('❌ E-mail et mot de passe requis.', 'error');
+if (currentAuthMode === 'register' && pass.length < 6) return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.', 'error');
 
 authLoading = true;
 submitBtn.disabled = true;
 submitBtn.innerText = currentAuthMode === 'login' ? 'CONNEXION...' : 'CRÉATION...';
 
 try {
-let userCredential;
-
 if (currentAuthMode === 'login') {
-userCredential = await auth.signInWithEmailAndPassword(email, pass);
+// Timeout de sécurité : le bouton ne peut plus rester grisé indéfiniment.
+const credential = await withTimeout(
+auth.signInWithEmailAndPassword(email, pass),
+12000,
+'Firebase Authentication ne répond pas. Vérifie ta connexion Internet.'
+);
 
-// On attend explicitement que le profil Firebase soit lisible avant de dire
-// « connexion réussie ». C'était le point qui pouvait afficher le toast alors
-// que l'interface restait sur le formulaire.
-const ok = await loadFirebaseUserProfile(userCredential.user);
-if (!ok) {
-try { await auth.signOut(); } catch (_) {}
-return;
-}
+// Connexion Firebase réussie : on ne dépend PAS de la Realtime Database.
+await loadFirebaseUserProfile(credential.user);
 showToast('👋 Connexion réussie !', 'success');
 } else {
-userCredential = await auth.createUserWithEmailAndPassword(email, pass);
-const u = userCredential.user;
+const credential = await withTimeout(
+auth.createUserWithEmailAndPassword(email, pass),
+12000,
+'Firebase Authentication ne répond pas. Vérifie ta connexion Internet.'
+);
+const u = credential.user;
 const fId = generateFriendCode(u.uid);
 const initialCatalogs = JSON.parse(JSON.stringify(CATALOGS));
 const isAdminEmail = email === 'carer.nathan11@gmail.com';
-if (isAdminEmail) {
-Object.keys(initialCatalogs).forEach(cat => initialCatalogs[cat].forEach(i => i.unlocked = true));
-}
+if (isAdminEmail) Object.keys(initialCatalogs).forEach(cat => initialCatalogs[cat].forEach(i => i.unlocked = true));
+
+// Ne bloque pas l'inscription sur une écriture DB qui pourrait être refusée.
 const initialData = {
-username: username || email.split('@')[0],
-credits: isAdminEmail ? 999999999 : 0,
-friendId: fId,
-friends: [],
-isAdmin: isAdminEmail,
-catalogs: initialCatalogs,
-redeemedCodes: []
+username: username || email.split('@')[0], credits: isAdminEmail ? 999999999 : 0,
+friendId: fId, friends: [], isAdmin: isAdminEmail, catalogs: initialCatalogs, redeemedCodes: []
 };
-await db.ref('users/' + u.uid).set(initialData);
-await db.ref('friend_codes/' + friendCodeKey(fId)).set(u.uid);
-await loadFirebaseUserProfile(u);
+
+appData.currentUser = { email: u.email || email, username: initialData.username, uid: u.uid };
+appData.credits = initialData.credits; appData.friendId = fId; appData.friends = [];
+appData.isAdmin = isAdminEmail; appData.catalogs = initialCatalogs; appData.redeemedCodes = [];
+updateUI();
+
+db.ref('users/' + u.uid).set(initialData).catch(err => console.warn('Profil inscription:', err));
+db.ref('friend_codes/' + friendCodeKey(fId)).set(u.uid).catch(err => console.warn('Code ami inscription:', err));
+listenToTrades(); listenToFriendRequests();
 showToast('✨ Compte créé avec succès !', 'success');
 }
 } catch (err) {
@@ -966,7 +1001,6 @@ return showToast("❌ ID invalide. Exemple : #DROP-ABC12345", 'error');
 
 const btn = input.nextElementSibling;
 if (btn) btn.disabled = true;
-
 // Les anciennes versions pouvaient avoir tenté d'utiliser # dans la clé Firebase.
 // La nouvelle version utilise uniquement DROP-XXXXXXXX comme clé réelle.
 db.ref('friend_codes/' + key).once('value')
@@ -1008,7 +1042,6 @@ const requests = snapshot.val();
 const listEl = document.getElementById('friendRequestsList');
 if (!listEl) return;
 listEl.innerHTML = '';
-
 if (!requests) {
 listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
 return;
@@ -1029,7 +1062,6 @@ div.innerHTML = `<div style="font-size:0.8rem;"><b>${req.senderName}</b> <span s
 listEl.appendChild(div);
 }
 });
-
 if (count === 0) {
 listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
 }
@@ -1065,6 +1097,7 @@ if (!appData.friends || appData.friends.length === 0) {
 fl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucun ami ajouté.</i>';
 return;
 }
+
 fl.innerHTML = '';
 appData.friends.forEach(f => {
 const div = document.createElement('div');
@@ -1238,7 +1271,6 @@ function startAdModal() {
 adTimeRemaining = 30;
 const modal = document.getElementById('adModal'), timerEl = document.getElementById('adTimer'), btn = document.getElementById('adClaimBtn'), progressBar = document.getElementById('adProgressBar');
 modal.classList.add('active'); btn.disabled = true; btn.innerText = 'PATIENTEZ (' + adTimeRemaining + 's)...'; timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = '0%';
-
 adInterval = setInterval(() => {
 adTimeRemaining--;
 timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = ((30 - adTimeRemaining) / 30) * 100 + '%';
