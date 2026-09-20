@@ -2,62 +2,35 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GOLDEN CLAW — La Pince des César</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CÉSAR CLAW — Machine à Trophées</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0b0c10;
-      --card-bg: rgba(22, 24, 29, 0.85);
-      --gold: #d4af37;
-      --gold-light: #fff2a8;
-      --gold-glow: rgba(212, 175, 55, 0.35);
-      --text: #f5f5f7;
-      --text-muted: #8e8e93;
-      --border: rgba(255, 255, 255, 0.1);
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       user-select: none;
+      font-family: 'Fredoka', cursive, sans-serif;
     }
 
     body {
-      background-color: var(--bg-dark);
-      color: var(--text);
-      font-family: 'Inter', -apple-system, sans-serif;
+      background: #111827;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
-      overflow-x: hidden;
+      align-items: center;
+      overflow: hidden;
     }
 
-    /* Ambient Glow Background */
-    .bg-glow {
-      position: fixed;
-      top: -10vh;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90vw;
-      height: 70vh;
-      background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(90px);
-    }
-
-    /* Modal d'inscription */
+    /* Modal Email */
     .auth-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(15px);
+      backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -65,286 +38,353 @@
     }
 
     .auth-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 40px 30px;
+      background: #73d6c7;
+      border: 4px solid #ffffff;
+      border-radius: 32px;
+      padding: 30px 25px;
       width: 90%;
-      max-width: 420px;
+      max-width: 380px;
       text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      box-shadow: 0 15px 0 #329183, 0 25px 30px rgba(0,0,0,0.5);
     }
 
     .auth-card h1 {
-      font-size: 1.8rem;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #fff, var(--gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: 2.2rem;
+      color: #fff;
+      text-shadow: 0 4px 0 #2b7a6f;
+      margin-bottom: 8px;
     }
 
     .auth-card p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 25px;
+      color: #1a4d46;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      font-weight: 600;
     }
 
     .auth-input {
       width: 100%;
-      padding: 14px 18px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-      font-size: 1rem;
+      padding: 16px;
+      border-radius: 20px;
+      border: 3px solid #329183;
+      background: #fff;
+      color: #333;
+      font-size: 1.1rem;
       outline: none;
-      margin-bottom: 20px;
-      transition: border 0.3s;
+      margin-bottom: 15px;
+      text-align: center;
     }
 
-    .auth-input:focus {
-      border-color: var(--gold);
-    }
-
-    .btn-gold {
+    .btn-pop {
       width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: linear-gradient(135deg, var(--gold), #b8860b);
-      color: #000;
+      padding: 16px;
+      border-radius: 20px;
+      border: 3px solid #fff;
+      background: #ff5252;
+      color: #fff;
+      font-size: 1.3rem;
       font-weight: 700;
-      font-size: 1rem;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 6px 0 #c62828;
+      transition: transform 0.1s, box-shadow 0.1s;
     }
 
-    .btn-gold:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 20px var(--gold-glow);
+    .btn-pop:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #c62828;
     }
 
-    /* Interface Principale du Jeu */
-    .game-wrapper {
+    /* Machine Arcade Frame */
+    .arcade-machine {
+      width: 100%;
+      max-width: 420px;
+      height: 100vh;
+      max-height: 820px;
+      background: #7be5d6;
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
       position: relative;
+      box-shadow: 0 0 50px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+
+    @media (min-width: 500px) {
+      .arcade-machine {
+        border-radius: 40px;
+        border: 8px solid #52c2b3;
+        height: 95vh;
+      }
+    }
+
+    /* Top Bar HUD */
+    .top-bar {
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       z-index: 10;
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      background: #ff5252;
+      border: 3px solid #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 0 #c62828;
+      cursor: pointer;
+    }
+
+    .icon-btn::after {
+      content: '🏠';
+      font-size: 1.4rem;
+    }
+
+    .pill-counter {
+      background: rgba(255, 255, 255, 0.85);
+      border: 3px solid #52c2b3;
+      padding: 6px 16px;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+    }
+
+    .pill-counter .coin-icon {
+      width: 26px;
+      height: 26px;
+      background: #ffd54f;
+      border: 2px solid #ffb300;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #b78103;
+      font-size: 0.8rem;
+    }
+
+    .pill-val {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #2e7d71;
+    }
+
+    /* Game Canvas Glass Screen */
+    .screen-container {
+      flex: 1;
+      margin: 0 12px;
+      background: #a8f3ea;
+      border-radius: 25px;
+      border: 4px solid #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.08);
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Dashboard Bottom Control Panel */
+    .control-deck {
+      height: 150px;
+      background: #80ebd2;
+      border-top: 6px solid #4eb8a9;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 15px;
-      width: 100%;
-      max-width: 480px;
-      padding: 20px;
+      justify-content: center;
+      padding: 10px 20px;
+      gap: 10px;
     }
 
-    .header-bar {
+    .deck-buttons {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 12px 20px;
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
+      padding: 0 10px;
     }
 
-    .stat-box {
+    .joystick-base {
+      width: 70px;
+      height: 70px;
+      background: #52c2b3;
+      border-radius: 50%;
+      border: 3px solid #fff;
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .stat-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
-    }
-
-    .stat-val {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--gold-light);
-    }
-
-    /* Canvas de la Pince Arcade */
-    #arcadeCanvas {
-      background: #111318;
-      border: 2px solid var(--gold);
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 20px rgba(212, 175, 55, 0.1);
-      width: 100%;
-      height: 420px;
-    }
-
-    /* Panneau de Contrôle */
-    .controls-panel {
-      width: 100%;
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn-ctrl {
-      flex: 1;
-      padding: 16px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: var(--card-bg);
-      color: var(--text);
-      font-weight: 700;
-      font-size: 1.2rem;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 0 #3a968a;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
-    .btn-ctrl:active {
-      background: rgba(212, 175, 55, 0.2);
+    .joystick-knob {
+      width: 38px;
+      height: 38px;
+      background: #ff7043;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 0 #d84315;
     }
 
-    .btn-drop {
-      background: linear-gradient(135deg, var(--gold), #b8860b);
-      color: #000;
-      border: none;
-    }
-
-    .ad-btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px dashed var(--gold);
-      color: var(--gold-light);
-      font-size: 0.85rem;
-      font-weight: 600;
+    .red-action-btn {
+      width: 85px;
+      height: 60px;
+      background: #ff5252;
+      border: 4px solid #fff;
+      border-radius: 30px;
+      box-shadow: 0 6px 0 #c62828;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
     }
 
-    /* Modal Pub simulée */
+    .red-action-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #c62828;
+    }
+
+    .ad-banner-btn {
+      width: 100%;
+      padding: 10px;
+      background: #ffd54f;
+      border: 3px solid #fff;
+      border-radius: 16px;
+      color: #6d4c41;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #ffb300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Modal Pub */
     .ad-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.95);
+      background: rgba(0,0,0,0.9);
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 2000;
-      padding: 20px;
-      text-align: center;
     }
 
-    .ad-box {
-      border: 1px solid var(--border);
+    .ad-card {
+      background: #fff;
       padding: 30px;
-      border-radius: 20px;
-      background: #181920;
-      max-width: 350px;
+      border-radius: 30px;
+      text-align: center;
+      max-width: 320px;
+      border: 5px solid #ffd54f;
     }
 
     .ad-timer {
-      font-size: 2.5rem;
+      font-size: 3rem;
       font-weight: 800;
-      color: var(--gold);
-      margin: 20px 0;
+      color: #ff5252;
+      margin: 15px 0;
     }
   </style>
 </head>
 <body>
 
-  <div class="bg-glow"></div>
-
-  <!-- Ecran d'inscription Email -->
+  <!-- Modal Auth -->
   <div class="auth-overlay" id="authModal">
     <div class="auth-card">
       <h1>CÉSAR CLAW</h1>
-      <p>Entrez votre e-mail pour recevoir 10 crédits cadeaux et accéder à la pince.</p>
+      <p>Inscris-toi avec ton e-mail pour recevoir 10 crédits gratuits !</p>
       <form onsubmit="handleAuth(event)">
-        <input type="email" id="userEmail" class="auth-input" placeholder="nom@exemple.com" required>
-        <button type="submit" class="btn-gold">Recevoir 10 Crédits</button>
+        <input type="email" id="userEmail" class="auth-input" placeholder="ton.email@exemple.com" required>
+        <button type="submit" class="btn-pop">JOUER (10 🪙)</button>
       </form>
     </div>
   </div>
 
-  <!-- Modal Pub Interstitielle (Simulée) -->
+  <!-- Modal Pub -->
   <div class="ad-overlay" id="adModal">
-    <div class="ad-box">
-      <div style="font-size: 0.75rem; color: var(--text-muted); letter-spacing: 2px;">SPONSOR PUBLICITAIRE</div>
-      <h2 style="margin-top: 10px; color: #fff;">Académie des César 2026</h2>
-      <p style="font-size: 0.85rem; color: #aaa; margin-top: 5px;">Regardez cette vidéo pour débloquer +5 Crédits de jeu.</p>
+    <div class="ad-card">
+      <h3 style="color: #333;">PUBLICITÉ CÉSAR</h3>
+      <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">Regarde la pub pour gagner 5 Crédits !</p>
       <div class="ad-timer" id="adTimer">30</div>
-      <p style="font-size: 0.75rem; color: var(--text-muted);">Récompense créditée automatiquement à la fin du décompte.</p>
+      <p style="color: #aaa; font-size: 0.8rem;">Crédités à la fin du chrono.</p>
     </div>
   </div>
 
-  <!-- Zone de Jeu -->
-  <div class="game-wrapper">
-    <div class="header-bar">
-      <div class="stat-box">
-        <span class="stat-label">Joueur</span>
-        <span class="stat-val" id="displayMail" style="font-size: 0.85rem;">-</span>
-      </div>
-      <div class="stat-box">
-        <span class="stat-label">Score</span>
-        <span class="stat-val" id="scoreVal">0 pts</span>
-      </div>
-      <div class="stat-box">
-        <span class="stat-label">Crédits</span>
-        <span class="stat-val" id="creditsVal">0</span>
+  <!-- Machine Arcade -->
+  <div class="arcade-machine">
+    <!-- Top HUD -->
+    <div class="top-bar">
+      <div class="icon-btn" onclick="location.reload()"></div>
+      <div class="pill-counter">
+        <div class="coin-icon">🪙</div>
+        <div class="pill-val" id="creditsVal">0</div>
       </div>
     </div>
 
-    <!-- Canvas Arcade -->
-    <canvas id="arcadeCanvas" width="400" height="420"></canvas>
-
-    <!-- Contrôles -->
-    <div class="controls-panel">
-      <button class="btn-ctrl" onclick="moveClaw(-15)">◄</button>
-      <button class="btn-ctrl btn-drop" onclick="dropClaw()">LANCER</button>
-      <button class="btn-ctrl" onclick="moveClaw(15)">►</button>
+    <!-- Screen Canvas -->
+    <div class="screen-container">
+      <canvas id="gameCanvas"></canvas>
     </div>
 
-    <button class="ad-btn" onclick="watchAd()">
-      <span>🎬</span> Regarder une pub (+5 Crédits)
-    </button>
+    <!-- Controls -->
+    <div class="control-deck">
+      <div class="deck-buttons">
+        <div class="joystick-base" onclick="moveClaw(-25)">
+          <div class="joystick-knob"></div>
+        </div>
+        <button class="red-action-btn" onclick="dropClaw()">PRENDRE</button>
+        <div class="joystick-base" onclick="moveClaw(25)">
+          <div class="joystick-knob"></div>
+        </div>
+      </div>
+      <button class="ad-banner-btn" onclick="watchAd()">
+        📺 Regarder une vidéo (+5 🪙)
+      </button>
+    </div>
   </div>
 
   <script>
-    /* ===================================================
-       1. GESTION DES ETATS ET CREDITS
-       =================================================== */
     let credits = 0;
     let score = 0;
-    let email = "";
     let audioCtx = null;
 
     function handleAuth(e) {
       e.preventDefault();
-      email = document.getElementById('userEmail').value;
       credits = 10;
-      document.getElementById('displayMail').innerText = email.split('@')[0];
       document.getElementById('creditsVal').innerText = credits;
       document.getElementById('authModal').style.display = 'none';
       initAudio();
-      playBgMusic();
     }
 
     function watchAd() {
       const modal = document.getElementById('adModal');
-      const timerEl = document.getElementById('adTimer');
+      const timer = document.getElementById('adTimer');
       modal.style.display = 'flex';
       let left = 30;
-      timerEl.innerText = left;
+      timer.innerText = left;
 
-      const interval = setInterval(() => {
+      const inv = setInterval(() => {
         left--;
-        timerEl.innerText = left;
+        timer.innerText = left;
         if (left <= 0) {
-          clearInterval(interval);
+          clearInterval(inv);
           modal.style.display = 'none';
           credits += 5;
           document.getElementById('creditsVal').innerText = credits;
@@ -353,25 +393,9 @@
       }, 1000);
     }
 
-    /* ===================================================
-       2. SYSTEME AUDIO SYNTHETIQUE (Web Audio API)
-       =================================================== */
+    /* Audio Synth */
     function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-    }
-
-    function playBgMusic() {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(130, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
     function playWinSound() {
@@ -380,14 +404,14 @@
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(523.25, now); // C5
-      osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.4); // C6
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
-      osc.stop(now + 0.4);
+      osc.stop(now + 0.3);
     }
 
     function playLoseSound() {
@@ -396,34 +420,40 @@
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(220, now);
-      osc.frequency.linearRampToValueAtTime(110, now + 0.5);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+      osc.frequency.setValueAtTime(250, now);
+      osc.frequency.linearRampToValueAtTime(120, now + 0.4);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
-      osc.stop(now + 0.5);
+      osc.stop(now + 0.4);
     }
 
-    /* ===================================================
-       3. MOTEUR DE JEU CANVAS 2D (LA PINCE A TROPHEES)
-       =================================================== */
-    const canvas = document.getElementById('arcadeCanvas');
+    /* Engine Canvas Engine */
+    const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    let clawX = canvas.width / 2;
-    let clawY = 40;
-    let clawState = 'idle'; // 'idle', 'dropping', 'grabbing', 'returning'
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let clawX = 150;
+    let clawY = 60;
+    let clawState = 'idle';
     let grabbedItem = null;
 
-    // Trophées positionnés au fond de la machine
-    const trophies = [
-      { x: 60, y: 370, radius: 18, points: 10, color: '#d4af37' },
-      { x: 130, y: 375, radius: 15, points: 20, color: '#fff2a8' },
-      { x: 200, y: 370, radius: 22, points: 5,  color: '#cd7f32' },
-      { x: 270, y: 375, radius: 16, points: 15, color: '#d4af37' },
-      { x: 340, y: 370, radius: 20, points: 50, color: '#e5e4e2' }
+    // Items pastel cartoon (style image)
+    const items = [
+      { x: 50,  y: 380, r: 22, type: 'basket', color: '#ff7043' },
+      { x: 110, y: 390, r: 18, type: 'coin', color: '#ffd54f' },
+      { x: 160, y: 375, r: 24, type: 'blue', color: '#42a5f5' },
+      { x: 220, y: 385, r: 20, type: 'egg', color: '#ab47bc' },
+      { x: 280, y: 370, r: 23, type: 'basket', color: '#ff7043' },
+      { x: 320, y: 390, r: 18, type: 'coin', color: '#ffd54f' }
     ];
 
     function moveClaw(dir) {
@@ -436,7 +466,7 @@
     function dropClaw() {
       if (clawState !== 'idle') return;
       if (credits <= 0) {
-        alert("Crédits insuffisants ! Regardez une pub pour recharger.");
+        alert("Tu n'as plus de crédits ! Regarde une vidéo.");
         return;
       }
       credits--;
@@ -444,41 +474,71 @@
       clawState = 'dropping';
     }
 
-    function updateGame() {
-      // Logique de descente/remontée de la pince
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Fond Villes Silhouette Kawaii
+      ctx.fillStyle = '#92e8dc';
+      ctx.fillRect(0, canvas.height - 120, canvas.width, 120);
+
+      // Dessin des Objets
+      items.forEach(it => {
+        ctx.save();
+        ctx.translate(it.x, it.y);
+
+        if (it.type === 'basket') {
+          ctx.fillStyle = '#ff7043';
+          ctx.beginPath();
+          ctx.arc(0, 0, it.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#333';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        } else if (it.type === 'coin') {
+          ctx.fillStyle = '#ffd54f';
+          ctx.beginPath();
+          ctx.arc(0, 0, it.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#ffb300';
+          ctx.lineWidth = 4;
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = it.color;
+          ctx.beginPath();
+          ctx.arc(0, 0, it.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      });
+
+      // Mouvement Pince
       if (clawState === 'dropping') {
-        clawY += 4;
-        if (clawY >= 340) {
+        clawY += 5;
+        if (clawY >= canvas.height - 90) {
           clawState = 'grabbing';
-          // Détections de collision avec les trophées
-          trophies.forEach(t => {
-            if (Math.abs(t.x - clawX) < 25 && !grabbedItem) {
-              grabbedItem = t;
+          items.forEach(it => {
+            if (Math.abs(it.x - clawX) < 25 && !grabbedItem) {
+              grabbedItem = it;
             }
           });
-          setTimeout(() => { clawState = 'returning'; }, 500);
+          setTimeout(() => { clawState = 'returning'; }, 400);
         }
       } else if (clawState === 'returning') {
-        clawY -= 3;
+        clawY -= 4;
         if (grabbedItem) {
-          grabbedItem.y = clawY + 25;
+          grabbedItem.y = clawY + 35;
           grabbedItem.x = clawX;
         }
-        if (clawY <= 40) {
+        if (clawY <= 60) {
           clawState = 'idle';
           if (grabbedItem) {
-            // Chance de faire tomber le trophée en haut (suspense)
-            if (Math.random() > 0.25) {
-              score += grabbedItem.points;
-              document.getElementById('scoreVal').innerText = score + " pts";
-              playWinSound();
-              // Réinitialisation du trophée au sol
-              grabbedItem.y = 370;
-              grabbedItem.x = Math.random() * 300 + 50;
-            } else {
-              playLoseSound();
-              grabbedItem.y = 370;
-            }
+            playWinSound();
+            grabbedItem.y = canvas.height - 80;
+            grabbedItem.x = Math.random() * (canvas.width - 80) + 40;
             grabbedItem = null;
           } else {
             playLoseSound();
@@ -486,65 +546,60 @@
         }
       }
 
-      render();
-      requestAnimationFrame(updateGame);
-    }
-
-    function render() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Dessin des trophées
-      trophies.forEach(t => {
-        ctx.save();
-        ctx.fillStyle = t.color;
-        ctx.beginPath();
-        // Socle
-        ctx.fillRect(t.x - 10, t.y, 20, 10);
-        // Corps du Trophée
-        ctx.arc(t.x, t.y - 10, t.radius / 1.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
-
-      // Dessin du câble
-      ctx.strokeStyle = '#8e8e93';
-      ctx.lineWidth = 3;
+      // Câble de la pince
+      ctx.strokeStyle = '#6d4c41';
+      ctx.lineWidth = 6;
       ctx.beginPath();
       ctx.moveTo(clawX, 0);
       ctx.lineTo(clawX, clawY);
       ctx.stroke();
 
-      // Dessin de la Pince en Métal
+      // Pince Cute Cartoon (Tête jaune avec yeux)
       ctx.save();
       ctx.translate(clawX, clawY);
-      ctx.strokeStyle = '#d4af37';
-      ctx.lineWidth = 5;
 
-      // Tête de la pince
-      ctx.fillStyle = '#222';
-      ctx.fillRect(-15, -10, 30, 15);
-
-      // Bras gauche et droit
-      const openAngle = (clawState === 'grabbing') ? 0.2 : 0.6;
-      
-      // Bras gauche
+      // Yeux et sourire
+      ctx.fillStyle = '#ffd54f';
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(-10, 5);
-      ctx.lineTo(-25 * Math.cos(openAngle), 25 * Math.sin(openAngle));
+      ctx.roundRect(-22, -15, 44, 30, 10);
+      ctx.fill();
       ctx.stroke();
 
-      // Bras droit
+      // Yeux
+      ctx.fillStyle = '#333';
       ctx.beginPath();
-      ctx.moveTo(10, 5);
-      ctx.lineTo(25 * Math.cos(openAngle), 25 * Math.sin(openAngle));
+      ctx.arc(-8, -2, 4, 0, Math.PI * 2);
+      ctx.arc(8, -2, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sourire
+      ctx.beginPath();
+      ctx.arc(0, 3, 5, 0, Math.PI);
+      ctx.stroke();
+
+      // Bras de pince
+      ctx.strokeStyle = '#b0bec5';
+      ctx.lineWidth = 5;
+      const angle = (clawState === 'grabbing') ? 0.2 : 0.5;
+
+      ctx.beginPath();
+      ctx.moveTo(-15, 10);
+      ctx.lineTo(-28 * Math.cos(angle), 35 * Math.sin(angle));
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(15, 10);
+      ctx.lineTo(28 * Math.cos(angle), 35 * Math.sin(angle));
       ctx.stroke();
 
       ctx.restore();
+
+      requestAnimationFrame(loop);
     }
 
-    // Lancement de la boucle de rendu
-    requestAnimationFrame(updateGame);
+    loop();
   </script>
 </body>
 </html>
- 
