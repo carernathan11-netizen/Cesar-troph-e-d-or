@@ -396,6 +396,7 @@ firebase.initializeApp(firebaseConfig);
 }
 const auth = firebase.auth();
 const db = firebase.database();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.warn('Persistance Firebase:', err));
 
 const CATALOGS = {
 tiktok: [
@@ -577,7 +578,7 @@ appData.isAdmin = data.isAdmin || isAdminEmail;
 appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = data.redeemedCodes || [];
 
-db.ref('friend_codes/' + appData.friendId).set(user.uid);
+db.ref('friend_codes/' + friendCodeKey(appData.friendId)).set(user.uid).catch(err => console.error('friend code:', err));
 listenToTrades();
 listenToFriendRequests();
 updateUI();
@@ -601,6 +602,13 @@ function generateFriendCode(uid) {
 return '#DROP-' + uid.substring(0, 8).toUpperCase();
 }
 
+// Firebase interdit # dans les clés Realtime Database.
+// On affiche #DROP-XXXXXXXX à l'écran, mais on stocke DROP-XXXXXXXX comme clé.
+function friendCodeKey(code) {
+return String(code || '').trim().toUpperCase().replace(/^#/, '');
+}
+
+
 function saveAppData() {
 if (appData.currentUser) {
 db.ref('users/' + appData.currentUser.uid).update({
@@ -617,7 +625,6 @@ updateUI();
 
 function updateUI() {
 document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
-
 const authSec = document.getElementById('authSection');
 const profSec = document.getElementById('userProfileSection');
 const friendsSec = document.getElementById('friendsSection');
@@ -646,6 +653,7 @@ friendsSec.style.display = 'none';
 
 renderCatalogGrid();
 }
+
 function switchTab(id, btn) {
 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -708,6 +716,7 @@ saveAppData();
 function openRandomDrop() {
 if (isDropping) return;
 if (!appData.isAdmin && appData.credits < 150) return showToast('150 Crédits requis pour lancer un drop !', 'error');
+
 const roll = Math.random();
 let isUltraRare = roll < 0.1;
 
@@ -792,11 +801,13 @@ showToast('💥 ACCÈS ADMINISTRATEUR SUPRÊME DÉBLOQUÉ !', 'success');
 }
 
 function setAuthMode(mode) {
-currentAuthMode = mode;
-document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
-document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
-document.getElementById('usernameBox').style.display = mode === 'register' ? 'block' : 'none';
-document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE";
+currentAuthMode = mode === 'register' ? 'register' : 'login';
+const isRegister = currentAuthMode === 'register';
+document.getElementById('tabLogin').classList.toggle('active', !isRegister);
+document.getElementById('tabRegister').classList.toggle('active', isRegister);
+document.getElementById('usernameBox').style.display = isRegister ? 'block' : 'none';
+document.getElementById('authUsername').required = isRegister;
+document.getElementById('authSubmitBtn').innerText = isRegister ? "S'INSCRIRE" : 'SE CONNECTER';
 }
 
 function firebaseAuthErrorMessage(err) {
@@ -812,71 +823,53 @@ const messages = {
 };
 return messages[code] || (err && err.message) || 'Une erreur inconnue est survenue.';
 }
-function handleAuth(e) {
+
+async function handleAuth(e) {
 e.preventDefault();
 const submitBtn = document.getElementById('authSubmitBtn');
 const email = document.getElementById('authEmail').value.trim().toLowerCase();
 const pass = document.getElementById('authPass').value;
 const username = document.getElementById('authUsername').value.trim();
+
 if (!email || !pass) return showToast('❌ E-mail et mot de passe requis.', 'error');
+if (currentAuthMode === 'register' && pass.length < 6) return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.', 'error');
+
 submitBtn.disabled = true;
+submitBtn.innerText = currentAuthMode === 'login' ? 'CONNEXION...' : 'CRÉATION...';
 
-let isAdminAccount = (email === 'carer.nathan11@gmail.com');
-if (isAdminAccount && pass === 'dropadministrator20262027acces') {
-appData.isAdmin = true;
-appData.credits = 999999999;
-Object.keys(appData.catalogs).forEach(cat => appData.catalogs[cat].forEach(i => i.unlocked = true));
-}
-
-if (currentAuthMode === 'register') {
-auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
+try {
+let userCredential;
+if (currentAuthMode === 'login') {
+userCredential = await auth.signInWithEmailAndPassword(email, pass);
+showToast('👋 Connexion réussie !', 'success');
+} else {
+userCredential = await auth.createUserWithEmailAndPassword(email, pass);
 const u = userCredential.user;
 const fId = generateFriendCode(u.uid);
-let initialCatalogs = JSON.parse(JSON.stringify(CATALOGS));
-if (appData.isAdmin) {
-Object.keys(initialCatalogs).forEach(cat => initialCatalogs[cat].forEach(i => i.unlocked = true));
-}
+const initialCatalogs = JSON.parse(JSON.stringify(CATALOGS));
 const initialData = {
 username: username || email.split('@')[0],
-credits: appData.isAdmin ? 999999999 : 0,
+credits: 0,
 friendId: fId,
 friends: [],
-isAdmin: appData.isAdmin,
+isAdmin: false,
 catalogs: initialCatalogs,
 redeemedCodes: []
 };
-db.ref('users/' + u.uid).set(initialData).then(() => {
-db.ref('friend_codes/' + fId).set(u.uid);
-appData.currentUser = { email: u.email, username: initialData.username, uid: u.uid };
-showToast('✨ Compte créé avec succès ! Bienvenue.', 'success');
-updateUI();
-});
-}).catch(err => showToast("❌ Erreur d’inscription : " + firebaseAuthErrorMessage(err), "error"))
-.finally(() => { submitBtn.disabled = false; });
-} else {
-auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
-const u = userCredential.user;
-db.ref('users/' + u.uid).once('value').then(snapshot => {
-let data = snapshot.val() || {};
-if (!data.username) {
-data.username = u.email.split('@')[0];
-}
-db.ref('friend_codes/' + (data.friendId || generateFriendCode(u.uid))).set(u.uid);
-appData.currentUser = { email: u.email, username: data.username, uid: u.uid };
-appData.credits = data.credits !== undefined ? data.credits : 0;
-appData.friendId = data.friendId || generateFriendCode(u.uid);
-appData.friends = data.friends || [];
-appData.isAdmin = data.isAdmin || appData.isAdmin;
-appData.catalogs = data.catalogs || appData.catalogs;
-appData.redeemedCodes = data.redeemedCodes || [];
-showToast('👋 Connexion réussie ! Bon retour.', 'success');
-updateUI();
-});
-}).catch(err => showToast('❌ Erreur de connexion : ' + firebaseAuthErrorMessage(err), 'error'))
-.finally(() => { submitBtn.disabled = false; });
-}
+await db.ref('users/' + u.uid).set(initialData);
+await db.ref('friend_codes/' + friendCodeKey(fId)).set(u.uid);
+showToast('✨ Compte créé avec succès !', 'success');
 }
 
+// onAuthStateChanged charge le profil et affiche automatiquement le compte.
+} catch (err) {
+console.error('AUTH ERROR:', err);
+showToast('❌ ' + firebaseAuthErrorMessage(err), 'error');
+} finally {
+submitBtn.disabled = false;
+submitBtn.innerText = currentAuthMode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE";
+}
+}
 function logoutUser() {
 auth.signOut().then(() => {
 appData.currentUser = null;
@@ -888,43 +881,51 @@ updateUI();
 // GESTION CORRIGÉE DES AMIS ET DES DEMANDES
 function sendFriendRequest() {
 if (!appData.currentUser) return showToast('❌ Connectez-vous pour ajouter un ami.', 'error');
-const rawCode = document.getElementById('addFriendInput').value.trim().toUpperCase();
-const code = rawCode.startsWith('#') ? rawCode : '#' + rawCode;
-if (!code) return showToast("❌ Veuillez entrer un ID d'ami valide !", 'error');
 
-db.ref('friend_codes/' + code).once('value').then(snapshot => {
+const input = document.getElementById('addFriendInput');
+const raw = input.value.trim().toUpperCase();
+const key = friendCodeKey(raw);
+if (!key || !key.startsWith('DROP-')) {
+return showToast("❌ ID invalide. Exemple : #DROP-ABC12345", 'error');
+}
+
+const btn = input.nextElementSibling;
+if (btn) btn.disabled = true;
+
+// Les anciennes versions pouvaient avoir tenté d'utiliser # dans la clé Firebase.
+// La nouvelle version utilise uniquement DROP-XXXXXXXX comme clé réelle.
+db.ref('friend_codes/' + key).once('value')
+.then(snapshot => {
 const targetUid = snapshot.val();
-if (!targetUid) return showToast("❌ Cet ID Ami n'existe pas dans le système !", 'error');
-if (targetUid === appData.currentUser.uid) return showToast("❌ Vous ne pouvez pas vous ajouter vous-même !", 'error');
+if (!targetUid) throw new Error("Cet ID Ami n'existe pas.");
+if (targetUid === appData.currentUser.uid) throw new Error('Vous ne pouvez pas vous ajouter vous-même.');
+if ((appData.friends || []).some(f => f.uid === targetUid)) throw new Error('Cet utilisateur est déjà dans vos amis.');
 
-if (appData.friends.some(f => f.uid === targetUid)) {
-return showToast("⚠️ Cet utilisateur est déjà dans votre liste d'amis.", 'error');
-}
-
-db.ref('friend_requests/' + targetUid).once('value').then(reqSnap => {
+return db.ref('friend_requests/' + targetUid).once('value').then(reqSnap => {
 const requests = reqSnap.val() || {};
-const alreadyRequested = Object.values(requests).some(r => r.senderUid === appData.currentUser.uid && r.status === 'pending');
+const duplicate = Object.values(requests).some(r => r && r.senderUid === appData.currentUser.uid && r.status === 'pending');
+if (duplicate) throw new Error('Une demande a déjà été envoyée à cet utilisateur.');
 
-if (alreadyRequested) {
-return showToast("⚠️ Une demande a déjà été envoyée à cet utilisateur.", 'error');
-}
-
-const reqId = 'req_' + Date.now();
-db.ref('friend_requests/' + targetUid + '/' + reqId).set({
+const reqId = 'req_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+return db.ref('friend_requests/' + targetUid + '/' + reqId).set({
 senderUid: appData.currentUser.uid,
 senderName: appData.currentUser.username,
 senderFriendId: appData.friendId,
-status: 'pending'
-}).then(() => {
-document.getElementById('addFriendInput').value = '';
-showToast("✅ Demande d'ami envoyée avec succès !", 'success');
+status: 'pending',
+createdAt: firebase.database.ServerValue.TIMESTAMP
 });
 });
-}).catch(err => {
-showToast("❌ Erreur : " + err.message, 'error');
-});
+})
+.then(() => {
+input.value = '';
+showToast("✅ Demande d'ami envoyée !", 'success');
+})
+.catch(err => {
+console.error('sendFriendRequest:', err);
+showToast('❌ ' + (err.message || 'Impossible d’envoyer la demande.'), 'error');
+})
+.finally(() => { if (btn) btn.disabled = false; });
 }
-
 function listenToFriendRequests() {
 if (!appData.currentUser) return;
 db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
@@ -937,6 +938,7 @@ if (!requests) {
 listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
 return;
 }
+
 let count = 0;
 Object.keys(requests).forEach(reqId => {
 const req = requests[reqId];
@@ -958,7 +960,6 @@ listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucun
 }
 });
 }
-
 function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
 if (!appData.friends.some(f => f.uid === senderUid)) {
 appData.friends.push({ uid: senderUid, username: senderName, friendId: senderFriendId });
@@ -1042,7 +1043,6 @@ const trades = snapshot.val();
 const tl = document.getElementById('tradesList');
 if(!tl) return;
 tl.innerHTML = '';
-
 if (!trades) { tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>'; return; }
 
 let count = 0;
@@ -1189,7 +1189,6 @@ saveAppData();
 document.getElementById('gameArea').classList.add('active');
 const container = document.getElementById('gameCanvasContainer');
 container.innerHTML = '';
-
 if (gameType === 'reaction') runReactionGame(container);
 else if (gameType === 'connect4') runConnect4Game(container);
 else if (gameType === 'snake') runSnakeGame(container);
@@ -1209,6 +1208,7 @@ appData.credits += amount;
 saveAppData();
 closeGame();
 }
+
 function runReactionGame(c) {
 document.getElementById('gameTitle').innerText = "Réaction Extrême";
 c.innerHTML = '<div style="text-align:center;"><div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);"><div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div><div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div></div><button class="btn" onclick="stopReaction()">STOP !</button></div>';
