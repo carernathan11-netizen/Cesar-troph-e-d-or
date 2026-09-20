@@ -508,42 +508,51 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS))
 let currentAuthMode = 'login';
 let isDropping = false;
 
-// ÉCOUTEUR DE CONNEXION FIREBASE EN TEMPS RÉEL
+// ÉCOUTEUR DE CONNEXION FIREBASE CORRIGÉ & ROBUSTE
 auth.onAuthStateChanged((user) => {
 if (user) {
 const userRef = db.ref('users/' + user.uid);
-userRef.on('value', (snapshot) => {
-const data = snapshot.val();
-if (data) {
-appData.currentUser = { email: user.email, username: data.username, uid: user.uid };
-appData.credits = data.credits || 0;
+userRef.once('value').then((snapshot) => {
+let data = snapshot.val();
+const isAdminEmail = (user.email === 'carer.nathan11@gmail.com');
+
+if (!data) {
+// Initialisation automatique si le compte existe dans Auth mais pas dans la Base de Données
+const fId = generateFriendCode(user.uid);
+let freshCatalogs = JSON.parse(JSON.stringify(CATALOGS));
+if (isAdminEmail) {
+Object.keys(freshCatalogs).forEach(cat => freshCatalogs[cat].forEach(i => i.unlocked = true));
+}
+data = {
+username: user.email.split('@')[0],
+credits: isAdminEmail ? 999999999 : 0,
+friendId: fId,
+friends: [],
+isAdmin: isAdminEmail,
+catalogs: freshCatalogs,
+redeemedCodes: []
+};
+userRef.set(data);
+}
+
+appData.currentUser = { email: user.email, username: data.username || user.email.split('@')[0], uid: user.uid };
+appData.credits = data.credits !== undefined ? data.credits : 0;
 appData.friendId = data.friendId || generateFriendCode(user.uid);
 appData.friends = data.friends || [];
-appData.isAdmin = data.isAdmin || false;
+appData.isAdmin = data.isAdmin || isAdminEmail;
 appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
+appData.redeemedCodes = data.redeemedCodes || [];
 
 db.ref('friend_codes/' + appData.friendId).set(user.uid);
 listenToTrades();
 updateUI();
-} else {
-// Si le compte existe dans Auth mais pas dans Database, on l'initialise
-const fId = generateFriendCode(user.uid);
-const initialData = {
-username: user.email.split('@')[0],
-credits: user.email === 'carer.nathan11@gmail.com' ? 999999999 : 0,
-friendId: fId,
-isAdmin: user.email === 'carer.nathan11@gmail.com',
-catalogs: JSON.parse(JSON.stringify(CATALOGS))
-};
-if(user.email === 'carer.nathan11@gmail.com') {
-Object.keys(initialData.catalogs).forEach(cat => initialData.catalogs[cat].forEach(i => i.unlocked = true));
-}
-userRef.set(initialData);
-}
 });
 } else {
 appData.currentUser = null;
 appData.credits = 0;
+appData.friendId = null;
+appData.friends = [];
+appData.isAdmin = false;
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 updateUI();
 }
@@ -560,7 +569,8 @@ credits: appData.credits,
 catalogs: appData.catalogs,
 friends: appData.friends,
 friendId: appData.friendId,
-isAdmin: appData.isAdmin
+isAdmin: appData.isAdmin,
+redeemedCodes: appData.redeemedCodes
 });
 }
 updateUI();
@@ -631,9 +641,9 @@ div.className = `catalog-card ${item.unlocked ? '' : 'locked'}`;
 div.innerHTML = `
 <div class="emoji">${item.emoji}</div>
 <div class="item-name">${item.name}</div>
-<div class="item-price">${item.price} 🪙</div>
-<button class="btn" style="padding:6px; font-size:0.7rem; margin-top:6px;" onclick="buyItemDirect(${item.id})">
-${item.unlocked ? 'POSSÉDÉ' : 'OBTENIR'}
+<div class="item-price">${item.unlocked ? 'POSSÉDÉ' : item.price + ' 🪙'}</div>
+<button class="btn" style="padding:6px; font-size:0.65rem; margin-top:6px;" ${item.unlocked ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">
+${item.unlocked ? 'acquis' : 'obtenir'}
 </button>`;
 grid.appendChild(div);
 });
@@ -762,7 +772,8 @@ const email = document.getElementById('authEmail').value.trim().toLowerCase();
 const pass = document.getElementById('authPass').value.trim();
 const username = document.getElementById('authUsername').value.trim();
 
-if (email === 'carer.nathan11@gmail.com' && pass === 'dropadministrator20262027acces') {
+let isAdminAccount = (email === 'carer.nathan11@gmail.com');
+if (isAdminAccount && pass === 'dropadministrator20262027acces') {
 appData.isAdmin = true;
 appData.credits = 999999999;
 Object.keys(appData.catalogs).forEach(cat => appData.catalogs[cat].forEach(i => i.unlocked = true));
@@ -772,12 +783,18 @@ if (currentAuthMode === 'register') {
 auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
 const u = userCredential.user;
 const fId = generateFriendCode(u.uid);
+let initialCatalogs = JSON.parse(JSON.stringify(CATALOGS));
+if (appData.isAdmin) {
+Object.keys(initialCatalogs).forEach(cat => initialCatalogs[cat].forEach(i => i.unlocked = true));
+}
 const initialData = {
 username: username || email.split('@')[0],
 credits: appData.isAdmin ? 999999999 : 0,
 friendId: fId,
+friends: [],
 isAdmin: appData.isAdmin,
-catalogs: appData.catalogs
+catalogs: initialCatalogs,
+redeemedCodes: []
 };
 db.ref('users/' + u.uid).set(initialData).then(() => {
 appData.currentUser = { email: u.email, username: initialData.username, uid: u.uid };
@@ -794,17 +811,20 @@ data = {
 username: u.email.split('@')[0],
 credits: appData.isAdmin ? 999999999 : 0,
 friendId: generateFriendCode(u.uid),
+friends: [],
 isAdmin: appData.isAdmin,
-catalogs: appData.catalogs
+catalogs: appData.catalogs,
+redeemedCodes: []
 };
 db.ref('users/' + u.uid).set(data);
 }
-appData.currentUser = { email: u.email, username: data.username, uid: u.uid };
-appData.credits = data.credits || 0;
+appData.currentUser = { email: u.email, username: data.username || u.email.split('@')[0], uid: u.uid };
+appData.credits = data.credits !== undefined ? data.credits : 0;
 appData.friendId = data.friendId || generateFriendCode(u.uid);
 appData.friends = data.friends || [];
 appData.isAdmin = data.isAdmin || appData.isAdmin;
 appData.catalogs = data.catalogs || appData.catalogs;
+appData.redeemedCodes = data.redeemedCodes || [];
 updateUI();
 });
 }).catch(err => alert('❌ Erreur : ' + err.message));
@@ -855,7 +875,7 @@ appData.friends.forEach(f => {
 const div = document.createElement('div');
 div.className = 'friend-badge';
 div.innerHTML = `<div><b>${f.username}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${f.friendId})</span></div>
-<button class="btn" style="width:auto; padding:6px 12px; font-size:0.7rem;" onclick="openTradePrompt('${f.uid}', '${f.username}')">ÉCHANGER</button>`;
+<button class="btn" style="width:auto; padding:6px 10px; font-size:0.7rem;" onclick="openTradePrompt('${f.uid}', '${f.username}')">ÉCHANGER</button>`;
 fl.appendChild(div);
 });
 }
@@ -868,11 +888,11 @@ appData.catalogs[cat].forEach(i => { if(i.unlocked) myUnlocked.push(i); });
 
 if (myUnlocked.length === 0) return alert("Tu n'as aucune carte à proposer !");
 
-let msg = `Proposer un échange à ${targetName} :\nEntrez le nom ou l'ID de la carte que vous DONNEZ :\n` + myUnlocked.map(i => `#${i.id}: ${i.name}`).join('\n');
+let msg = `Proposer un échange à ${targetName} :\nEntrez l'ID de la carte que vous DONNEZ :\n` + myUnlocked.map(i => `#${i.id} : ${i.name}`).join('\n');
 let myCardId = prompt(msg);
 if (!myCardId) return;
 
-let wantedCardId = prompt("Entrez le NOM ou l'ID de la carte que vous DEMANDEZ en échange :");
+let wantedCardId = prompt("Entrez l'ID de la carte que vous DEMANDEZ en échange :");
 if (!wantedCardId) return;
 
 const tradeId = 'trade_' + Date.now();
@@ -892,6 +912,7 @@ function listenToTrades() {
 db.ref('trades').on('value', snapshot => {
 const trades = snapshot.val();
 const tl = document.getElementById('tradesList');
+if(!tl) return;
 tl.innerHTML = '';
 
 if (!trades) { tl.innerHTML = '<i>Aucune offre en cours.</i>'; return; }
@@ -1033,7 +1054,8 @@ c.innerHTML = `<div style="text-align:center;"><div id="bar" style="width:250px;
 let pos = 0, dir = 12;
 currentGameInterval = setInterval(() => {
 pos += dir; if(pos > 244 || pos < 0) dir *= -1;
-document.getElementById('cursor').style.left = pos + 'px';
+const cur = document.getElementById('cursor');
+if(cur) cur.style.left = pos + 'px';
 }, 4);
 window.stopReaction = () => {
 clearInterval(currentGameInterval);
@@ -1046,7 +1068,7 @@ document.getElementById('gameTitle').innerText = "Puissance 4 Tactique";
 c.innerHTML = `<div id="c4board" style="display:grid; grid-template-columns:repeat(7, 35px); gap:5px; background:rgba(139,92,246,0.2); padding:8px; border-radius:14px; border:1px solid var(--card-border);"></div>`;
 let board = Array(6).fill().map(() => Array(7).fill(0));
 function draw() {
-const b = document.getElementById('c4board'); b.innerHTML = '';
+const b = document.getElementById('c4board'); if(!b) return; b.innerHTML = '';
 for(let r=0; r<6; r++) {
 for(let col=0; col<7; col++) {
 let cell = document.createElement('div');
@@ -1105,13 +1127,17 @@ function runTapGame(c) {
 document.getElementById('gameTitle').innerText = "Tap Cible (10s)";
 let score = 0, timeLeft = 10;
 c.innerHTML = `<div style="text-align:center;"><h2 id="timer">10s</h2><div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div><h3>Score : <span id="tapScore">0</span></h3></div>`;
-document.getElementById('target').onclick = () => {
+const targetEl = document.getElementById('target');
+if(targetEl) {
+targetEl.onclick = () => {
 score++; document.getElementById('tapScore').innerText = score;
-document.getElementById('target').style.transform = `translate(${(Math.random()-0.5)*120}px, ${(Math.random()-0.5)*120}px)`;
+targetEl.style.transform = `translate(${(Math.random()-0.5)*120}px, ${(Math.random()-0.5)*120}px)`;
 };
+}
 currentGameInterval = setInterval(() => {
 timeLeft--;
-if(document.getElementById('timer')) document.getElementById('timer').innerText = timeLeft + 's';
+const timerEl = document.getElementById('timer');
+if(timerEl) timerEl.innerText = timeLeft + 's';
 if(timeLeft <= 0) rewardPlayer(Math.min(10 + score*2, 50));
 }, 1000);
 }
@@ -1140,13 +1166,15 @@ document.getElementById('gameTitle').innerText = "Stack Néon";
 c.innerHTML = `<div style="text-align:center;"><div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div><p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p><button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button></div>`;
 const board = document.getElementById('sboard'), BOARD_WIDTH = 200, BLOCK_HEIGHT = 20;
 let stack = [], currentWidth = 100, currentPos = 0, currentDir = 2, currentLevel = 0;
+if(board) {
 stack.push({ left: 50, width: 100 }); renderBlock(50, 100, 0, false); currentLevel = 1; createMovingBlock();
+}
 
 function createMovingBlock() {
 currentPos = 0;
 const movingEl = document.createElement('div'); movingEl.id = 'movingBlock';
-movingEl.style.cssText = `width:${currentWidth}px; height:${currentLevel * BLOCK_HEIGHT}px; left:0px; background:var(--glow-violet); box-shadow:0 0 10px var(--glow-violet); border-radius:4px;`;
-board.appendChild(movingEl);
+movingEl.style.cssText = `width:${currentWidth}px; height:${BLOCK_HEIGHT}px; left:0px; bottom:${currentLevel * BLOCK_HEIGHT}px; position:absolute; background:var(--glow-violet); box-shadow:0 0 10px var(--glow-violet); border-radius:4px;`;
+if(board) board.appendChild(movingEl);
 }
 currentGameInterval = setInterval(() => {
 currentPos += currentDir;
@@ -1156,8 +1184,8 @@ const m = document.getElementById('movingBlock'); if (m) m.style.left = currentP
 
 function renderBlock(left, width, level, isMoving = false) {
 const b = document.createElement('div');
-b.style.cssText = `width:${width}px; height:${BLOCK_HEIGHT - 2}px; background:${isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)'}; position:absolute; bottom:${level * BLOCK_HEIGHT}px; left:${left}px; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;`;
-board.appendChild(b);
+b.style.cssText = `width:${width}px; height:${BLOCK_HEIGHT}px; left:${left}px; bottom:${level * BLOCK_HEIGHT}px; position:absolute; background:${isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)'}; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;`;
+if(board) board.appendChild(b);
 }
 
 window.stackDrop = () => {
@@ -1167,7 +1195,9 @@ if (Math.abs(diff) >= currentWidth) { clearInterval(currentGameInterval); reward
 let newWidth = currentWidth - Math.abs(diff), newLeft = diff > 0 ? currentPos : prevBlock.left;
 const m = document.getElementById('movingBlock'); if (m) m.remove();
 stack.push({ left: newLeft, width: newWidth }); renderBlock(newLeft, newWidth, currentLevel, false);
-currentWidth = newWidth; currentLevel++; document.getElementById('stackCount').innerText = stack.length - 1;
+currentWidth = newWidth; currentLevel++; 
+const sCount = document.getElementById('stackCount');
+if(sCount) sCount.innerText = stack.length - 1;
 if (currentLevel >= 8) { clearInterval(currentGameInterval); rewardPlayer(50); } else createMovingBlock();
 };
 }
