@@ -3,21 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CÉSAR CLAW — Machine à Trophées</title>
+  <title>GENESIS — Create. Discover. Evolve.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-dark: #08090c;
+      --card-bg: rgba(20, 24, 33, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary-cyan: #00f2fe;
+      --primary-violet: #7928ca;
+      --accent-gold: #ffd700;
+      --accent-green: #00e676;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --rarity-common: #9e9e9e;
+      --rarity-uncommon: #4caf50;
+      --rarity-rare: #2196f3;
+      --rarity-epic: #9c27b0;
+      --rarity-legendary: #ff9800;
+      --rarity-mythic: #f44336;
+      --rarity-unknown: #00f2fe;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       user-select: none;
-      font-family: 'Fredoka', cursive, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background: #111827;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -25,581 +46,718 @@
       overflow: hidden;
     }
 
-    /* Modal Email */
-    .auth-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .auth-card {
-      background: #73d6c7;
-      border: 4px solid #ffffff;
-      border-radius: 32px;
-      padding: 30px 25px;
-      width: 90%;
-      max-width: 380px;
-      text-align: center;
-      box-shadow: 0 15px 0 #329183, 0 25px 30px rgba(0,0,0,0.5);
-    }
-
-    .auth-card h1 {
-      font-size: 2.2rem;
-      color: #fff;
-      text-shadow: 0 4px 0 #2b7a6f;
-      margin-bottom: 8px;
-    }
-
-    .auth-card p {
-      color: #1a4d46;
-      font-size: 1rem;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-
-    .auth-input {
+    /* Application Shell Mobile-First */
+    .app-viewport {
       width: 100%;
-      padding: 16px;
-      border-radius: 20px;
-      border: 3px solid #329183;
-      background: #fff;
-      color: #333;
-      font-size: 1.1rem;
-      outline: none;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    .btn-pop {
-      width: 100%;
-      padding: 16px;
-      border-radius: 20px;
-      border: 3px solid #fff;
-      background: #ff5252;
-      color: #fff;
-      font-size: 1.3rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 6px 0 #c62828;
-      transition: transform 0.1s, box-shadow 0.1s;
-    }
-
-    .btn-pop:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #c62828;
-    }
-
-    /* Machine Arcade Frame */
-    .arcade-machine {
-      width: 100%;
-      max-width: 420px;
+      max-width: 480px;
       height: 100vh;
-      max-height: 820px;
-      background: #7be5d6;
-      border-radius: 0;
+      max-height: 920px;
+      background: radial-gradient(circle at 50% 0%, #151928 0%, #08090c 100%);
+      position: relative;
       display: flex;
       flex-direction: column;
-      position: relative;
-      box-shadow: 0 0 50px rgba(0,0,0,0.6);
       overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     }
 
     @media (min-width: 500px) {
-      .arcade-machine {
-        border-radius: 40px;
-        border: 8px solid #52c2b3;
-        height: 95vh;
+      .app-viewport {
+        border-radius: 36px;
+        height: 94vh;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
     }
 
-    /* Top Bar HUD */
-    .top-bar {
-      padding: 15px 20px;
+    /* Ambient Background Glow */
+    .ambient-glow {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(0,242,254,0.15) 0%, rgba(121,40,202,0.15) 50%, transparent 70%);
+      filter: blur(50px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top HUD Header */
+    .hud-header {
+      position: relative;
+      z-index: 10;
+      padding: 16px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 10;
+      background: rgba(8, 9, 12, 0.6);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
     }
 
-    .icon-btn {
-      width: 48px;
-      height: 48px;
-      background: #ff5252;
-      border: 3px solid #fff;
-      border-radius: 50%;
+    .user-pill {
       display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 0 #c62828;
-      cursor: pointer;
-    }
-
-    .icon-btn::after {
-      content: '🏠';
-      font-size: 1.4rem;
-    }
-
-    .pill-counter {
-      background: rgba(255, 255, 255, 0.85);
-      border: 3px solid #52c2b3;
-      padding: 6px 16px;
-      border-radius: 25px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 0 rgba(0,0,0,0.1);
-    }
-
-    .pill-counter .coin-icon {
-      width: 26px;
-      height: 26px;
-      background: #ffd54f;
-      border: 2px solid #ffb300;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: #b78103;
-      font-size: 0.8rem;
-    }
-
-    .pill-val {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #2e7d71;
-    }
-
-    /* Game Canvas Glass Screen */
-    .screen-container {
-      flex: 1;
-      margin: 0 12px;
-      background: #a8f3ea;
-      border-radius: 25px;
-      border: 4px solid #ffffff;
-      position: relative;
-      overflow: hidden;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.08);
-    }
-
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    /* Dashboard Bottom Control Panel */
-    .control-deck {
-      height: 150px;
-      background: #80ebd2;
-      border-top: 6px solid #4eb8a9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 20px;
       gap: 10px;
     }
 
-    .deck-buttons {
-      width: 100%;
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-cyan), var(--primary-violet));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .user-info .username {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .user-info .level-badge {
+      font-size: 0.7rem;
+      color: var(--primary-cyan);
+      font-weight: 600;
+    }
+
+    .currency-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .pill-icon {
+      font-size: 0.9rem;
+    }
+
+    /* Main Content Router Screen */
+    .screen-container {
+      flex: 1;
+      position: relative;
+      z-index: 5;
+      overflow-y: auto;
+      padding: 16px;
+      scrollbar-width: none;
+    }
+
+    .screen-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out forwards;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Glass Cards */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 10px;
     }
 
-    .joystick-base {
-      width: 70px;
-      height: 70px;
-      background: #52c2b3;
-      border-radius: 50%;
-      border: 3px solid #fff;
+    /* Creature Spotlight Card */
+    .creature-card {
+      position: relative;
+      background: radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.1) 0%, rgba(20, 24, 33, 0.8) 70%);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 24px;
+      padding: 20px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .creature-avatar {
+      width: 130px;
+      height: 130px;
+      margin: 10px auto;
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 0 #3a968a;
-      cursor: pointer;
     }
 
-    .joystick-knob {
-      width: 38px;
-      height: 38px;
-      background: #ff7043;
+    .creature-core {
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
-      border: 2px solid #fff;
-      box-shadow: 0 4px 0 #d84315;
-    }
-
-    .red-action-btn {
-      width: 85px;
-      height: 60px;
-      background: #ff5252;
-      border: 4px solid #fff;
-      border-radius: 30px;
-      box-shadow: 0 6px 0 #c62828;
-      cursor: pointer;
+      background: linear-gradient(135deg, var(--primary-cyan), var(--primary-violet));
+      box-shadow: 0 0 30px var(--primary-cyan);
+      animation: pulse 3s infinite ease-in-out;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      font-size: 1.1rem;
+      font-size: 2.5rem;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 25px rgba(0,242,254,0.5); }
+      50% { transform: scale(1.06); box-shadow: 0 0 40px rgba(121,40,202,0.7); }
+    }
+
+    .mutation-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 215, 0, 0.15);
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 12px;
       font-weight: 700;
+      margin-top: 8px;
     }
 
-    .red-action-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #c62828;
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
-    .ad-banner-btn {
-      width: 100%;
-      padding: 10px;
-      background: #ffd54f;
-      border: 3px solid #fff;
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Zone Map List */
+    .zone-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px;
       border-radius: 16px;
-      color: #6d4c41;
-      font-size: 0.95rem;
-      font-weight: 700;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      margin-bottom: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 0 #ffb300;
+      transition: all 0.2s;
+    }
+
+    .zone-item:hover {
+      border-color: var(--primary-cyan);
+      background: rgba(0, 242, 254, 0.05);
+    }
+
+    .zone-item.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .zone-info h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .zone-info p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Missions List */
+    .mission-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .mission-item:last-child {
+      border-bottom: none;
+    }
+
+    .mission-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .mission-reward {
+      font-size: 0.75rem;
+      color: var(--accent-gold);
+      font-weight: 700;
+    }
+
+    /* Action Buttons */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, var(--primary-cyan), #00a8ff);
+      color: #08090c;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3);
     }
 
-    /* Modal Pub */
-    .ad-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.9);
-      display: none;
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid var(--card-border);
+      box-shadow: none;
+    }
+
+    /* Capsule Container */
+    .capsule-box {
+      text-align: center;
+      padding: 24px;
+      background: radial-gradient(circle, rgba(121,40,202,0.2) 0%, rgba(20,24,33,0.9) 80%);
+      border: 1px dashed var(--primary-violet);
+      border-radius: 20px;
+    }
+
+    .capsule-icon {
+      font-size: 3.5rem;
+      margin-bottom: 10px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* Navigation Dock */
+    .nav-dock {
+      position: relative;
+      z-index: 10;
+      padding: 10px 16px;
+      background: rgba(8, 9, 12, 0.85);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .nav-item {
+      display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      z-index: 2000;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 0.2s;
+      background: none;
+      border: none;
     }
 
-    .ad-card {
-      background: #fff;
-      padding: 30px;
-      border-radius: 30px;
-      text-align: center;
-      max-width: 320px;
-      border: 5px solid #ffd54f;
+    .nav-item .nav-icon {
+      font-size: 1.3rem;
     }
 
-    .ad-timer {
-      font-size: 3rem;
-      font-weight: 800;
-      color: #ff5252;
-      margin: 15px 0;
+    .nav-item.active {
+      color: var(--primary-cyan);
+    }
+
+    /* Sound Bar Indicator */
+    .sound-toggle {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 6px 10px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .sound-toggle.active {
+      color: var(--accent-green);
+      border-color: var(--accent-green);
     }
   </style>
 </head>
 <body>
 
-  <!-- Modal Auth -->
-  <div class="auth-overlay" id="authModal">
-    <div class="auth-card">
-      <h1>CÉSAR CLAW</h1>
-      <p>Inscris-toi avec ton e-mail pour recevoir 10 crédits gratuits !</p>
-      <form onsubmit="handleAuth(event)">
-        <input type="email" id="userEmail" class="auth-input" placeholder="ton.email@exemple.com" required>
-        <button type="submit" class="btn-pop">JOUER (10 🪙)</button>
-      </form>
-    </div>
-  </div>
+  <div class="app-viewport">
+    <div class="ambient-glow"></div>
 
-  <!-- Modal Pub -->
-  <div class="ad-overlay" id="adModal">
-    <div class="ad-card">
-      <h3 style="color: #333;">PUBLICITÉ CÉSAR</h3>
-      <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">Regarde la pub pour gagner 5 Crédits !</p>
-      <div class="ad-timer" id="adTimer">30</div>
-      <p style="color: #aaa; font-size: 0.8rem;">Crédités à la fin du chrono.</p>
-    </div>
-  </div>
-
-  <!-- Machine Arcade -->
-  <div class="arcade-machine">
-    <!-- Top HUD -->
-    <div class="top-bar">
-      <div class="icon-btn" onclick="location.reload()"></div>
-      <div class="pill-counter">
-        <div class="coin-icon">🪙</div>
-        <div class="pill-val" id="creditsVal">0</div>
-      </div>
-    </div>
-
-    <!-- Screen Canvas -->
-    <div class="screen-container">
-      <canvas id="gameCanvas"></canvas>
-    </div>
-
-    <!-- Controls -->
-    <div class="control-deck">
-      <div class="deck-buttons">
-        <div class="joystick-base" onclick="moveClaw(-25)">
-          <div class="joystick-knob"></div>
-        </div>
-        <button class="red-action-btn" onclick="dropClaw()">PRENDRE</button>
-        <div class="joystick-base" onclick="moveClaw(25)">
-          <div class="joystick-knob"></div>
+    <!-- HUD Header -->
+    <header class="hud-header">
+      <div class="user-pill">
+        <div class="avatar">N</div>
+        <div class="user-info">
+          <div class="username">Nathan C.</div>
+          <div class="level-badge">NIV. 4 • ARCHIVISTE</div>
         </div>
       </div>
-      <button class="ad-banner-btn" onclick="watchAd()">
-        📺 Regarder une vidéo (+5 🪙)
+
+      <div class="currency-group">
+        <div class="pill">
+          <span class="pill-icon">💎</span>
+          <span id="creditVal">1 250</span>
+        </div>
+        <button class="sound-toggle active" id="audioBtn" onclick="toggleAudio()">🔊 AUDIO</button>
+      </div>
+    </header>
+
+    <!-- Router Screen Area -->
+    <main class="screen-container">
+
+      <!-- SCREEN 1: DASHBOARD -->
+      <section id="scr-dashboard" class="screen active">
+        <div class="creature-card glass-card">
+          <div class="card-title">
+            <span>Créature Active</span>
+            <span style="color: var(--rarity-epic); font-weight:700;">ÉPIQUE</span>
+          </div>
+          <div class="creature-avatar">
+            <div class="creature-core">🧬</div>
+          </div>
+          <h2 style="font-family:'Space Grotesk'; font-size:1.3rem;">Astra-Kael #009</h2>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Espèce : Lumis • Hab. Zone Astrale</p>
+          <div class="mutation-badge">✨ MUTATION : PRISMATIC</div>
+
+          <div style="margin-top:15px; background:rgba(0,0,0,0.3); border-radius:10px; height:8px; overflow:hidden;">
+            <div style="width: 68%; height:100%; background:linear-gradient(90deg, var(--primary-cyan), var(--primary-violet));"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:4px;">
+            <span>XP : 680 / 1000</span>
+            <span>NIV. 12</span>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-title">Action Rapide</div>
+          <button class="btn" onclick="triggerExploration()">
+            <span>🚀 Explorer la Vallée Verdoyante</span>
+          </button>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-title">Missions du Jour</div>
+          <div class="mission-item">
+            <div>
+              <div class="mission-title">Découvrir 1 nouvelle mutation</div>
+              <div class="mission-reward">+150 CREDITS • +50 XP</div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto; padding:6px 12px; font-size:0.75rem;" onclick="claimReward(this)">Réclamer</button>
+          </div>
+          <div class="mission-item">
+            <div>
+              <div class="mission-title">Effectuer 3 explorations</div>
+              <div class="mission-reward">+200 CREDITS</div>
+            </div>
+            <span style="font-size:0.75rem; color:var(--accent-green); font-weight:700;">2/3</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 2: MAP WORLD -->
+      <section id="scr-map" class="screen">
+        <div class="glass-card">
+          <div class="card-title">GENESIS WORLD — Carte des Zones</div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Sélectionnez une zone pour lancer une expédition.</p>
+          
+          <div class="zone-item" onclick="selectZone('Verdant Valley')">
+            <div class="zone-info">
+              <h4>🌿 Verdant Valley</h4>
+              <p>Zone de départ • 12/12 Créatures répertoriées</p>
+            </div>
+            <span style="color:var(--accent-green); font-size:0.8rem; font-weight:700;">EXPLORABLE</span>
+          </div>
+
+          <div class="zone-item" onclick="selectZone('Abyssal Ocean')">
+            <div class="zone-info">
+              <h4>🌊 Abyssal Ocean</h4>
+              <p>Niveau requis : 3 • 4/18 Créatures</p>
+            </div>
+            <span style="color:var(--primary-cyan); font-size:0.8rem; font-weight:700;">DÉBLOQUÉ</span>
+          </div>
+
+          <div class="zone-item locked">
+            <div class="zone-info">
+              <h4>🌋 Ember Lands</h4>
+              <p>Niveau requis : 8 • Zone verrouillée</p>
+            </div>
+            <span style="color:var(--text-muted); font-size:0.8rem;">🔒 NIVAL 8</span>
+          </div>
+
+          <div class="zone-item locked">
+            <div class="zone-info">
+              <h4>🌌 Astral Zone</h4>
+              <p>Condition : Obtenir 1 Artefact Cosmique</p>
+            </div>
+            <span style="color:var(--text-muted); font-size:0.8rem;">🔒 MYSTÈRE</span>
+          </div>
+
+          <div class="zone-item locked">
+            <div class="zone-info">
+              <h4>🌑 Unknown Zone</h4>
+              <p>« Cette zone n'a pas encore été entièrement comprise. »</p>
+            </div>
+            <span style="color:var(--rarity-unknown); font-size:0.8rem; font-weight:700;">???</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: CAPSULES -->
+      <section id="scr-capsules" class="screen">
+        <div class="glass-card capsule-box">
+          <div class="capsule-icon">🔮</div>
+          <h3 style="font-family:'Space Grotesk'; font-size:1.2rem; margin-bottom:4px;">Genesis Capsule</h3>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:16px;">Contient des créatures rares, des matériaux d'évolution et des mutations.</p>
+          <button class="btn" onclick="openCapsule()">Ouvrir (300 CREDITS)</button>
+        </div>
+
+        <div class="glass-card" style="margin-top:14px;">
+          <div class="card-title">Capsules Événementielles</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; opacity:0.6;">
+            <div>
+              <div style="font-weight:700; font-size:0.9rem;">🌑 Eclipse Capsule</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Disponible lors de l'événement « The Eclipse »</div>
+            </div>
+            <span style="font-size:0.75rem; color:var(--accent-gold);">VERROUILLÉ</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 4: LABORATOIRE / INDEX -->
+      <section id="scr-lab" class="screen">
+        <div class="glass-card">
+          <div class="card-title">GENESIS INDEX (247 / 1000)</div>
+          <div class="grid-3" style="margin-top:10px;">
+            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:14px; text-align:center; border:1px solid var(--rarity-epic);">
+              <div style="font-size:1.5rem;">🧬</div>
+              <div style="font-size:0.7rem; font-weight:700; margin-top:4px;">Astra-Kael</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:14px; text-align:center; border:1px solid var(--rarity-rare);">
+              <div style="font-size:1.5rem;">🌿</div>
+              <div style="font-size:0.7rem; font-weight:700; margin-top:4px;">Flora-Sylvan</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:14px; text-align:center; border:1px dashed rgba(255,255,255,0.2); opacity:0.4;">
+              <div style="font-size:1.5rem;">❓</div>
+              <div style="font-size:0.7rem; font-weight:700; margin-top:4px;">Inconnu</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-title">Statistiques du Laboratoire</div>
+          <div class="grid-2">
+            <div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Mutations découvertes</div>
+              <div style="font-size:1.2rem; font-weight:800; color:var(--primary-cyan);">84 / 350</div>
+            </div>
+            <div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Artefacts possédés</div>
+              <div style="font-size:1.2rem; font-weight:800; color:var(--accent-gold);">31 / 200</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 5: PROFIL -->
+      <section id="scr-profile" class="screen">
+        <div class="glass-card" style="text-align:center;">
+          <div class="avatar" style="width:60px; height:60px; margin:0 auto 10px; font-size:1.4rem;">N</div>
+          <h3>Nathan CARER</h3>
+          <p style="font-size:0.8rem; color:var(--text-muted);">Archiviste de Rang IV • Lorient, FR</p>
+          <div class="grid-2" style="margin-top:16px; text-align:left;">
+            <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:12px;">
+              <span style="font-size:0.7rem; color:var(--text-muted);">Zones explorées</span>
+              <div style="font-weight:700;">2 / 9</div>
+            </div>
+            <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:12px;">
+              <span style="font-size:0.7rem; color:var(--text-muted);">Temps de jeu</span>
+              <div style="font-weight:700;">14h 20m</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Navigation Dock Footer -->
+    <nav class="nav-dock">
+      <button class="nav-item active" onclick="switchTab('scr-dashboard', this)">
+        <span class="nav-icon">🏠</span>
+        <span>Aperçu</span>
       </button>
-    </div>
+      <button class="nav-item" onclick="switchTab('scr-map', this)">
+        <span class="nav-icon">🗺️</span>
+        <span>Monde</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('scr-capsules', this)">
+        <span class="nav-icon">🔮</span>
+        <span>Capsules</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('scr-lab', this)">
+        <span class="nav-icon">🧪</span>
+        <span>Index</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('scr-profile', this)">
+        <span class="nav-icon">👤</span>
+        <span>Profil</span>
+      </button>
+    </nav>
   </div>
 
   <script>
-    let credits = 0;
-    let score = 0;
+    /* ===================================================
+       1. SYNTHÉTISEUR AUDIO AVANCÉ (Web Audio API)
+       =================================================== */
     let audioCtx = null;
+    let audioEnabled = true;
 
-    function handleAuth(e) {
-      e.preventDefault();
-      credits = 10;
-      document.getElementById('creditsVal').innerText = credits;
-      document.getElementById('authModal').style.display = 'none';
-      initAudio();
-    }
-
-    function watchAd() {
-      const modal = document.getElementById('adModal');
-      const timer = document.getElementById('adTimer');
-      modal.style.display = 'flex';
-      let left = 30;
-      timer.innerText = left;
-
-      const inv = setInterval(() => {
-        left--;
-        timer.innerText = left;
-        if (left <= 0) {
-          clearInterval(inv);
-          modal.style.display = 'none';
-          credits += 5;
-          document.getElementById('creditsVal').innerText = credits;
-          playWinSound();
-        }
-      }, 1000);
-    }
-
-    /* Audio Synth */
     function initAudio() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
     }
 
-    function playWinSound() {
-      if (!audioCtx) return;
-      const now = audioCtx.currentTime;
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      const btn = document.getElementById('audioBtn');
+      if (audioEnabled) {
+        btn.classList.add('active');
+        btn.innerText = '🔊 AUDIO';
+        playTone(523, 'sine', 0.1);
+      } else {
+        btn.classList.remove('active');
+        btn.innerText = '🔇 MUET';
+      }
+    }
+
+    function playTone(freq, type, duration) {
+      if (!audioEnabled) return;
+      initAudio();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(400, now);
-      osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
-      osc.stop(now + 0.3);
+      osc.stop(audioCtx.currentTime + duration);
     }
 
-    function playLoseSound() {
-      if (!audioCtx) return;
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(250, now);
-      osc.frequency.linearRampToValueAtTime(120, now + 0.4);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(now + 0.4);
+    function soundReward() {
+      if (!audioEnabled) return;
+      playTone(523, 'triangle', 0.1);
+      setTimeout(() => playTone(659, 'triangle', 0.1), 80);
+      setTimeout(() => playTone(783, 'triangle', 0.2), 160);
     }
 
-    /* Engine Canvas Engine */
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-
-    function resizeCanvas() {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    let clawX = 150;
-    let clawY = 60;
-    let clawState = 'idle';
-    let grabbedItem = null;
-
-    // Items pastel cartoon (style image)
-    const items = [
-      { x: 50,  y: 380, r: 22, type: 'basket', color: '#ff7043' },
-      { x: 110, y: 390, r: 18, type: 'coin', color: '#ffd54f' },
-      { x: 160, y: 375, r: 24, type: 'blue', color: '#42a5f5' },
-      { x: 220, y: 385, r: 20, type: 'egg', color: '#ab47bc' },
-      { x: 280, y: 370, r: 23, type: 'basket', color: '#ff7043' },
-      { x: 320, y: 390, r: 18, type: 'coin', color: '#ffd54f' }
-    ];
-
-    function moveClaw(dir) {
-      if (clawState !== 'idle') return;
-      clawX += dir;
-      if (clawX < 40) clawX = 40;
-      if (clawX > canvas.width - 40) clawX = canvas.width - 40;
+    /* ===================================================
+       2. GESTION DU ROUTEUR DE NAVIGATION
+       =================================================== */
+    function switchTab(screenId, btnEl) {
+      playTone(400, 'sine', 0.05);
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      document.getElementById(screenId).classList.add('active');
+      btnEl.classList.add('active');
     }
 
-    function dropClaw() {
-      if (clawState !== 'idle') return;
-      if (credits <= 0) {
-        alert("Tu n'as plus de crédits ! Regarde une vidéo.");
+    /* ===================================================
+       3. LOGIQUE DE GAMEPLAY ET INTERACTION
+       =================================================== */
+    let credits = 1250;
+
+    function updateCredits(amount) {
+      credits += amount;
+      document.getElementById('creditVal').innerText = credits.toLocaleString();
+    }
+
+    function claimReward(btn) {
+      soundReward();
+      updateCredits(150);
+      btn.innerText = "Réclamé !";
+      btn.disabled = true;
+      btn.style.opacity = "0.5";
+    }
+
+    function triggerExploration() {
+      playTone(300, 'sine', 0.1);
+      setTimeout(() => playTone(600, 'triangle', 0.15), 100);
+      alert("🔎 Expédition dans la Vallée Verdoyante terminée !\n\nRécompense : +80 CREDITS, +40 XP, 1x Fragment #014 débloqué.");
+      updateCredits(80);
+    }
+
+    function selectZone(zoneName) {
+      playTone(450, 'sine', 0.08);
+      alert("🗺️ Zone sélectionnée : " + zoneName + "\nPrêt pour la prochaine expédition.");
+    }
+
+    function openCapsule() {
+      if (credits < 300) {
+        playTone(150, 'sawtooth', 0.2);
+        alert("Crédits insuffisants pour ouvrir une capsule.");
         return;
       }
-      credits--;
-      document.getElementById('creditsVal').innerText = credits;
-      clawState = 'dropping';
+      updateCredits(-300);
+      soundReward();
+      
+      const rewards = [
+        "✨ MUTATION DÉCOUVERTE : Corail Phosphorescent",
+        "🐾 NOUVELLE CRÉATURE : Pyros-Ember (Rare)",
+        "🔮 ARTEFACT : Boussole Céleste"
+      ];
+      const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+      alert("🎉 CAPSULE OUVERTE !\n\n" + randomReward);
     }
-
-    function loop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Fond Villes Silhouette Kawaii
-      ctx.fillStyle = '#92e8dc';
-      ctx.fillRect(0, canvas.height - 120, canvas.width, 120);
-
-      // Dessin des Objets
-      items.forEach(it => {
-        ctx.save();
-        ctx.translate(it.x, it.y);
-
-        if (it.type === 'basket') {
-          ctx.fillStyle = '#ff7043';
-          ctx.beginPath();
-          ctx.arc(0, 0, it.r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = '#333';
-          ctx.lineWidth = 3;
-          ctx.stroke();
-        } else if (it.type === 'coin') {
-          ctx.fillStyle = '#ffd54f';
-          ctx.beginPath();
-          ctx.arc(0, 0, it.r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = '#ffb300';
-          ctx.lineWidth = 4;
-          ctx.stroke();
-        } else {
-          ctx.fillStyle = it.color;
-          ctx.beginPath();
-          ctx.arc(0, 0, it.r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 3;
-          ctx.stroke();
-        }
-
-        ctx.restore();
-      });
-
-      // Mouvement Pince
-      if (clawState === 'dropping') {
-        clawY += 5;
-        if (clawY >= canvas.height - 90) {
-          clawState = 'grabbing';
-          items.forEach(it => {
-            if (Math.abs(it.x - clawX) < 25 && !grabbedItem) {
-              grabbedItem = it;
-            }
-          });
-          setTimeout(() => { clawState = 'returning'; }, 400);
-        }
-      } else if (clawState === 'returning') {
-        clawY -= 4;
-        if (grabbedItem) {
-          grabbedItem.y = clawY + 35;
-          grabbedItem.x = clawX;
-        }
-        if (clawY <= 60) {
-          clawState = 'idle';
-          if (grabbedItem) {
-            playWinSound();
-            grabbedItem.y = canvas.height - 80;
-            grabbedItem.x = Math.random() * (canvas.width - 80) + 40;
-            grabbedItem = null;
-          } else {
-            playLoseSound();
-          }
-        }
-      }
-
-      // Câble de la pince
-      ctx.strokeStyle = '#6d4c41';
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(clawX, 0);
-      ctx.lineTo(clawX, clawY);
-      ctx.stroke();
-
-      // Pince Cute Cartoon (Tête jaune avec yeux)
-      ctx.save();
-      ctx.translate(clawX, clawY);
-
-      // Yeux et sourire
-      ctx.fillStyle = '#ffd54f';
-      ctx.strokeStyle = '#333';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(-22, -15, 44, 30, 10);
-      ctx.fill();
-      ctx.stroke();
-
-      // Yeux
-      ctx.fillStyle = '#333';
-      ctx.beginPath();
-      ctx.arc(-8, -2, 4, 0, Math.PI * 2);
-      ctx.arc(8, -2, 4, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Sourire
-      ctx.beginPath();
-      ctx.arc(0, 3, 5, 0, Math.PI);
-      ctx.stroke();
-
-      // Bras de pince
-      ctx.strokeStyle = '#b0bec5';
-      ctx.lineWidth = 5;
-      const angle = (clawState === 'grabbing') ? 0.2 : 0.5;
-
-      ctx.beginPath();
-      ctx.moveTo(-15, 10);
-      ctx.lineTo(-28 * Math.cos(angle), 35 * Math.sin(angle));
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(15, 10);
-      ctx.lineTo(28 * Math.cos(angle), 35 * Math.sin(angle));
-      ctx.stroke();
-
-      ctx.restore();
-
-      requestAnimationFrame(loop);
-    }
-
-    loop();
   </script>
 </body>
 </html>
