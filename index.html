@@ -1096,31 +1096,60 @@ if (listEl) listEl.innerHTML = '<i style="color:var(--danger); font-size:0.75rem
 });
 }
 
-function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
+async function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
 if (!appData.currentUser || !senderUid) return;
+
+const myUid = appData.currentUser.uid;
+if (senderUid === myUid) return;
 if ((appData.friends || []).some(f => f.uid === senderUid)) {
-  db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove();
+  try { await db.ref('friend_requests/' + myUid + '/' + reqId).remove(); } catch (_) {}
   return showToast('Cet utilisateur est déjà votre ami.', 'error');
 }
 
-const me = { uid: appData.currentUser.uid, username: appData.currentUser.username, friendId: appData.friendId };
-const them = { uid: senderUid, username: senderName || 'Joueur', friendId: senderFriendId || ('#DROP-' + senderUid) };
-const updates = {};
-updates['friendships/' + me.uid + '/' + senderUid] = them;
-updates['friendships/' + senderUid + '/' + me.uid] = me;
-updates['friend_requests/' + me.uid + '/' + reqId] = null;
+const me = {
+  uid: myUid,
+  username: appData.currentUser.username || 'Joueur',
+  friendId: appData.friendId || ('#DROP-' + myUid)
+};
+const them = {
+  uid: senderUid,
+  username: senderName || 'Joueur',
+  friendId: senderFriendId || ('#DROP-' + senderUid)
+};
 
-withTimeout(db.ref().update(updates), 8000, 'Firebase ne répond pas pour la validation de la demande.')
-.then(() => {
-appData.friends.push(them);
-try { localStorage.setItem('drop2027_profile_' + me.uid, JSON.stringify({username: appData.currentUser.username, credits: appData.credits, friendId: appData.friendId, friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, redeemedCodes: appData.redeemedCodes})); } catch (_) {}
-updateUI();
-showToast('🎉 Vous êtes désormais ami avec ' + (senderName || 'ce joueur') + ' !', 'success');
-})
-.catch(err => {
-console.error('acceptFriendRequest:', err);
-showToast('❌ Impossible d’accepter la demande : ' + (err.message || err), 'error');
-});
+// Une seule opération atomique : les deux côtés deviennent amis et la demande disparaît.
+// Les règles Firebase vérifient que la demande existait avant l'acceptation.
+const updates = {};
+updates['friendships/' + myUid + '/' + senderUid] = them;
+updates['friendships/' + senderUid + '/' + myUid] = me;
+updates['friend_requests/' + myUid + '/' + reqId] = null;
+
+try {
+  await withTimeout(db.ref().update(updates), 10000, 'Firebase ne répond pas pour la validation de la demande.');
+
+  appData.friends = Array.isArray(appData.friends) ? appData.friends : [];
+  appData.friends.push(them);
+  try {
+    localStorage.setItem('drop2027_profile_' + myUid, JSON.stringify({
+      username: appData.currentUser.username,
+      credits: appData.credits,
+      friendId: appData.friendId,
+      friends: appData.friends,
+      isAdmin: appData.isAdmin,
+      catalogs: appData.catalogs,
+      redeemedCodes: appData.redeemedCodes
+    }));
+  } catch (_) {}
+  updateUI();
+  showToast('🎉 Vous êtes désormais ami avec ' + them.username + ' !', 'success');
+} catch (err) {
+  console.error('acceptFriendRequest:', err);
+  if (err && err.code === 'PERMISSION_DENIED') {
+    showToast('❌ Firebase bloque encore la validation. Publie les nouvelles règles DROP 2027.', 'error');
+  } else {
+    showToast('❌ Impossible d’accepter la demande : ' + (err.message || err), 'error');
+  }
+}
 }
 
 function refuseFriendRequest(reqId) {
@@ -1161,7 +1190,6 @@ if (!myCardId) return;
 
 let wantedCardInput = prompt("Entrez l'ID de la carte que vous DEMANDEZ en échange :");
 if (!wantedCardInput) return;
-
 const offeredCardId = Number(String(myCardId).replace('#', '').trim());
 const wantedCardId = Number(String(wantedCardInput).replace('#', '').trim());
 if (!Number.isInteger(offeredCardId) || !Number.isInteger(wantedCardId)) {
@@ -1190,6 +1218,7 @@ const trades = snapshot.val();
 const tl = document.getElementById('tradesList');
 if(!tl) return;
 tl.innerHTML = '';
+
 if (!trades) { tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>'; return; }
 
 let count = 0;
@@ -1223,7 +1252,6 @@ db.ref('trades/' + tradeId).once('value').then(snapshot => {
 const t = snapshot.val();
 if (!t || t.status !== 'pending') return;
 if (!appData.currentUser || t.receiverUid !== appData.currentUser.uid) return;
-
 const offeredCard = findCardById(t.offeredCardId);
 const wantedCard = findCardById(t.wantedCardId);
 if (!offeredCard || !wantedCard || !wantedCard.unlocked) {
@@ -1265,7 +1293,6 @@ showToast('❌ Impossible de finaliser l’échange : ' + err.message, 'error');
 });
 });
 }
-
 function findCardById(id) {
 let result = null;
 Object.keys(appData.catalogs).forEach(cat => {
@@ -1336,6 +1363,7 @@ saveAppData();
 document.getElementById('gameArea').classList.add('active');
 const container = document.getElementById('gameCanvasContainer');
 container.innerHTML = '';
+
 if (gameType === 'reaction') runReactionGame(container);
 else if (gameType === 'connect4') runConnect4Game(container);
 else if (gameType === 'snake') runSnakeGame(container);
@@ -1348,7 +1376,6 @@ function closeGame() {
 if(currentGameInterval) clearInterval(currentGameInterval);
 document.getElementById('gameArea').classList.remove('active');
 }
-
 function rewardPlayer(amount) {
 showToast('🎮 Fin de partie ! Gains : +' + amount + ' Crédits 🪙', 'success');
 appData.credits += amount;
@@ -1512,4 +1539,4 @@ if (currentLevel >= 8) { clearInterval(currentGameInterval); rewardPlayer(50); }
 }
 </script>
 </body>
-  </html>
+</html>
