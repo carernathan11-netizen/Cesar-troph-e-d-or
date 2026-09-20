@@ -24,6 +24,8 @@
 --card-border-glow: rgba(217, 70, 239, 0.5);
 --text-main: #f3f4f6;
 --text-muted: #a1a1aa;
+--success: #22c55e;
+--danger: #ef4444;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -98,12 +100,25 @@ transition: transform 0.2s, box-shadow 0.2s;
 .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); box-shadow: none; }
 .btn-danger { background: linear-gradient(135deg, #ef4444, #991b1b); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+.btn-success { background: linear-gradient(135deg, #22c55e, #15803d); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
 
 .input-field {
 width: 100%; padding: 14px; background: rgba(15, 12, 29, 0.8);
 border: 1px solid var(--card-border); border-radius: 14px; color: #fff; font-family: inherit; margin-bottom: 10px; outline: none;
 }
 .input-field:focus { border-color: var(--glow-magenta); box-shadow: 0 0 10px rgba(217, 70, 239, 0.3); }
+
+/* FEEDBACK NOTIFICATIONS TOAST */
+.app-toast {
+position: fixed; top: 75px; left: 50%; transform: translateX(-50%) translateY(-20px);
+background: rgba(15, 12, 29, 0.95); border: 1px solid var(--card-border-glow);
+padding: 12px 20px; border-radius: 14px; z-index: 1000; font-size: 0.85rem; font-weight: 600;
+box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transition: all 0.3s ease;
+display: flex; align-items: center; gap: 8px; max-width: 90vw; text-align: center;
+}
+.app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.app-toast.error { border-color: var(--danger); color: #fca5a5; }
+.app-toast.success { border-color: var(--success); color: #86efac; }
 
 .binder-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; }
 .binder-tabs::-webkit-scrollbar { display: none; }
@@ -186,14 +201,20 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 .ad-screen { width: 100%; height: 180px; background: #000; border-radius: 16px; margin: 15px 0; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--card-border); position: relative; overflow: hidden; }
 .ad-progress { position: absolute; bottom: 0; left: 0; height: 6px; background: linear-gradient(90deg, var(--glow-violet), var(--glow-magenta)); width: 0%; transition: width 1s linear; }
 
-/* TRADE & FRIENDS UI */
-.friend-badge { background: rgba(139, 92, 246, 0.15); border: 1px solid var(--card-border); padding: 10px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+/* AMIS & DEMANDES INTERFACE STRUCTURE */
+.friend-badge { background: rgba(139, 92, 246, 0.15); border: 1px solid var(--card-border); padding: 12px; border-radius: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.request-card-box { background: rgba(217, 70, 239, 0.08); border: 1px solid var(--card-border-glow); border-radius: 14px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; }
 .trade-card-box { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-bottom: 10px; }
 </style>
 </head>
 <body>
 
 <div class="app-viewport" id="viewport">
+
+<div id="appToast" class="app-toast">
+  <span id="toastIcon">ℹ️</span>
+  <span id="toastMsg">Message</span>
+</div>
 
 <header class="hud-header">
 <div class="brand-logo"><div class="brand-dot"></div>DROP 2027</div>
@@ -301,19 +322,22 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="btn btn-danger" style="margin-top:15px;" onclick="logoutUser()">SE DÉCONNECTER</button>
 </div>
 
-<!-- SECTION AMIS ET ÉCHANGES -->
+<!-- SECTION AMIS ET DEMANDES (REPENSÉE) -->
 <div id="friendsSection" class="glass-card" style="display:none;">
-<div class="card-title"><span>🤝 SYSTEME D'AMIS & ÉCHANGES</span></div>
+<div class="card-title"><span>🤝 CENTRE D'AMIS & DEMANDES</span></div>
 <div style="display:flex; gap:8px; margin-bottom:12px;">
-<input type="text" id="addFriendInput" class="input-field" placeholder="Entrer l'ID Ami (ex: #DROP-XXXX)" style="margin-bottom:0;">
-<button class="btn" style="width:auto; padding:0 15px;" onclick="addFriend()">AJOUTER</button>
+<input type="text" id="addFriendInput" class="input-field" placeholder="ID Ami (ex: #DROP-XXXX)" style="margin-bottom:0;">
+<button class="btn" style="width:auto; padding:0 15px;" onclick="sendFriendRequest()">AJOUTER</button>
 </div>
 
-<h4 style="font-size:0.8rem; margin:10px 0 6px; color:var(--text-muted);">MES AMIS</h4>
-<div id="friendsList"><i>Aucun ami ajouté.</i></div>
+<h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--glow-magenta);">📬 DEMANDES D'AMIS REÇUES</h4>
+<div id="friendRequestsList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i></div>
 
-<h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">ÉCHANGES EN COURS</h4>
-<div id="tradesList"><i>Aucune offre en cours.</i></div>
+<h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">👥 MES AMIS</h4>
+<div id="friendsList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucun ami ajouté.</i></div>
+
+<h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">🔄 ÉCHANGES DE CARTES</h4>
+<div id="tradesList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i></div>
 </div>
 
 <div class="glass-card">
@@ -508,6 +532,22 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS))
 let currentAuthMode = 'login';
 let isDropping = false;
 
+// SYSTÈME DE NOTIFICATION TOAST STRUCTURÉ
+function showToast(message, type = 'success') {
+const toast = document.getElementById('appToast');
+const msgEl = document.getElementById('toastMsg');
+const iconEl = document.getElementById('toastIcon');
+
+toast.className = 'app-toast ' + type;
+msgEl.innerText = message;
+iconEl.innerText = type === 'success' ? '✅' : '❌';
+
+toast.classList.add('show');
+setTimeout(() => {
+toast.classList.remove('show');
+}, 3500);
+}
+
 // ÉCOUTEUR DE CONNEXION FIREBASE OPTIMISÉ
 auth.onAuthStateChanged((user) => {
 if (user) {
@@ -544,6 +584,7 @@ appData.redeemedCodes = data.redeemedCodes || [];
 
 db.ref('friend_codes/' + appData.friendId).set(user.uid);
 listenToTrades();
+listenToFriendRequests();
 updateUI();
 }).catch((error) => {
 console.error("Erreur de récupération :", error);
@@ -645,7 +686,7 @@ div.innerHTML = `
 <div class="emoji">${item.emoji}</div>
 <div class="item-name">${item.name}</div>
 <div class="item-price">${item.unlocked ? 'ACQUIS' : item.price + ' 🪙'}</div>
-<button class="btn" style="padding:6px; font-size:0.7rem; margin-top:6px;" ${item.unlocked ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">
+<button class="btn btn-secondary" style="padding:6px; font-size:0.65rem; margin-top:6px;" ${item.unlocked ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">
 ${item.unlocked ? 'Déjà acquis' : 'Obtenir'}
 </button>`;
 grid.appendChild(div);
@@ -660,23 +701,23 @@ if(item) found = item;
 });
 
 if (!found) return;
-if (found.unlocked) return alert('Article déjà débloqué !');
+if (found.unlocked) return showToast('Article déjà débloqué !', 'error');
 
 if (!appData.isAdmin && appData.credits < found.price) {
-return alert(`Crédits insuffisants ! Il faut ${found.price} 🪙 pour cet objet.`);
+return showToast(`Crédits insuffisants ! Il faut ${found.price} 🪙`, 'error');
 }
 
 if (!appData.isAdmin) appData.credits -= found.price;
 found.unlocked = true;
 
 if (found.id === 2000) triggerAnnihilation();
-else alert(`🎉 FÉLICITATIONS ! Tu as obtenu : ${found.emoji} ${found.name}`);
+else showToast(`🎉 FÉLICITATIONS ! Objet obtenu : ${found.emoji} ${found.name}`, 'success');
 saveAppData();
 }
 
 function openRandomDrop() {
 if (isDropping) return;
-if (!appData.isAdmin && appData.credits < 150) return alert('150 Crédits requis !');
+if (!appData.isAdmin && appData.credits < 150) return showToast('150 Crédits requis pour lancer un drop !', 'error');
 
 const roll = Math.random();
 let isUltraRare = roll < 0.1;
@@ -698,7 +739,7 @@ appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
 });
 }
 
-if (pool.length === 0) return alert('Félicitations, tout le classeur est déjà débloqué !');
+if (pool.length === 0) return showToast('Félicitations, tout le classeur est déjà débloqué !', 'success');
 
 if (!appData.isAdmin) appData.credits -= 150;
 saveAppData();
@@ -727,7 +768,7 @@ btn.disabled = false;
 saveAppData();
 
 if (picked.id === 2000) triggerAnnihilation();
-else alert(`💥 UNBOXING EXPLOSIF ! Tu as obtenu : ${picked.emoji} ${picked.name}`);
+else showToast(`💥 UNBOXING EXPLOSIF ! Obtenu : ${picked.emoji} ${picked.name}`, 'success');
 }, 2200);
 }
 
@@ -757,7 +798,7 @@ Object.keys(appData.catalogs).forEach(cat => {
 appData.catalogs[cat].forEach(i => i.unlocked = true);
 });
 saveAppData();
-alert('💥 SYSTEM OVERRIDE 2027... ACCÈS ADMINISTRATEUR SUPRÊME DÉBLOQUÉ !');
+showToast('💥 ACCÈS ADMINISTRATEUR SUPRÊME DÉBLOQUÉ !', 'success');
 }, 2500);
 }
 
@@ -802,79 +843,146 @@ redeemedCodes: []
 db.ref('users/' + u.uid).set(initialData).then(() => {
 db.ref('friend_codes/' + fId).set(u.uid);
 appData.currentUser = { email: u.email, username: initialData.username, uid: u.uid };
+showToast('✨ Compte créé avec succès ! Bienvenue.', 'success');
 updateUI();
 });
-}).catch(err => alert('❌ Erreur d\'inscription : ' + err.message));
+}).catch(err => showToast('❌ Erreur d\'inscription : ' + err.message, 'error'));
 } else {
 auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
 const u = userCredential.user;
 db.ref('users/' + u.uid).once('value').then(snapshot => {
-let data = snapshot.val();
-if (!data) {
-data = {
-username: u.email.split('@')[0],
-credits: appData.isAdmin ? 999999999 : 0,
-friendId: generateFriendCode(u.uid),
-friends: [],
-isAdmin: appData.isAdmin,
-catalogs: appData.catalogs,
-redeemedCodes: []
-};
-db.ref('users/' + u.uid).set(data);
+let data = snapshot.val() || {};
+if (!data.username) {
+data.username = u.email.split('@')[0];
 }
 db.ref('friend_codes/' + (data.friendId || generateFriendCode(u.uid))).set(u.uid);
-appData.currentUser = { email: u.email, username: data.username || u.email.split('@')[0], uid: u.uid };
+appData.currentUser = { email: u.email, username: data.username, uid: u.uid };
 appData.credits = data.credits !== undefined ? data.credits : 0;
 appData.friendId = data.friendId || generateFriendCode(u.uid);
 appData.friends = data.friends || [];
 appData.isAdmin = data.isAdmin || appData.isAdmin;
 appData.catalogs = data.catalogs || appData.catalogs;
 appData.redeemedCodes = data.redeemedCodes || [];
+showToast('👋 Connexion réussie ! Bon retour.', 'success');
 updateUI();
 });
-}).catch(err => alert('❌ Erreur de connexion : ' + err.message));
+}).catch(err => showToast('❌ Erreur de connexion : ' + err.message, 'error'));
 }
 }
 
 function logoutUser() {
 auth.signOut().then(() => {
 appData.currentUser = null;
+showToast('Déconnexion effectuée.', 'success');
 updateUI();
-alert('Déconnexion effectuée.');
 });
 }
 
-function addFriend() {
+// GESTION DES AMIS ET DES DEMANDES (ENVOI ET RÉCEPTION VIA FIREBASE)
+function sendFriendRequest() {
 const code = document.getElementById('addFriendInput').value.trim().toUpperCase();
-if (!code) return alert("❌ Veuillez entrer un identifiant d'ami valide !");
+if (!code) return showToast("❌ Veuillez entrer un ID d'ami valide !", 'error');
 
 db.ref('friend_codes/' + code).once('value').then(snapshot => {
-const friendUid = snapshot.val();
-if (!friendUid) return alert("❌ Cet ID Ami n'existe pas !");
-if (friendUid === appData.currentUser.uid) return alert("❌ Tu ne peux pas t'ajouter toi-même !");
+const targetUid = snapshot.val();
+if (!targetUid) return showToast("❌ Cet ID Ami n'existe pas dans le système !", 'error');
+if (targetUid === appData.currentUser.uid) return showToast("❌ Vous ne pouvez pas vous ajouter vous-même !", 'error');
 
-db.ref('users/' + friendUid).once('value').then(fSnap => {
-const fData = fSnap.val();
-const friendName = fData ? (fData.username || 'Ami') : 'Ami';
-
-if (!appData.friends.some(f => f.uid === friendUid)) {
-appData.friends.push({ uid: friendUid, username: friendName, friendId: code });
-saveAppData();
-document.getElementById('addFriendInput').value = '';
-alert(`✅ Ajouté avec succès ! ${friendName} a été ajouté à tes amis.`);
-} else {
-alert("⚠️ Cet ami est déjà dans ta liste !");
+if (appData.friends.some(f => f.uid === targetUid)) {
+return showToast("⚠️ Cet utilisateur est déjà dans votre liste d'amis.", 'error');
 }
+
+// Vérifier si une demande existe déjà
+db.ref('friend_requests/' + targetUid).once('value').then(reqSnap => {
+const requests = reqSnap.val() || {};
+const alreadyRequested = Object.values(requests).some(r => r.senderUid === appData.currentUser.uid && r.status === 'pending');
+
+if (alreadyRequested) {
+return showToast("⚠️ Une demande a déjà été envoyée à cet utilisateur.", 'error');
+}
+
+const reqId = 'req_' + Date.now();
+db.ref('friend_requests/' + targetUid + '/' + reqId).set({
+senderUid: appData.currentUser.uid,
+senderName: appData.currentUser.username,
+senderFriendId: appData.friendId,
+status: 'pending'
+}).then(() => {
+document.getElementById('addFriendInput').value = '';
+showToast("✅ Demande d'ami envoyée avec succès !", 'success');
+});
 });
 }).catch(err => {
-alert("❌ Erreur lors de la recherche de l'ami : " + err.message);
+showToast("❌ Erreur : " + err.message, 'error');
 });
+}
+
+function listenToFriendRequests() {
+if (!appData.currentUser) return;
+db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
+const requests = snapshot.val();
+const listEl = document.getElementById('friendRequestsList');
+if (!listEl) return;
+listEl.innerHTML = '';
+
+if (!requests) {
+listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
+return;
+}
+
+let count = 0;
+Object.keys(requests).forEach(reqId => {
+const req = requests[reqId];
+if (req && req.status === 'pending') {
+count++;
+const div = document.createElement('div');
+div.className = 'request-card-box';
+div.innerHTML = `
+<div style="font-size:0.8rem;"><b>${req.senderName}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${req.senderFriendId})</span></div>
+<div style="display:flex; gap:6px;">
+<button class="btn btn-success" style="padding:6px; font-size:0.7rem;" onclick="acceptFriendRequest('${reqId}', '${req.senderUid}', '${req.senderName}', '${req.senderFriendId}')">ACCEPTER</button>
+<button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="refuseFriendRequest('${reqId}')">REFUSER</button>
+</div>`;
+listEl.appendChild(div);
+}
+});
+
+if (count === 0) {
+listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
+}
+});
+}
+
+function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
+// Ajouter à mes amis
+if (!appData.friends.some(f => f.uid === senderUid)) {
+appData.friends.push({ uid: senderUid, username: senderName, friendId: senderFriendId });
+}
+
+// Ajouter l'utilisateur courant chez l'ami
+db.ref('users/' + senderUid + '/friends').once('value').then(snap => {
+let friendList = snap.val() || [];
+if (!friendList.some(f => f.uid === appData.currentUser.uid)) {
+friendList.push({ uid: appData.currentUser.uid, username: appData.currentUser.username, friendId: appData.friendId });
+db.ref('users/' + senderUid + '/friends').set(friendList);
+}
+});
+
+// Supprimer/Mettre à jour la demande
+db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove();
+saveAppData();
+showToast(`🎉 Vous êtes désormais ami avec ${senderName} !`, 'success');
+}
+
+function refuseFriendRequest(reqId) {
+db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove();
+showToast("Demande refusée.", 'success');
 }
 
 function renderFriendsUI() {
 const fl = document.getElementById('friendsList');
 if (!appData.friends || appData.friends.length === 0) {
-fl.innerHTML = '<i>Aucun ami ajouté.</i>';
+fl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucun ami ajouté.</i>';
 return;
 }
 
@@ -893,7 +1001,7 @@ Object.keys(appData.catalogs).forEach(cat => {
 appData.catalogs[cat].forEach(i => { if(i.unlocked) myUnlocked.push(i); });
 });
 
-if (myUnlocked.length === 0) return alert("Tu n'as aucune carte à proposer !");
+if (myUnlocked.length === 0) return showToast("Vous n'avez aucune carte débloquée à proposer !", 'error');
 
 let msg = `Proposer un échange à ${targetName} :\nEntrez l'ID de la carte que vous DONNEZ :\n` + myUnlocked.map(i => `#${i.id} : ${i.name}`).join('\n');
 let myCardId = prompt(msg);
@@ -912,7 +1020,7 @@ wantedCardId: parseInt(wantedCardId),
 status: 'pending'
 });
 
-alert("📩 Offre d'échange envoyée en direct !");
+showToast("📩 Offre d'échange envoyée avec succès !", 'success');
 }
 
 function listenToTrades() {
@@ -922,7 +1030,7 @@ const tl = document.getElementById('tradesList');
 if(!tl) return;
 tl.innerHTML = '';
 
-if (!trades) { tl.innerHTML = '<i>Aucune offre en cours.</i>'; return; }
+if (!trades) { tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>'; return; }
 
 let count = 0;
 Object.keys(trades).forEach(tid => {
@@ -934,20 +1042,20 @@ div.className = 'trade-card-box';
 
 if (t.receiverUid === appData.currentUser.uid) {
 div.innerHTML = `
-<p style="font-size:0.75rem;">📩 <b>${t.senderName}</b> veut échanger avec toi !</p>
-<p style="font-size:0.7rem; color:var(--glow-cyan);">Il donne : ID #${t.offeredCardId} | Il demande : ID #${t.wantedCardId}</p>
+<p style="font-size:0.75rem;">📩 <b>${t.senderName}</b> souhaite faire un échange !</p>
+<p style="font-size:0.7rem; color:var(--glow-cyan);">Donne ID #${t.offeredCardId} | Demande ID #${t.wantedCardId}</p>
 <div style="display:flex; gap:6px; margin-top:8px;">
-<button class="btn" style="padding:6px; font-size:0.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button>
+<button class="btn btn-success" style="padding:6px; font-size:0.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button>
 <button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button>
 </div>`;
 } else {
-div.innerHTML = `<p style="font-size:0.75rem;">⏳ Offre envoyée à ton ami (En attente...)</p>`;
+div.innerHTML = `<p style="font-size:0.75rem; color:var(--text-muted);">⏳ Offre envoyée à votre ami (En attente...)</p>`;
 }
 tl.appendChild(div);
 }
 });
 
-if (count === 0) tl.innerHTML = '<i>Aucune offre en cours.</i>';
+if (count === 0) tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>';
 });
 }
 
@@ -971,12 +1079,13 @@ db.ref('users/' + t.senderUid + '/catalogs').set(senderCats);
 
 db.ref('trades/' + tradeId).update({ status: 'accepted' });
 saveAppData();
-alert("🎉 Échange réussi ! Les cartes ont été synchronisées dans vos classeurs.");
+showToast("🎉 Échange réussi ! Les cartes ont été synchronisées.", 'success');
 });
 }
 
 function refuseTrade(tradeId) {
 db.ref('trades/' + tradeId).update({ status: 'refused' });
+showToast("Offre d'échange refusée.", 'success');
 }
 
 function unlockCardById(id) {
@@ -989,16 +1098,16 @@ function redeemSecretCode() {
 const code = document.getElementById('secretCodeInput').value.trim().toUpperCase();
 if (!code) return;
 
-if (appData.redeemedCodes.includes(code)) return alert('❌ Code déjà utilisé ou invalide.');
+if (appData.redeemedCodes.includes(code)) return showToast('❌ Ce code a déjà été utilisé.', 'error');
 
 if (code === 'DROPDROP2627GIVEFREE10000') {
 appData.credits += 10000;
 appData.redeemedCodes.push(code);
 saveAppData();
 document.getElementById('secretCodeInput').value = '';
-alert('🎉 CODE VALIDE ! +10 000 Crédits.');
+showToast('🎉 CODE VALIDE ! +10 000 Crédits ajoutés.', 'success');
 } else {
-alert('❌ Code déjà utilisé ou invalide.');
+showToast('❌ Code promotionnel invalide ou expiré.', 'error');
 }
 }
 
@@ -1011,7 +1120,8 @@ modal.classList.add('active'); btn.disabled = true; btn.innerText = `PATIENTEZ (
 
 adInterval = setInterval(() => {
 adTimeRemaining--;
-timerEl.innerText = `${adTimeRemaining}s`; progressBar.style.width = `${((30 - adTimeRemaining) / 30) * 100}%`;
+timerEl.innerText = `${adTimeRemaining}s`; 
+progressBar.style.width = `${((30 - adTimeRemaining) / 30) * 100}%`;
 if (adTimeRemaining <= 0) {
 clearInterval(adInterval); btn.disabled = false; btn.innerText = 'RÉCUPÉRER 15 🪙';
 }
@@ -1022,13 +1132,13 @@ function claimAdReward() {
 appData.credits += 15;
 saveAppData();
 document.getElementById('adModal').classList.remove('active');
-alert('Pub terminée avec succès ! +15 Crédits 🪙');
+showToast('Pub visionnée avec succès ! +15 Crédits 🪙', 'success');
 }
 
 /* MINI-JEUX ARCADE */
 let currentGameInterval = null;
 function startGame(gameType) {
-if (!appData.isAdmin && appData.credits < 25) return alert('25 Crédits nécessaires !');
+if (!appData.isAdmin && appData.credits < 25) return showToast('25 Crédits nécessaires pour jouer !', 'error');
 if (!appData.isAdmin) appData.credits -= 25;
 saveAppData();
 
@@ -1050,7 +1160,7 @@ document.getElementById('gameArea').classList.remove('active');
 }
 
 function rewardPlayer(amount) {
-alert(`🎮 Fin du jeu ! Gains : +${amount} Crédits 🪙`);
+showToast(`🎮 Fin de partie ! Gains : +${amount} Crédits 🪙`, 'success');
 appData.credits += amount;
 saveAppData();
 closeGame();
