@@ -193,12 +193,78 @@ flex-shrink: 0;
 background: rgba(10, 8, 20, 0.8);
 backdrop-filter: blur(25px);
 border-top: 1px solid var(--card-border);
-display: flex; justify-around: space-around; align-items: center;
+display: flex; justify-content: space-around; align-items: center;
 z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 20%; cursor: pointer; }
 .nav-item.active { color: var(--glow-magenta); text-shadow: 0 0 10px rgba(217, 70, 239, 0.5); }
 .nav-item .nav-icon { font-size: 1.3rem; }
+
+/* ANIMATION SPECTACULAIRE DU DROP CARTE */
+.drop-stage {
+width: 100%; height: 260px;
+perspective: 1000px;
+display: flex; justify-content: center; align-items: center;
+margin: 15px 0; position: relative;
+}
+.drop-card-3d {
+width: 160px; height: 220px;
+position: relative;
+transform-style: preserve-3d;
+transition: transform 1.2s cubic-bezier(0.4, 0.2, 0.2, 1);
+cursor: pointer;
+}
+.drop-card-3d.revealed {
+transform: rotateY(180deg);
+}
+.drop-card-face {
+position: absolute; inset: 0;
+backface-visibility: hidden;
+border-radius: 18px;
+border: 2px solid var(--glow-magenta);
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+box-shadow: 0 0 25px rgba(217, 70, 239, 0.4);
+background: rgba(15, 12, 29, 0.9);
+}
+.drop-card-back {
+background: linear-gradient(135deg, #100b26, #28124d);
+border-color: var(--glow-violet);
+}
+.drop-card-front {
+transform: rotateY(180deg);
+background: linear-gradient(135deg, #1f103c, #090514);
+border-color: var(--glow-cyan);
+padding: 10px; text-align: center;
+}
+
+@keyframes cardExplode {
+0% { transform: scale(1) rotateY(180deg); filter: brightness(1); }
+50% { transform: scale(1.3) rotateY(180deg); filter: brightness(3) drop-shadow(0 0 50px var(--glow-magenta)); }
+75% { transform: scale(0.9) rotateY(180deg); }
+100% { transform: scale(1) rotateY(180deg); filter: brightness(1); }
+}
+.drop-card-3d.exploding {
+animation: cardExplode 0.8s ease-out forwards;
+}
+
+/* Particules de l'explosion */
+.particle-burst {
+position: absolute; inset: 0; pointer-events: none; z-index: 10;
+display: flex; justify-content: center; align-items: center;
+}
+.particle {
+position: absolute; width: 8px; height: 8px; border-radius: 50%;
+background: var(--glow-magenta);
+box-shadow: 0 0 10px var(--glow-magenta);
+opacity: 0;
+}
+@keyframes particleFly {
+0% { transform: translate(0,0) scale(1); opacity: 1; }
+100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
+.particle.active {
+animation: particleFly 0.8s ease-out forwards;
+}
 
 @keyframes glitchAnnihilate {
 0% { transform: translate(0); filter: hue-rotate(0deg); }
@@ -222,14 +288,29 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <main class="screen-container">
 
-<!-- 1. ACCUEIL / DROP MYSTÈRE -->
+<!-- 1. ACCUEIL / DROP MYSTÈRE ANIMÉ -->
 <section id="scr-home" class="screen active">
-<div class="glass-card" style="text-align:center; padding:24px 12px;">
+<div class="glass-card" style="text-align:center; padding:20px 12px;">
 <div class="card-title"><span>DROP MYSTÈRE ULTIME</span></div>
-<div style="font-size:4rem; margin:10px 0; filter: drop-shadow(0 0 15px var(--glow-magenta));">🔮</div>
-<h3 style="font-family:'Space Grotesk'; font-size:1.2rem;">Coffre d'Objet Aléatoire</h3>
-<p style="font-size:0.75rem; color:var(--text-muted); margin:6px 0 18px;">Débloque un article unique parmi toutes les catégories du classeur.</p>
-<button class="btn" onclick="openRandomDrop()">DÉBLOQUER (150 🪙)</button>
+
+<!-- ZONE ANIMATION CARTE 3D -->
+<div class="drop-stage">
+<div class="particle-burst" id="particleBurst"></div>
+<div class="drop-card-3d" id="dropCard">
+  <div class="drop-card-face drop-card-back">
+    <div style="font-size:3.5rem; color:var(--glow-violet); font-weight:900; font-family:'Space Grotesk';">?</div>
+    <div style="font-size:0.65rem; color:var(--text-muted); margin-top:5px; text-transform:uppercase; letter-spacing:1px;">Mystère</div>
+  </div>
+  <div class="drop-card-face drop-card-front" id="cardFront">
+    <div style="font-size:3rem; margin-bottom:5px;" id="dropCardEmoji">🔮</div>
+    <h4 style="font-size:0.85rem; font-family:'Space Grotesk';" id="dropCardName">Objet Mystère</h4>
+    <p style="font-size:0.65rem; color:var(--glow-cyan); margin-top:4px;" id="dropCardRarity">Rareté</p>
+  </div>
+</div>
+</div>
+
+<p style="font-size:0.75rem; color:var(--text-muted); margin:6px 0 14px;">Chances : <b>9/10</b> Classique & Rare | <b style="color:var(--glow-magenta);">1/10</b> Ultra Rare !</p>
+<button class="btn" id="btnDrop" onclick="openRandomDrop()">DÉBLOQUER (150 🪙)</button>
 </div>
 
 <div class="glass-card">
@@ -291,18 +372,18 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </div>
 </section>
 
-<!-- 4. BOUTIQUE (SYSTEME PAIEMENT DIRECT CB) -->
+<!-- 4. BOUTIQUE (SYSTEME PAR EMAIL & CODE) -->
 <section id="scr-shop" class="screen">
 <div class="glass-card">
-<div class="card-title"><span>ACHAT DE CRÉDITS (CB SÉCURISÉ)</span></div>
-<p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:14px;">Terminal bancaire crypté. Crédits ajoutés immédiatement à ton compte.</p>
+<div class="card-title"><span>ACHAT DE CRÉDITS (PAR DÉBLOCAGE EMAIL)</span></div>
+<p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:14px;">Commandez vos crédits directement auprès de notre support pour obtenir un code unique de déblocage instantané.</p>
 
 <div class="shop-item">
 <div class="shop-info">
 <h4>Pack Starter</h4>
 <p>+1 000 🪙</p>
 </div>
-<button class="btn" style="width:auto; padding:8px 16px;" onclick="openPaymentModal(1000, '0,99 €')">0,99 €</button>
+<button class="btn" style="width:auto; padding:8px 16px;" onclick="openMailShopModal(1000, '0,99 €')">0,99 €</button>
 </div>
 
 <div class="shop-item">
@@ -310,7 +391,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <h4>Pack Pro</h4>
 <p>+6 000 🪙 (+20% offert)</p>
 </div>
-<button class="btn" style="width:auto; padding:8px 16px;" onclick="openPaymentModal(6000, '4,99 €')">4,99 €</button>
+<button class="btn" style="width:auto; padding:8px 16px;" onclick="openMailShopModal(6000, '4,99 €')">4,99 €</button>
 </div>
 
 <div class="shop-item">
@@ -318,8 +399,14 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <h4>Pack Ultime</h4>
 <p>+15 000 🪙 (+50% offert)</p>
 </div>
-<button class="btn" style="width:auto; padding:8px 16px;" onclick="openPaymentModal(15000, '9,99 €')">9,99 €</button>
+<button class="btn" style="width:auto; padding:8px 16px;" onclick="openMailShopModal(15000, '9,99 €')">9,99 €</button>
 </div>
+</div>
+
+<div class="glass-card">
+<div class="card-title"><span>ACTIVER VOTRE CODE REÇU</span></div>
+<input type="text" id="shopCodeInput" class="input-field" placeholder="Ex: DROP-CREDIT-XXXX..." style="text-transform:uppercase;">
+<button class="btn" onclick="redeemShopCode()">VALIDER MON CODE</button>
 </div>
 </section>
 
@@ -349,7 +436,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </div>
 
 <div class="glass-card">
-<div class="card-title"><span>CODE PROMO</span></div>
+<div class="card-title"><span>CODE PROMO ADMINISTRATEUR</span></div>
 <input type="text" id="secretCodeInput" class="input-field" placeholder="Entrez le code..." style="text-transform:uppercase;">
 <button class="btn" onclick="redeemSecretCode()">VALIDER LE CODE</button>
 </div>
@@ -374,23 +461,24 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div id="gameCanvasContainer" style="width:100%; display:flex; justify-content:center; align-items:center; flex:1;"></div>
 </div>
 
-<!-- MODAL DE PAIEMENT CB SÉCURISÉ -->
+<!-- MODAL D'INSTRUCTION DE PAIEMENT VIA EMAIL -->
 <div class="game-modal" id="payModal">
-<div style="width:100%; max-width:350px; background:var(--card-bg); border:1px solid var(--card-border-glow); border-radius:22px; padding:20px; backdrop-filter:blur(25px);">
+<div style="width:100%; max-width:350px; background:var(--card-bg); border:1px solid var(--card-border-glow); border-radius:22px; padding:20px; backdrop-filter:blur(25px); text-align:center;">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-<h3 style="font-family:'Space Grotesk'; font-size:1rem; color:#fff;">💳 PAIEMENT PAR CARTE</h3>
+<h3 style="font-family:'Space Grotesk'; font-size:1rem; color:#fff;">📧 ACHAT DE CRÉDITS</h3>
 <button onclick="closePaymentModal()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✕</button>
 </div>
-<p style="font-size:0.8rem; color:var(--glow-cyan); margin-bottom:12px; font-weight:700;" id="payPackTitle">Pack +1000 🪙 (0.99 €)</p>
-<form onsubmit="processPayment(event)">
-<input type="text" class="input-field" placeholder="Numéro de Carte (16 chiffres)" maxlength="19" required>
-<div style="display:flex; gap:10px;">
-<input type="text" class="input-field" placeholder="MM/AA" maxlength="5" required>
-<input type="text" class="input-field" placeholder="CVC" maxlength="3" required>
+<p style="font-size:0.9rem; color:var(--glow-cyan); margin-bottom:12px; font-weight:700;" id="payPackTitle">Pack +1000 🪙 (0,99 €)</p>
+
+<div style="background:rgba(0,0,0,0.4); padding:14px; border-radius:14px; border:1px dashed var(--glow-magenta); margin-bottom:15px; font-size:0.8rem; text-align:left; line-height:1.4;">
+Pour obtenir ce pack, veuillez :<br><br>
+1. Envoyer le montant demandé par e-mail à :<br>
+<b style="color:var(--glow-magenta); word-break:break-all;">anonymemaildesktop@gmail.com</b><br><br>
+2. Indiquez votre e-mail de compte.<br>
+3. Vous recevrez en retour votre code secret à 16 caractères à entrer dans l'onglet Shop !
 </div>
-<input type="text" class="input-field" placeholder="Nom du titulaire" required>
-<button type="submit" class="btn" style="margin-top:10px;">PAYER & RECEVOIR LES CRÉDITS</button>
-</form>
+
+<button class="btn" onclick="closePaymentModal()">J'AI COMPRIS</button>
 </div>
 </div>
 
@@ -398,7 +486,18 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <script>
 
-/* CATALOGUES MASSIFS ET STRUCTURES EN CLASSEUR (12 objets par catégorie) */
+/* GENERATION AUTOMATIQUE DE 5000 CODES UNIQUS POUR LES CREDITS */
+const GENERATED_5000_CODES = {};
+(function generate5000Codes() {
+  for (let i = 1; i <= 5000; i++) {
+    // Génère des codes variés (entre 500 et 20000 crédits)
+    const creditAmount = (i % 5 === 0) ? 10000 : (i % 2 === 0) ? 2000 : 1000;
+    const code = "DROP-CREDIT-" + (100000 + i);
+    GENERATED_5000_CODES[code] = creditAmount;
+  }
+})();
+
+/* CATALOGUES MASSIFS ET STRUCTURES EN CLASSEUR */
 const CATALOGS = {
 tiktok: [
 { id: 101, name: "Anneau Lumineux LED", emoji: "💡", price: 200, unlocked: false },
@@ -412,7 +511,9 @@ tiktok: [
 { id: 109, name: "Lampe Coucher de Soleil", emoji: "🌅", price: 220, unlocked: false },
 { id: 110, name: "Micro Karaoke Bluetooth", emoji: "🎤", price: 310, unlocked: false },
 { id: 111, name: "Sac Banane Holographique", emoji: "🎒", price: 280, unlocked: false },
-{ id: 112, name: "Veilleuse Pain de Mie", emoji: "🍞", price: 190, unlocked: false }
+{ id: 112, name: "Veilleuse Pain de Mie", emoji: "🍞", price: 190, unlocked: false },
+{ id: 113, name: "Projecteur de poche 4K", emoji: "📹", price: 600, unlocked: false },
+{ id: 114, name: "Support Smartphone Flex", emoji: "📱", price: 170, unlocked: false }
  ],
 memes: [
 { id: 201, name: "Lunettes Thug Life 8-Bit", emoji: "🕶️", price: 180, unlocked: false },
@@ -426,7 +527,9 @@ memes: [
 { id: 209, name: "Coussin Geant Cheetos", emoji: "🛋️", price: 350, unlocked: false },
 { id: 210, name: "Figurine Gigachad", emoji: "🗿", price: 750, unlocked: false },
 { id: 211, name: "Tapis Froggy Peepo", emoji: "🐸", price: 290, unlocked: false },
-{ id: 212, name: "Mug 'Fine Dog' Fire", emoji: "☕", price: 210, unlocked: false }
+{ id: 212, name: "Mug 'Fine Dog' Fire", emoji: "☕", price: 210, unlocked: false },
+{ id: 213, name: "Trompette Doot Doot", emoji: "🎺", price: 330, unlocked: false },
+{ id: 214, name: "Costume Inflatable Alien", emoji: "👽", price: 520, unlocked: false }
  ],
 gaming: [
 { id: 301, name: "Manette Pro Translucide", emoji: "🎮", price: 800, unlocked: false },
@@ -440,7 +543,9 @@ gaming: [
 { id: 309, name: "Mini Borne Arcade", emoji: "👾", price: 1100, unlocked: false },
 { id: 310, name: "Stream Deck Mini", emoji: "🎛️", price: 1350, unlocked: false },
 { id: 311, name: "Câble Lumineux Fast Charge", emoji: "🔌", price: 210, unlocked: false },
-{ id: 312, name: "Finger Sleeves Pro", emoji: "🖐️", price: 120, unlocked: false }
+{ id: 312, name: "Finger Sleeves Pro", emoji: "🖐️", price: 120, unlocked: false },
+{ id: 313, name: "Chaise Gaming Quantum", emoji: "💺", price: 3200, unlocked: false },
+{ id: 314, name: "Microphone Studio Pro", emoji: "🎙️", price: 1400, unlocked: false }
  ],
 secret: [
 { id: 401, name: "Carte VIP Gold Access", emoji: "💳", price: 5000, unlocked: false },
@@ -469,7 +574,7 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS))
 };
 
 let currentAuthMode = 'login';
-let pendingCreditAmount = 0;
+let isDropping = false;
 
 function loadAppData() {
 const saved = localStorage.getItem('drop_app_mobile_2027');
@@ -480,7 +585,6 @@ appData.redeemedCodes = parsed.redeemedCodes || [];
 appData.currentUser = parsed.currentUser || null;
 appData.isAdmin = parsed.isAdmin || false;
 if (parsed.catalogs) {
-// Merge pour conserver les nouveaux objets si existant
 Object.keys(CATALOGS).forEach(cat => {
 if (parsed.catalogs[cat]) {
 CATALOGS[cat].forEach(newItem => {
@@ -585,29 +689,94 @@ alert(`🎉 FÉLICITATIONS ! Tu as obtenu : ${found.emoji} ${found.name}`);
 saveAppData();
 }
 
+/* ANIMATION SPECTACULAIRE ET TIRAGE ALEATOIRE (1/10 ULTRA RARE) */
 function openRandomDrop() {
+if (isDropping) return;
 if (!appData.isAdmin && appData.credits < 150) return alert('150 Crédits requis !');
 
-let allLocked = [];
-Object.keys(appData.catalogs).forEach(cat => {
-appData.catalogs[cat].forEach(item => {
-if (!item.unlocked) allLocked.push(item);
-});
-});
+// Sélection selon la probabilité 1/10 Ultra Rare et 9/10 Normales/Rares
+const roll = Math.random(); // 0 à 1
+let isUltraRare = roll < 0.1; // 10% de chance (1/10)
 
-if (allLocked.length === 0) return alert('Félicitations, tout le classeur est débloqué !');
+let pool = [];
+if (isUltraRare) {
+  appData.catalogs.secret.forEach(i => { if(!i.unlocked) pool.push(i); });
+} else {
+  ['tiktok', 'memes', 'gaming'].forEach(cat => {
+    appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+  });
+}
+
+// Fallback si la catégorie est vide
+if (pool.length === 0) {
+  Object.keys(appData.catalogs).forEach(cat => {
+    appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+  });
+}
+
+if (pool.length === 0) return alert('Félicitations, tout le classeur est déjà débloqué !');
 
 if (!appData.isAdmin) appData.credits -= 150;
-
-const picked = allLocked[Math.floor(Math.random() * allLocked.length)];
-picked.unlocked = true;
 saveAppData();
 
-if (picked.id === 2000) {
-triggerAnnihilation();
-} else {
-alert(`🔮 DROP RÉUSSI ! Tu as reçu : ${picked.emoji} ${picked.name}`);
+const picked = pool[Math.floor(Math.random() * pool.length)];
+picked.unlocked = true;
+
+// Démarrage de l'animation
+isDropping = true;
+const card = document.getElementById('dropCard');
+const btn = document.getElementById('btnDrop');
+btn.disabled = true;
+
+// Remettre la carte de dos
+card.classList.remove('revealed', 'exploding');
+
+// Remplir la face avant
+document.getElementById('dropCardEmoji').innerText = picked.emoji;
+document.getElementById('dropCardName').innerText = picked.name;
+document.getElementById('dropCardRarity').innerText = isUltraRare ? "⚡ ULTRA RARE (1/10)" : "🌟 CLASSIQUE / RARE";
+document.getElementById('dropCardRarity').style.color = isUltraRare ? "var(--glow-magenta)" : "var(--glow-cyan)";
+
+// Étape 1 : Rotation lente
+setTimeout(() => {
+  card.classList.add('revealed');
+}, 300);
+
+// Étape 2 : Explosion et particules
+setTimeout(() => {
+  card.classList.add('exploding');
+  createExplosionParticles();
+}, 1400);
+
+// Étape 3 : Révélation finale et sauvegarde
+setTimeout(() => {
+  isDropping = false;
+  btn.disabled = false;
+  saveAppData();
+
+  if (picked.id === 2000) {
+    triggerAnnihilation();
+  } else {
+    alert(`💥 UNBOXING EXPLOSIF ! Tu as obtenu : ${picked.emoji} ${picked.name}`);
+  }
+}, 2200);
 }
+
+function createExplosionParticles() {
+  const container = document.getElementById('particleBurst');
+  container.innerHTML = '';
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle active';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 80 + Math.random() * 120;
+    const dx = Math.cos(angle) * dist + 'px';
+    const dy = Math.sin(angle) * dist + 'px';
+    p.style.setProperty('--dx', dx);
+    p.style.setProperty('--dy', dy);
+    p.style.background = (i % 2 === 0) ? 'var(--glow-magenta)' : 'var(--glow-cyan)';
+    container.appendChild(p);
+  }
 }
 
 function triggerAnnihilation() {
@@ -625,14 +794,8 @@ alert('💥 SYSTEM OVERRIDE 2027... ACCÈS ADMINISTRATEUR SUPRÊME DÉBLOQUÉ !'
 }, 2500);
 }
 
-/* PAIEMENT CB DIRECT SÉCURISÉ POUR LA BOUTIQUE */
-function openPaymentModal(credits, priceText) {
-if (!appData.currentUser) {
-alert('⚠️ Connexion requise avant paiement.');
-switchTab('scr-account', document.querySelectorAll('.nav-item')[4]);
-return;
-}
-pendingCreditAmount = credits;
+/* MODAL DE CONSIGNES EMAIL SHOP */
+function openMailShopModal(credits, priceText) {
 document.getElementById('payPackTitle').innerText = `Pack +${credits.toLocaleString()} 🪙 (${priceText})`;
 document.getElementById('payModal').classList.add('active');
 }
@@ -641,15 +804,23 @@ function closePaymentModal() {
 document.getElementById('payModal').classList.remove('active');
 }
 
-function processPayment(e) {
-e.preventDefault();
-alert('💳 Transaction sécurisée en cours...');
-setTimeout(() => {
-appData.credits += pendingCreditAmount;
+/* VALIDATION DES CODES DE BOUTIQUE (5000 CODES) */
+function redeemShopCode() {
+const code = document.getElementById('shopCodeInput').value.trim().toUpperCase();
+if (!code) return;
+
+if (appData.redeemedCodes.includes(code)) return alert('⚠️ Ce code a déjà été débloqué !');
+
+if (GENERATED_5000_CODES[code]) {
+const amount = GENERATED_5000_CODES[code];
+appData.credits += amount;
+appData.redeemedCodes.push(code);
 saveAppData();
-closePaymentModal();
-alert(`✅ PAIEMENT ACCEPTÉ ! +${pendingCreditAmount.toLocaleString()} 🪙 ajoutés à votre compte.`);
-}, 1200);
+document.getElementById('shopCodeInput').value = '';
+alert(`🎉 CODE DE BOUTIQUE CONFIRMÉ ! +${amount.toLocaleString()} Crédits ajoutés à votre compte !`);
+} else {
+alert('❌ Code invalide ou inexistant.');
+}
 }
 
 /* AUTHENTIFICATION */
@@ -748,13 +919,7 @@ closeGame();
 
 function runReactionGame(c) {
 document.getElementById('gameTitle').innerText = "Réaction Néon";
-c.innerHTML = `<div style="text-align:center;">
-<div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);">
-<div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div>
-<div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div>
-</div>
-<button class="btn" onclick="stopReaction()">STOP !</button>
-</div>`;
+c.innerHTML = `<div style="text-align:center;"> <div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);"> <div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div> <div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div> </div> <button class="btn" onclick="stopReaction()">STOP !</button> </div>`;
 let pos = 0, dir = 3;
 currentGameInterval = setInterval(() => {
 pos += dir;
@@ -839,11 +1004,7 @@ ctx.fillStyle = "#06b6d4"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
 function runTapGame(c) {
 document.getElementById('gameTitle').innerText = "Tap Cible (10s)";
 let score = 0, timeLeft = 10;
-c.innerHTML = `<div style="text-align:center;">
-<h2 id="timer">10s</h2>
-<div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div>
-<h3>Score : <span id="tapScore">0</span></h3>
-</div>`;
+c.innerHTML = `<div style="text-align:center;"> <h2 id="timer">10s</h2> <div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div> <h3>Score : <span id="tapScore">0</span></h3> </div>`;
 
 document.getElementById('target').onclick = () => {
 score++;
@@ -860,12 +1021,7 @@ if(timeLeft <= 0) rewardPlayer(Math.min(10 + score*2, 50));
 
 function runMemoryGame(c) {
 document.getElementById('gameTitle').innerText = "Mémoire Flash";
-c.innerHTML = `<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;">
-<div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div>
-<div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div>
-<div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div>
-<div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div>
-</div>`;
+c.innerHTML = `<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;"> <div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div> <div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div> <div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div> <div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div> </div>`;
 let seq = [Math.floor(Math.random()*4), Math.floor(Math.random()*4)], step = 0;
 
 function playSeq() {
@@ -891,12 +1047,7 @@ rewardPlayer(10);
 
 function runStackGame(c) {
 document.getElementById('gameTitle').innerText = "Stack Néon";
-c.innerHTML = `<div style="text-align:center;">
-<div id="sboard" style="width:200px; height:200px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px;">
-<div id="sblock" style="width:80px; height:20px; background:var(--glow-violet); position:absolute; bottom:0; left:0; box-shadow:0 0 10px var(--glow-violet);"></div>
-</div>
-<button class="btn" style="margin-top:12px;" onclick="stackDrop()">EMPILER</button>
-</div>`;
+c.innerHTML = `<div style="text-align:center;"> <div id="sboard" style="width:200px; height:200px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px;"> <div id="sblock" style="width:80px; height:20px; background:var(--glow-violet); position:absolute; bottom:0; left:0; box-shadow:0 0 10px var(--glow-violet);"></div> </div> <button class="btn" style="margin-top:12px;" onclick="stackDrop()">EMPILER</button> </div>`;
 let pos = 0, dir = 4, score = 0;
 currentGameInterval = setInterval(() => {
 pos += dir;
