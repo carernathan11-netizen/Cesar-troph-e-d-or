@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+
+<!-- FIREBASE SDKs (Temps réel et Cloud) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
 :root {
 --bg-dark: #050508;
@@ -18,12 +24,6 @@
 --card-border-glow: rgba(217, 70, 239, 0.5);
 --text-main: #f3f4f6;
 --text-muted: #a1a1aa;
-
---rarity-common: #a1a1aa;
---rarity-rare: #3b82f6;
---rarity-epic: #a855f7;
---rarity-legendary: #f59e0b;
---rarity-admin: #ec4899;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -36,12 +36,8 @@ overflow: hidden;
 }
 
 .app-viewport {
-width: 100vw;
-height: 100vh;
-height: 100svh;
-display: flex;
-flex-direction: column;
-position: relative;
+width: 100vw; height: 100vh; height: 100svh;
+display: flex; flex-direction: column; position: relative;
 background: #050508;
 background-image:
 radial-gradient(at 10% 10%, rgba(139, 92, 246, 0.25) 0px, transparent 50%),
@@ -50,136 +46,91 @@ radial-gradient(at 50% 80%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
 }
 
 .hud-header {
-height: 65px;
-flex-shrink: 0;
-padding: 0 20px;
+height: 65px; flex-shrink: 0; padding: 0 20px;
 display: flex; justify-content: space-between; align-items: center;
 background: rgba(10, 8, 20, 0.7); backdrop-filter: blur(20px);
 border-bottom: 1px solid var(--card-border); z-index: 20;
 box-shadow: 0 4px 30px rgba(139, 92, 246, 0.15);
 }
 .brand-logo {
-font-family: 'Space Grotesk', sans-serif;
-font-weight: 900;
-font-size: 1.3rem;
-letter-spacing: 3px;
+font-family: 'Space Grotesk', sans-serif; font-weight: 900; font-size: 1.3rem; letter-spacing: 3px;
 background: linear-gradient(135deg, #fff 30%, var(--glow-magenta));
 -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 display: flex; align-items: center; gap: 8px;
 }
 .brand-dot {
-width: 10px; height: 10px;
-background: var(--glow-violet);
-border-radius: 50%;
+width: 10px; height: 10px; background: var(--glow-violet); border-radius: 50%;
 box-shadow: 0 0 12px var(--glow-magenta), 0 0 20px var(--glow-violet);
 }
 .pill {
-background: rgba(139, 92, 246, 0.12);
-border: 1px solid var(--card-border-glow);
-padding: 6px 14px; border-radius: 20px;
-font-size: 0.9rem; font-weight: 800; color: #fff;
-font-family: 'Space Grotesk', sans-serif;
-box-shadow: 0 0 15px rgba(217, 70, 239, 0.2);
+background: rgba(139, 92, 246, 0.12); border: 1px solid var(--card-border-glow);
+padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; color: #fff;
+font-family: 'Space Grotesk', sans-serif; box-shadow: 0 0 15px rgba(217, 70, 239, 0.2);
 }
 
-.screen-container {
-flex: 1;
-overflow-y: auto;
-padding: 16px;
--webkit-overflow-scrolling: touch;
-}
-
+.screen-container { flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch; }
 .screen { display: none; width: 100%; }
 .screen.active { display: flex; flex-direction: column; gap: 14px; }
 
 .glass-card {
-background: var(--card-bg);
-border: 1px solid var(--card-border);
-border-radius: 22px;
-padding: 18px;
-backdrop-filter: blur(25px);
-box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-position: relative;
-overflow: hidden;
+background: var(--card-bg); border: 1px solid var(--card-border);
+border-radius: 22px; padding: 18px; backdrop-filter: blur(25px);
+box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); position: relative; overflow: hidden;
 }
 .glass-card::before {
 content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-background: linear-gradient(90deg, transparent, var(--glow-magenta), transparent);
-opacity: 0.5;
+background: linear-gradient(90deg, transparent, var(--glow-magenta), transparent); opacity: 0.5;
 }
 
 .card-title {
-font-family: 'Space Grotesk', sans-serif;
-font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
-color: var(--glow-cyan); margin-bottom: 12px;
-display: flex; justify-content: space-between; font-weight: 700;
+font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+color: var(--glow-cyan); margin-bottom: 12px; display: flex; justify-content: space-between; font-weight: 700;
 }
 
 .btn {
 width: 100%; padding: 14px; border-radius: 16px; border: none;
 background: linear-gradient(135deg, var(--glow-violet), var(--glow-magenta));
-color: #fff; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
-font-size: 0.9rem; cursor: pointer; text-align: center;
-box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+color: #fff; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.9rem;
+cursor: pointer; text-align: center; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
 transition: transform 0.2s, box-shadow 0.2s;
 }
 .btn:active { transform: scale(0.98); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-.btn-secondary {
-background: rgba(255, 255, 255, 0.05);
-border: 1px solid var(--card-border);
-box-shadow: none;
-}
+.btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); box-shadow: none; }
 .btn-danger { background: linear-gradient(135deg, #ef4444, #991b1b); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
 
 .input-field {
-width: 100%; padding: 14px;
-background: rgba(15, 12, 29, 0.8);
-border: 1px solid var(--card-border);
-border-radius: 14px; color: #fff; font-family: inherit; margin-bottom: 10px; outline: none;
+width: 100%; padding: 14px; background: rgba(15, 12, 29, 0.8);
+border: 1px solid var(--card-border); border-radius: 14px; color: #fff; font-family: inherit; margin-bottom: 10px; outline: none;
 }
 .input-field:focus { border-color: var(--glow-magenta); box-shadow: 0 0 10px rgba(217, 70, 239, 0.3); }
 
-.binder-tabs {
-display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px;
--webkit-overflow-scrolling: touch;
-}
+.binder-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; }
 .binder-tabs::-webkit-scrollbar { display: none; }
 .binder-tab {
 padding: 8px 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.04);
-border: 1px solid var(--card-border); font-size: 0.75rem; font-weight: 700;
-color: var(--text-muted); whitespace: nowrap; cursor: pointer;
+border: 1px solid var(--card-border); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); whitespace: nowrap; cursor: pointer;
 }
-.binder-tab.active {
-background: rgba(139, 92, 246, 0.25); border-color: var(--glow-magenta);
-color: #fff; box-shadow: 0 0 12px rgba(217, 70, 239, 0.3);
-}
+.binder-tab.active { background: rgba(139, 92, 246, 0.25); border-color: var(--glow-magenta); color: #fff; box-shadow: 0 0 12px rgba(217, 70, 239, 0.3); }
 
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; position: relative; }
 .catalog-card {
-background: rgba(20, 16, 38, 0.6); border: 1px solid var(--card-border);
-border-radius: 16px; padding: 12px; text-align: center; position: relative;
-display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-z-index: 2;
+background: rgba(20, 16, 38, 0.6); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px;
+text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; z-index: 2;
 }
 .catalog-card .emoji { font-size: 2.2rem; margin: 6px 0; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
 .catalog-card .item-name { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; min-height: 2.2em; display: flex; align-items: center; justify-content: center; }
 .catalog-card .item-price { font-size: 0.7rem; color: var(--glow-cyan); font-weight: 800; font-family: 'Space Grotesk'; }
 .catalog-card.locked { opacity: 0.6; filter: grayscale(0.6); }
 
-/* ARRIÈRE-PLAN BALLONS DE FOOT */
 .football-bg-pattern {
 position: absolute; inset: 0; pointer-events: none; opacity: 0.08; z-index: 1;
 background-image: radial-gradient(#fff 2px, transparent 2px), radial-gradient(#fff 2px, transparent 2px);
 background-size: 40px 40px; background-position: 0 0, 20px 20px;
-display: flex; flex-wrap: wrap; justify-content: space-around; align-content: space-around;
-font-size: 2.5rem; overflow: hidden;
+display: flex; flex-wrap: wrap; justify-content: space-around; align-content: space-around; font-size: 2.5rem; overflow: hidden;
 }
 
-.game-card {
-background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border);
-border-radius: 16px; padding: 14px; display: flex; justify-content: space-between; align-items: center;
-}
+.game-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 16px; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
 .game-info h4 { font-size: 0.85rem; color: #fff; }
 .game-info p { font-size: 0.7rem; color: var(--text-muted); }
 
@@ -191,53 +142,20 @@ border-radius: 16px; padding: 14px; display: flex; justify-content: space-betwee
 .auth-tab.active { background: rgba(139, 92, 246, 0.2); border-color: var(--glow-violet); color: #fff; }
 
 .nav-dock {
-height: 70px;
-flex-shrink: 0;
-background: rgba(10, 8, 20, 0.8);
-backdrop-filter: blur(25px);
-border-top: 1px solid var(--card-border);
-display: flex; justify-content: space-around; align-items: center;
+height: 70px; flex-shrink: 0; background: rgba(10, 8, 20, 0.8); backdrop-filter: blur(25px);
+border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center;
 z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 20%; cursor: pointer; }
 .nav-item.active { color: var(--glow-magenta); text-shadow: 0 0 10px rgba(217, 70, 239, 0.5); }
 .nav-item .nav-icon { font-size: 1.3rem; }
 
-.drop-stage {
-width: 100%; height: 260px;
-perspective: 1000px;
-display: flex; justify-content: center; align-items: center;
-margin: 15px 0; position: relative;
-}
-.drop-card-3d {
-width: 160px; height: 220px;
-position: relative;
-transform-style: preserve-3d;
-transition: transform 1.2s cubic-bezier(0.4, 0.2, 0.2, 1);
-cursor: pointer;
-}
-.drop-card-3d.revealed {
-transform: rotateY(180deg);
-}
-.drop-card-face {
-position: absolute; inset: 0;
-backface-visibility: hidden;
-border-radius: 18px;
-border: 2px solid var(--glow-magenta);
-display: flex; flex-direction: column; align-items: center; justify-content: center;
-box-shadow: 0 0 25px rgba(217, 70, 239, 0.4);
-background: rgba(15, 12, 29, 0.9);
-}
-.drop-card-back {
-background: linear-gradient(135deg, #100b26, #28124d);
-border-color: var(--glow-violet);
-}
-.drop-card-front {
-transform: rotateY(180deg);
-background: linear-gradient(135deg, #1f103c, #090514);
-border-color: var(--glow-cyan);
-padding: 10px; text-align: center;
-}
+.drop-stage { width: 100%; height: 260px; perspective: 1000px; display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
+.drop-card-3d { width: 160px; height: 220px; position: relative; transform-style: preserve-3d; transition: transform 1.2s cubic-bezier(0.4, 0.2, 0.2, 1); cursor: pointer; }
+.drop-card-3d.revealed { transform: rotateY(180deg); }
+.drop-card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 18px; border: 2px solid var(--glow-magenta); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(217, 70, 239, 0.4); background: rgba(15, 12, 29, 0.9); }
+.drop-card-back { background: linear-gradient(135deg, #100b26, #28124d); border-color: var(--glow-violet); }
+.drop-card-front { transform: rotateY(180deg); background: linear-gradient(135deg, #1f103c, #090514); border-color: var(--glow-cyan); padding: 10px; text-align: center; }
 
 @keyframes cardExplode {
 0% { transform: scale(1) rotateY(180deg); filter: brightness(1); }
@@ -245,27 +163,12 @@ padding: 10px; text-align: center;
 75% { transform: scale(0.9) rotateY(180deg); }
 100% { transform: scale(1) rotateY(180deg); filter: brightness(1); }
 }
-.drop-card-3d.exploding {
-animation: cardExplode 0.8s ease-out forwards;
-}
+.drop-card-3d.exploding { animation: cardExplode 0.8s ease-out forwards; }
 
-.particle-burst {
-position: absolute; inset: 0; pointer-events: none; z-index: 10;
-display: flex; justify-content: center; align-items: center;
-}
-.particle {
-position: absolute; width: 8px; height: 8px; border-radius: 50%;
-background: var(--glow-magenta);
-box-shadow: 0 0 10px var(--glow-magenta);
-opacity: 0;
-}
-@keyframes particleFly {
-0% { transform: translate(0,0) scale(1); opacity: 1; }
-100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
-}
-.particle.active {
-animation: particleFly 0.8s ease-out forwards;
-}
+.particle-burst { position: absolute; inset: 0; pointer-events: none; z-index: 10; display: flex; justify-content: center; align-items: center; }
+.particle { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--glow-magenta); box-shadow: 0 0 10px var(--glow-magenta); opacity: 0; }
+@keyframes particleFly { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
+.particle.active { animation: particleFly 0.8s ease-out forwards; }
 
 @keyframes glitchAnnihilate {
 0% { transform: translate(0); filter: hue-rotate(0deg); }
@@ -277,25 +180,15 @@ animation: particleFly 0.8s ease-out forwards;
 }
 .annihilate { animation: glitchAnnihilate 2.5s forwards ease-in-out; }
 
-/* MODAL DE PUBLICITÉ */
-.ad-modal {
-position: fixed; inset: 0; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(20px);
-z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
-}
+.ad-modal { position: fixed; inset: 0; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(20px); z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
 .ad-modal.active { display: flex; }
-.ad-box {
-width: 100%; max-width: 340px; background: rgba(15, 12, 29, 0.9); border: 1px solid var(--glow-magenta);
-border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 0 30px rgba(217, 70, 239, 0.3);
-}
-.ad-screen {
-width: 100%; height: 180px; background: #000; border-radius: 16px; margin: 15px 0;
-display: flex; flex-direction: column; justify-content: center; align-items: center;
-border: 1px solid var(--card-border); position: relative; overflow: hidden;
-}
-.ad-progress {
-position: absolute; bottom: 0; left: 0; height: 6px; background: linear-gradient(90deg, var(--glow-violet), var(--glow-magenta));
-width: 0%; transition: width 1s linear;
-}
+.ad-box { width: 100%; max-width: 340px; background: rgba(15, 12, 29, 0.9); border: 1px solid var(--glow-magenta); border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 0 30px rgba(217, 70, 239, 0.3); }
+.ad-screen { width: 100%; height: 180px; background: #000; border-radius: 16px; margin: 15px 0; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--card-border); position: relative; overflow: hidden; }
+.ad-progress { position: absolute; bottom: 0; left: 0; height: 6px; background: linear-gradient(90deg, var(--glow-violet), var(--glow-magenta)); width: 0%; transition: width 1s linear; }
+
+/* TRADE & FRIENDS UI */
+.friend-badge { background: rgba(139, 92, 246, 0.15); border: 1px solid var(--card-border); padding: 10px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.trade-card-box { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -363,30 +256,12 @@ width: 0%; transition: width 1s linear;
 <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:12px;">Coût : 25 🪙 | Gain : 10 à 50 🪙</p>
 
 <div style="display:flex; flex-direction:column; gap:10px;">
-<div class="game-card">
-<div class="game-info"><h4>⚡ Réaction Extrême</h4><p>Stoppe le curseur hyper rapide !</p></div>
-<button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('reaction')">JOUER</button>
-</div>
-<div class="game-card">
-<div class="game-info"><h4>🔴 Puissance 4</h4><p>VS Robot Tactique (Minimax)</p></div>
-<button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('connect4')">JOUER</button>
-</div>
-<div class="game-card">
-<div class="game-info"><h4>🐍 Snake Néon</h4><p>Serpent tactile classique</p></div>
-<button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('snake')">JOUER</button>
-</div>
-<div class="game-card">
-<div class="game-info"><h4>🥞 Stack Néon</h4><p>Empilement de blocs précis</p></div>
-<button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('stack')">JOUER</button>
-</div>
-<div class="game-card">
-<div class="game-info"><h4>🎯 Tap Cible</h4><p>Touche les cibles en 10s</p></div>
-<button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('tap')">JOUER</button>
-</div>
-<div class="game-card">
-<div class="game-info"><h4>🧠 Mémoire Flash</h4><p>Répète la séquence néon</p></div>
-<button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('memory')">JOUER</button>
-</div>
+<div class="game-card"><div class="game-info"><h4>⚡ Réaction Extrême</h4><p>Stoppe le curseur hyper rapide !</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('reaction')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🔴 Puissance 4</h4><p>VS Robot Tactique</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('connect4')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🐍 Snake Néon</h4><p>Serpent tactile classique</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('snake')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🥞 Stack Néon</h4><p>Empilement de blocs précis</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('stack')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🎯 Tap Cible</h4><p>Touche les cibles en 10s</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('tap')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🧠 Mémoire Flash</h4><p>Répète la séquence néon</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('memory')">JOUER</button></div>
 </div>
 </div>
 </section>
@@ -400,7 +275,7 @@ width: 0%; transition: width 1s linear;
 </div>
 </section>
 
-<!-- 5. COMPTE -->
+<!-- 5. COMPTE & AMIS -->
 <section id="scr-account" class="screen">
 <div id="authSection" class="glass-card">
 <div class="auth-tabs">
@@ -422,7 +297,23 @@ width: 0%; transition: width 1s linear;
 <div style="font-size:3rem; margin-bottom:5px;">👤</div>
 <h3 style="font-family:'Space Grotesk';" id="profileName">Joueur</h3>
 <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" id="userStatus">Joueur Standard</p>
+<p style="font-size:0.8rem; color:var(--glow-cyan); margin-top:8px;" id="userFriendId">ID Ami : Chargement...</p>
 <button class="btn btn-danger" style="margin-top:15px;" onclick="logoutUser()">SE DÉCONNECTER</button>
+</div>
+
+<!-- SECTION AMIS ET ÉCHANGES -->
+<div id="friendsSection" class="glass-card" style="display:none;">
+<div class="card-title"><span>🤝 SYSTEME D'AMIS & ÉCHANGES</span></div>
+<div style="display:flex; gap:8px; margin-bottom:12px;">
+<input type="text" id="addFriendInput" class="input-field" placeholder="Entrer l'ID Ami (ex: #DROP-XXXX)" style="margin-bottom:0;">
+<button class="btn" style="width:auto; padding:0 15px;" onclick="addFriend()">AJOUTER</button>
+</div>
+
+<h4 style="font-size:0.8rem; margin:10px 0 6px; color:var(--text-muted);">MES AMIS</h4>
+<div id="friendsList"><i>Aucun ami ajouté.</i></div>
+
+<h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">ÉCHANGES EN COURS</h4>
+<div id="tradesList"><i>Aucune offre en cours.</i></div>
 </div>
 
 <div class="glass-card">
@@ -442,7 +333,7 @@ width: 0%; transition: width 1s linear;
 <button class="nav-item" onclick="switchTab('scr-account', this)"><span class="nav-icon">👤</span><span>COMPTE</span></button>
 </nav>
 
-<!-- MODAL DE JEU -->
+<!-- MODALS -->
 <div class="game-modal" id="gameArea">
 <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
 <h3 style="font-family:'Space Grotesk';" id="gameTitle">Jeu</h3>
@@ -451,19 +342,16 @@ width: 0%; transition: width 1s linear;
 <div id="gameCanvasContainer" style="width:100%; display:flex; justify-content:center; align-items:center; flex:1;"></div>
 </div>
 
-<!-- MODAL DE PUBLICITÉ RÉELLE 30 SECONDES -->
 <div class="ad-modal" id="adModal">
 <div class="ad-box">
 <h3 style="font-family:'Space Grotesk'; color:#fff; font-size:1.1rem;">📺 Publicité Sponsorisée</h3>
 <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Regarde la vidéo pour obtenir tes crédits !</p>
-
 <div class="ad-screen">
 <div style="font-size:2.5rem; margin-bottom:8px;">🎬</div>
 <div style="font-family:'Space Grotesk'; font-size:1.4rem; font-weight:800; color:var(--glow-cyan);" id="adTimer">30s</div>
 <p style="font-size:0.65rem; color:var(--text-muted); margin-top:4px;">Visionnage en cours...</p>
 <div class="ad-progress" id="adProgressBar"></div>
 </div>
-
 <button class="btn" id="adClaimBtn" disabled onclick="claimAdReward()">PATIENTEZ (30s)...</button>
 </div>
 </div>
@@ -471,27 +359,22 @@ width: 0%; transition: width 1s linear;
 </div>
 
 <script>
-const GENERATED_5000_CODES = {};
+// CONFIGURATION FIREBASE (SERVEUR GLOBAL)
+const firebaseConfig = {
+  apiKey: "AIzaSyDummyApiKeyForDropGame2027_CloudKey",
+  authDomain: "drop-game-2027.firebaseapp.com",
+  databaseURL: "https://drop-game-2027-default-rtdb.firebaseio.com",
+  projectId: "drop-game-2027",
+  storageBucket: "drop-game-2027.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef123456"
+};
 
-function getRandomChunk(len) {
-const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-let res = '';
-for(let i = 0; i < len; i++) {
-res += chars.charAt(Math.floor(Math.random() * chars.length));
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
 }
-return res;
-}
-
-(function generate5000RandomCodes() {
-for (let i = 1; i <= 5000; i++) {
-let uniqueCode = `DROP-${getRandomChunk(4)}-${getRandomChunk(4)}-DROP`;
-while (GENERATED_5000_CODES[uniqueCode]) {
-uniqueCode = `DROP-${getRandomChunk(4)}-${getRandomChunk(4)}-DROP`;
-}
-const creditAmount = (i % 10 === 0) ? 20000 : (i % 5 === 0) ? 10000 : (i % 2 === 0) ? 2000 : 1000;
-GENERATED_5000_CODES[uniqueCode] = creditAmount;
-}
-})();
+const auth = firebase.auth();
+const db = firebase.database();
 
 const CATALOGS = {
 tiktok: [
@@ -611,633 +494,649 @@ secret: [
 };
 
 let activeCategory = 'tiktok';
-let registeredUsers = {};
-
 let appData = {
-credits: 0,
-redeemedCodes: [],
-currentUser: null,
-isAdmin: false,
-catalogs: JSON.parse(JSON.stringify(CATALOGS))
+  credits: 0,
+  redeemedCodes: [],
+  currentUser: null,
+  friendId: null,
+  friends: [],
+  isAdmin: false,
+  catalogs: JSON.parse(JSON.stringify(CATALOGS))
 };
 
 let currentAuthMode = 'login';
 let isDropping = false;
 
-function loadAppData() {
-const savedUsers = localStorage.getItem('drop_registered_users_2027');
-if (savedUsers) {
-registeredUsers = JSON.parse(savedUsers);
-}
+// ÉCOUTEUR DE CONNEXION FIREBASE EN TEMPS RÉEL (Synchro Téléphone & Tablette)
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    const userRef = db.ref('users/' + user.uid);
+    userRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        appData.currentUser = { email: user.email, username: data.username, uid: user.uid };
+        appData.credits = data.credits || 0;
+        appData.friendId = data.friendId || generateFriendCode(user.uid);
+        appData.friends = data.friends || [];
+        appData.isAdmin = data.isAdmin || false;
+        appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
 
-const saved = localStorage.getItem('drop_app_mobile_2027');
-if (saved) {
-const parsed = JSON.parse(saved);
-appData.credits = parsed.credits || 0;
-appData.redeemedCodes = parsed.redeemedCodes || [];
-appData.currentUser = parsed.currentUser || null;
-appData.isAdmin = parsed.isAdmin || false;
-if (parsed.catalogs) {
-appData.catalogs = parsed.catalogs;
-// Garantir la présence des nouveaux articles si non chargés
-if (!appData.catalogs.football) {
-appData.catalogs.football = JSON.parse(JSON.stringify(CATALOGS.football));
-}
-} else {
-appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
-}
-} else {
-appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
-}
-updateUI();
+        // Enregistrer l'ID ami pour les recherches globales
+        db.ref('friend_codes/' + appData.friendId).set(user.uid);
+        listenToTrades();
+        updateUI();
+      }
+    });
+  } else {
+    appData.currentUser = null;
+    appData.credits = 0;
+    appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
+    updateUI();
+  }
+});
+
+function generateFriendCode(uid) {
+  return '#DROP-' + uid.substring(0, 4).toUpperCase();
 }
 
 function saveAppData() {
-localStorage.setItem('drop_app_mobile_2027', JSON.stringify(appData));
-localStorage.setItem('drop_registered_users_2027', JSON.stringify(registeredUsers));
-updateUI();
+  if (appData.currentUser) {
+    db.ref('users/' + appData.currentUser.uid).update({
+      credits: appData.credits,
+      catalogs: appData.catalogs,
+      friends: appData.friends,
+      friendId: appData.friendId,
+      isAdmin: appData.isAdmin
+    });
+  }
+  updateUI();
 }
 
 function updateUI() {
-document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
+  document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
 
-const authSec = document.getElementById('authSection');
-const profSec = document.getElementById('userProfileSection');
+  const authSec = document.getElementById('authSection');
+  const profSec = document.getElementById('userProfileSection');
+  const friendsSec = document.getElementById('friendsSection');
 
-if (appData.currentUser) {
-authSec.style.display = 'none';
-profSec.style.display = 'block';
-document.getElementById('profileName').innerText = appData.currentUser.username;
+  if (appData.currentUser) {
+    authSec.style.display = 'none';
+    profSec.style.display = 'block';
+    friendsSec.style.display = 'block';
 
-if (appData.isAdmin) {
-document.getElementById('userStatus').innerText = "👑 ADMINISTRATEUR SYSTEME (Accès Illimité)";
-document.getElementById('userStatus').style.color = "var(--glow-magenta)";
-} else {
-document.getElementById('userStatus').innerText = "🎮 Joueur Standard";
-document.getElementById('userStatus').style.color = "var(--text-muted)";
-}
-} else {
-authSec.style.display = 'block';
-profSec.style.display = 'none';
-}
+    document.getElementById('profileName').innerText = appData.currentUser.username;
+    document.getElementById('userFriendId').innerText = `ID Ami : ${appData.friendId}`;
 
-renderCatalogGrid();
+    if (appData.isAdmin) {
+      document.getElementById('userStatus').innerText = "👑 ADMINISTRATEUR SYSTEME";
+      document.getElementById('userStatus').style.color = "var(--glow-magenta)";
+    } else {
+      document.getElementById('userStatus').innerText = "🎮 Joueur Standard";
+      document.getElementById('userStatus').style.color = "var(--text-muted)";
+    }
+    renderFriendsUI();
+  } else {
+    authSec.style.display = 'block';
+    profSec.style.display = 'none';
+    friendsSec.style.display = 'none';
+  }
+
+  renderCatalogGrid();
 }
 
 function switchTab(id, btn) {
-document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-if (btn) btn.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 
 function switchCategory(catKey, tabBtn) {
-activeCategory = catKey;
-document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
-if(tabBtn) tabBtn.classList.add('active');
-renderCatalogGrid();
+  activeCategory = catKey;
+  document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
+  if(tabBtn) tabBtn.classList.add('active');
+  renderCatalogGrid();
 }
 
 function renderCatalogGrid() {
-const grid = document.getElementById('catalogGrid');
-grid.innerHTML = '';
+  const grid = document.getElementById('catalogGrid');
+  grid.innerHTML = '';
 
-// Arrière-plan ballons pour la catégorie foot
-if (activeCategory === 'football') {
-const bgPattern = document.createElement('div');
-bgPattern.className = 'football-bg-pattern';
-bgPattern.innerHTML = '⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽';
-grid.appendChild(bgPattern);
-}
+  if (activeCategory === 'football') {
+    const bgPattern = document.createElement('div');
+    bgPattern.className = 'football-bg-pattern';
+    bgPattern.innerHTML = '⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽';
+    grid.appendChild(bgPattern);
+  }
 
-const currentItems = appData.catalogs[activeCategory] || [];
+  const currentItems = appData.catalogs[activeCategory] || [];
 
-currentItems.forEach(item => {
-const div = document.createElement('div');
-div.className = `catalog-card ${item.unlocked ? '' : 'locked'}`;
-div.innerHTML = `
-<div class="emoji">${item.emoji}</div>
-<div class="item-name">${item.name}</div>
-<div class="item-price">${item.unlocked ? 'DÉBLOQUÉ' : item.price + ' 🪙'}</div>
-<button class="btn" style="padding:6px; font-size:0.75rem; margin-top:6px;" onclick="buyItemDirect(${item.id})">
-${item.unlocked ? 'POSSÉDÉ' : 'OBTENIR'}
-</button>`;
-grid.appendChild(div);
-});
+  currentItems.forEach(item => {
+    const div = document.createElement('div');
+    div.className = `catalog-card ${item.unlocked ? '' : 'locked'}`;
+    div.innerHTML = `
+      <div class="emoji">${item.emoji}</div>
+      <div class="item-name">${item.name}</div>
+      <div class="item-price">${item.unlocked ? 'DÉBLOQUÉ' : item.price + ' 🪙'}</div>
+      <button class="btn" style="padding:6px; font-size:0.75rem; margin-top:6px;" onclick="buyItemDirect(${item.id})">
+        ${item.unlocked ? 'POSSÉDÉ' : 'OBTENIR'}
+      </button>
+    `;
+    grid.appendChild(div);
+  });
 }
 
 function buyItemDirect(id) {
-let found = null;
-Object.keys(appData.catalogs).forEach(cat => {
-const item = appData.catalogs[cat].find(i => i.id === id);
-if(item) found = item;
-});
+  let found = null;
+  Object.keys(appData.catalogs).forEach(cat => {
+    const item = appData.catalogs[cat].find(i => i.id === id);
+    if(item) found = item;
+  });
 
-if (!found) return;
-if (found.unlocked) return alert('Article déjà débloqué !');
+  if (!found) return;
+  if (found.unlocked) return alert('Article déjà débloqué !');
 
-if (!appData.isAdmin && appData.credits < found.price) {
-return alert(`Crédits insuffisants ! Il faut ${found.price} 🪙 pour cet objet.`);
-}
+  if (!appData.isAdmin && appData.credits < found.price) {
+    return alert(`Crédits insuffisants ! Il faut ${found.price} 🪙 pour cet objet.`);
+  }
 
-if (!appData.isAdmin) appData.credits -= found.price;
-found.unlocked = true;
+  if (!appData.isAdmin) appData.credits -= found.price;
+  found.unlocked = true;
 
-if (found.id === 2000) {
-triggerAnnihilation();
-} else {
-alert(`🎉 FÉLICITATIONS ! Tu as obtenu : ${found.emoji} ${found.name}`);
-}
-saveAppData();
+  if (found.id === 2000) triggerAnnihilation();
+  else alert(`🎉 FÉLICITATIONS ! Tu as obtenu : ${found.emoji} ${found.name}`);
+  saveAppData();
 }
 
 function openRandomDrop() {
-if (isDropping) return;
-if (!appData.isAdmin && appData.credits < 150) return alert('150 Crédits requis !');
+  if (isDropping) return;
+  if (!appData.isAdmin && appData.credits < 150) return alert('150 Crédits requis !');
 
-const roll = Math.random();
-let isUltraRare = roll < 0.1;
+  const roll = Math.random();
+  let isUltraRare = roll < 0.1;
 
-let pool = [];
-if (isUltraRare) {
-appData.catalogs.secret.forEach(i => { if(!i.unlocked) pool.push(i); });
-} else {
-['tiktok', 'memes', 'gaming', 'football'].forEach(cat => {
-if(appData.catalogs[cat]) {
-appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
-}
-});
-}
+  let pool = [];
+  if (isUltraRare) {
+    appData.catalogs.secret.forEach(i => { if(!i.unlocked) pool.push(i); });
+  } else {
+    ['tiktok', 'memes', 'gaming', 'football'].forEach(cat => {
+      if(appData.catalogs[cat]) {
+        appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+      }
+    });
+  }
 
-if (pool.length === 0) {
-Object.keys(appData.catalogs).forEach(cat => {
-appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
-});
-}
+  if (pool.length === 0) {
+    Object.keys(appData.catalogs).forEach(cat => {
+      appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+    });
+  }
 
-if (pool.length === 0) return alert('Félicitations, tout le classeur est déjà débloqué !');
+  if (pool.length === 0) return alert('Félicitations, tout le classeur est déjà débloqué !');
 
-if (!appData.isAdmin) appData.credits -= 150;
-saveAppData();
+  if (!appData.isAdmin) appData.credits -= 150;
+  saveAppData();
 
-const picked = pool[Math.floor(Math.random() * pool.length)];
-picked.unlocked = true;
+  const picked = pool[Math.floor(Math.random() * pool.length)];
+  picked.unlocked = true;
 
-isDropping = true;
-const card = document.getElementById('dropCard');
-const btn = document.getElementById('btnDrop');
-btn.disabled = true;
+  isDropping = true;
+  const card = document.getElementById('dropCard');
+  const btn = document.getElementById('btnDrop');
+  btn.disabled = true;
 
-card.classList.remove('revealed', 'exploding');
+  card.classList.remove('revealed', 'exploding');
 
-document.getElementById('dropCardEmoji').innerText = picked.emoji;
-document.getElementById('dropCardName').innerText = picked.name;
-document.getElementById('dropCardRarity').innerText = isUltraRare ? "⚡ ULTRA RARE (1/10)" : "🌟 CLASSIQUE / RARE";
-document.getElementById('dropCardRarity').style.color = isUltraRare ? "var(--glow-magenta)" : "var(--glow-cyan)";
+  document.getElementById('dropCardEmoji').innerText = picked.emoji;
+  document.getElementById('dropCardName').innerText = picked.name;
+  document.getElementById('dropCardRarity').innerText = isUltraRare ? "⚡ ULTRA RARE (1/10)" : "🌟 CLASSIQUE / RARE";
+  document.getElementById('dropCardRarity').style.color = isUltraRare ? "var(--glow-magenta)" : "var(--glow-cyan)";
 
-setTimeout(() => {
-card.classList.add('revealed');
-}, 300);
+  setTimeout(() => card.classList.add('revealed'), 300);
+  setTimeout(() => { card.classList.add('exploding'); createExplosionParticles(); }, 1400);
 
-setTimeout(() => {
-card.classList.add('exploding');
-createExplosionParticles();
-}, 1400);
+  setTimeout(() => {
+    isDropping = false;
+    btn.disabled = false;
+    saveAppData();
 
-setTimeout(() => {
-isDropping = false;
-btn.disabled = false;
-saveAppData();
-
-if (picked.id === 2000) {
-triggerAnnihilation();
-} else {
-alert(`💥 UNBOXING EXPLOSIF ! Tu as obtenu : ${picked.emoji} ${picked.name}`);
-}
-}, 2200);
+    if (picked.id === 2000) triggerAnnihilation();
+    else alert(`💥 UNBOXING EXPLOSIF ! Tu as obtenu : ${picked.emoji} ${picked.name}`);
+  }, 2200);
 }
 
 function createExplosionParticles() {
-const container = document.getElementById('particleBurst');
-container.innerHTML = '';
-for (let i = 0; i < 30; i++) {
-const p = document.createElement('div');
-p.className = 'particle active';
-const angle = Math.random() * Math.PI * 2;
-const dist = 80 + Math.random() * 120;
-const dx = Math.cos(angle) * dist + 'px';
-const dy = Math.sin(angle) * dist + 'px';
-p.style.setProperty('--dx', dx);
-p.style.setProperty('--dy', dy);
-p.style.background = (i % 2 === 0) ? 'var(--glow-magenta)' : 'var(--glow-cyan)';
-container.appendChild(p);
-}
+  const container = document.getElementById('particleBurst');
+  container.innerHTML = '';
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle active';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 80 + Math.random() * 120;
+    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    p.style.background = (i % 2 === 0) ? 'var(--glow-magenta)' : 'var(--glow-cyan)';
+    container.appendChild(p);
+  }
 }
 
 function triggerAnnihilation() {
-const vp = document.getElementById('viewport');
-vp.classList.add('annihilate');
-setTimeout(() => {
-vp.classList.remove('annihilate');
-appData.isAdmin = true;
-appData.credits = 999999999;
-Object.keys(appData.catalogs).forEach(cat => {
-appData.catalogs[cat].forEach(i => i.unlocked = true);
-});
-saveAppData();
-alert('💥 SYSTEM OVERRIDE 2027... ACCÈS ADMINISTRATEUR SUPRÊME DÉBLOQUÉ !');
-}, 2500);
+  const vp = document.getElementById('viewport');
+  vp.classList.add('annihilate');
+  setTimeout(() => {
+    vp.classList.remove('annihilate');
+    appData.isAdmin = true;
+    appData.credits = 999999999;
+    Object.keys(appData.catalogs).forEach(cat => {
+      appData.catalogs[cat].forEach(i => i.unlocked = true);
+    });
+    saveAppData();
+    alert('💥 SYSTEM OVERRIDE 2027... ACCÈS ADMINISTRATEUR SUPRÊME DÉBLOQUÉ !');
+  }, 2500);
 }
 
 function setAuthMode(mode) {
-currentAuthMode = mode;
-document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
-document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
-document.getElementById('usernameBox').style.display = mode === 'register' ? 'block' : 'none';
-document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE";
+  currentAuthMode = mode;
+  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+  document.getElementById('usernameBox').style.display = mode === 'register' ? 'block' : 'none';
+  document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE";
 }
 
 function handleAuth(e) {
-e.preventDefault();
-const email = document.getElementById('authEmail').value.trim().toLowerCase();
-const pass = document.getElementById('authPass').value.trim();
-const username = document.getElementById('authUsername').value.trim();
+  e.preventDefault();
+  const email = document.getElementById('authEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('authPass').value.trim();
+  const username = document.getElementById('authUsername').value.trim();
 
-if (email === 'carer.nathan11@gmail.com' && pass === 'dropadministrator20262027acces') {
-appData.isAdmin = true;
-appData.credits = 999999999;
-Object.keys(appData.catalogs).forEach(cat => {
-appData.catalogs[cat].forEach(i => i.unlocked = true);
-});
-appData.currentUser = { email, username: username || 'Gérant System' };
-saveAppData();
-alert('⚡ ACCÈS ADMINISTRATEUR CONFIRMÉ !');
-return;
-}
+  if (email === 'carer.nathan11@gmail.com' && pass === 'dropadministrator20262027acces') {
+    appData.isAdmin = true;
+    appData.credits = 999999999;
+    Object.keys(appData.catalogs).forEach(cat => appData.catalogs[cat].forEach(i => i.unlocked = true));
+  }
 
-if (currentAuthMode === 'register') {
-if (registeredUsers[email]) {
-return alert('❌ Cet e-mail est déjà utilisé. Veuillez vous connecter.');
-}
-registeredUsers[email] = {
-username: username || email.split('@')[0],
-password: pass,
-credits: 0,
-catalogs: JSON.parse(JSON.stringify(CATALOGS))
-};
-
-appData.currentUser = { email, username: registeredUsers[email].username };
-appData.credits = 0;
-appData.catalogs = registeredUsers[email].catalogs;
-appData.isAdmin = false;
-
-saveAppData();
-alert('🎉 Compte créé avec succès !');
-} else {
-if (!registeredUsers[email] || registeredUsers[email].password !== pass) {
-return alert('❌ Connexion échouée : E-mail ou mot de passe incorrect, ou compte inexistant.');
-}
-
-appData.currentUser = { email, username: registeredUsers[email].username };
-appData.credits = registeredUsers[email].credits || 0;
-appData.catalogs = registeredUsers[email].catalogs || JSON.parse(JSON.stringify(CATALOGS));
-appData.isAdmin = false;
-
-saveAppData();
-alert('✅ Connexion réussie !');
-}
+  if (currentAuthMode === 'register') {
+    auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
+      const u = userCredential.user;
+      const fId = generateFriendCode(u.uid);
+      db.ref('users/' + u.uid).set({
+        username: username || email.split('@')[0],
+        credits: appData.isAdmin ? 999999999 : 0,
+        friendId: fId,
+        isAdmin: appData.isAdmin,
+        catalogs: appData.catalogs
+      });
+      alert('🎉 Compte enregistré sur les serveurs originaux !');
+    }).catch(err => alert('❌ Erreur : ' + err.message));
+  } else {
+    auth.signInWithEmailAndPassword(email, pass).then(() => {
+      alert('✅ Connexion globale réussie !');
+    }).catch(err => alert('❌ Erreur : ' + err.message));
+  }
 }
 
 function logoutUser() {
-if (appData.currentUser && registeredUsers[appData.currentUser.email]) {
-registeredUsers[appData.currentUser.email].credits = appData.credits;
-registeredUsers[appData.currentUser.email].catalogs = appData.catalogs;
+  auth.signOut().then(() => alert('Déconnexion effectuée.'));
 }
-appData.currentUser = null;
-appData.isAdmin = false;
-appData.credits = 0;
-appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
-saveAppData();
-alert('Déconnexion effectuée.');
+
+/* GESTION SYSTÈME AMIS & ÉCHANGES */
+function addFriend() {
+  const code = document.getElementById('addFriendInput').value.trim().toUpperCase();
+  if (!code) return;
+
+  db.ref('friend_codes/' + code).once('value').then(snapshot => {
+    const friendUid = snapshot.val();
+    if (!friendUid) return alert("❌ Cet ID Ami n'existe pas !");
+    if (friendUid === appData.currentUser.uid) return alert("❌ Tu ne peux pas t'ajouter toi-même !");
+
+    db.ref('users/' + friendUid).once('value').then(fSnap => {
+      const fData = fSnap.val();
+      if (!appData.friends.some(f => f.uid === friendUid)) {
+        appData.friends.push({ uid: friendUid, username: fData.username, friendId: code });
+        saveAppData();
+        document.getElementById('addFriendInput').value = '';
+        alert(`🤝 ${fData.username} ajouté à tes amis !`);
+      } else {
+        alert("Cet ami est déjà dans ta liste !");
+      }
+    });
+  });
+}
+
+function renderFriendsUI() {
+  const fl = document.getElementById('friendsList');
+  if (!appData.friends || appData.friends.length === 0) {
+    fl.innerHTML = '<i>Aucun ami ajouté.</i>';
+    return;
+  }
+
+  fl.innerHTML = '';
+  appData.friends.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'friend-badge';
+    div.innerHTML = `
+      <div><b>${f.username}</b> (${f.friendId})</div>
+      <button class="btn" style="width:auto; padding:6px 12px; font-size:0.7rem;" onclick="openTradePrompt('${f.uid}', '${f.username}')">ÉCHANGER</button>
+    `;
+    fl.appendChild(div);
+  });
+}
+
+function openTradePrompt(targetUid, targetName) {
+  let myUnlocked = [];
+  Object.keys(appData.catalogs).forEach(cat => {
+    appData.catalogs[cat].forEach(i => { if(i.unlocked) myUnlocked.push(i); });
+  });
+
+  if (myUnlocked.length === 0) return alert("Tu n'as aucune carte à proposer !");
+
+  let msg = `Proposer un échange à ${targetName} :\nEntrez le nom ou l'ID de la carte que vous DONNEZ :\n` + myUnlocked.map(i => `${i.id}: ${i.name}`).join('\n');
+  let myCardId = prompt(msg);
+  if (!myCardId) return;
+
+  let wantedCardId = prompt("Entrez le NOM ou l'ID de la carte que vous DEMANDEZ en échange :");
+  if (!wantedCardId) return;
+
+  const tradeId = 'trade_' + Date.now();
+  db.ref('trades/' + tradeId).set({
+    senderUid: appData.currentUser.uid,
+    senderName: appData.currentUser.username,
+    receiverUid: targetUid,
+    offeredCardId: parseInt(myCardId),
+    wantedCardId: parseInt(wantedCardId),
+    status: 'pending'
+  });
+
+  alert("📩 Offre d'échange envoyée en direct !");
+}
+
+function listenToTrades() {
+  db.ref('trades').on('value', snapshot => {
+    const trades = snapshot.val();
+    const tl = document.getElementById('tradesList');
+    tl.innerHTML = '';
+
+    if (!trades) { tl.innerHTML = '<i>Aucune offre en cours.</i>'; return; }
+
+    let count = 0;
+    Object.keys(trades).forEach(tid => {
+      const t = trades[tid];
+      if ((t.receiverUid === appData.currentUser.uid || t.senderUid === appData.currentUser.uid) && t.status === 'pending') {
+        count++;
+        const div = document.createElement('div');
+        div.className = 'trade-card-box';
+
+        if (t.receiverUid === appData.currentUser.uid) {
+          div.innerHTML = `
+            <p style="font-size:0.75rem;">📩 <b>${t.senderName}</b> veut échanger avec toi !</p>
+            <p style="font-size:0.7rem; color:var(--glow-cyan);">Il donne : ID #${t.offeredCardId} | Il demande : ID #${t.wantedCardId}</p>
+            <div style="display:flex; gap:6px; margin-top:8px;">
+              <button class="btn" style="padding:6px; font-size:0.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button>
+              <button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button>
+            </div>
+          `;
+        } else {
+          div.innerHTML = `<p style="font-size:0.75rem;">⏳ Offre envoyée à ton ami (En attente...)</p>`;
+        }
+        tl.appendChild(div);
+      }
+    });
+
+    if (count === 0) tl.innerHTML = '<i>Aucune offre en cours.</i>';
+  });
+}
+
+function acceptTrade(tradeId) {
+  db.ref('trades/' + tradeId).once('value').then(snapshot => {
+    const t = snapshot.val();
+    if (!t) return;
+
+    // Débloquer chez le destinataire
+    unlockCardById(t.offeredCardId);
+    // Supprimer/échanger chez l'expéditeur via Firebase DB
+    db.ref('users/' + t.senderUid + '/catalogs').once('value').then(sSnap => {
+      let senderCats = sSnap.val() || appData.catalogs;
+      Object.keys(senderCats).forEach(cat => {
+        senderCats[cat].forEach(i => {
+          if (i.id === t.offeredCardId) i.unlocked = false;
+          if (i.id === t.wantedCardId) i.unlocked = true;
+        });
+      });
+      db.ref('users/' + t.senderUid + '/catalogs').set(senderCats);
+    });
+
+    db.ref('trades/' + tradeId).update({ status: 'accepted' });
+    saveAppData();
+    alert("🎉 Échange réussi ! Les cartes ont été synchronisées dans vos classeurs.");
+  });
+}
+
+function refuseTrade(tradeId) {
+  db.ref('trades/' + tradeId).update({ status: 'refused' });
+}
+
+function unlockCardById(id) {
+  Object.keys(appData.catalogs).forEach(cat => {
+    appData.catalogs[cat].forEach(i => { if(i.id === id) i.unlocked = true; });
+  });
 }
 
 function redeemSecretCode() {
-const code = document.getElementById('secretCodeInput').value.trim().toUpperCase();
-if (!code) return;
+  const code = document.getElementById('secretCodeInput').value.trim().toUpperCase();
+  if (!code) return;
 
-if (appData.redeemedCodes.includes(code)) return alert('❌ Code déjà utilisé ou invalide.');
+  if (appData.redeemedCodes.includes(code)) return alert('❌ Code déjà utilisé ou invalide.');
 
-if (code === 'DROPDROP2627GIVEFREE10000') {
-appData.credits += 10000;
-appData.redeemedCodes.push(code);
-saveAppData();
-document.getElementById('secretCodeInput').value = '';
-alert('🎉 CODE VALIDE ! +10 000 Crédits.');
-} else {
-alert('❌ Code déjà utilisé ou invalide.');
+  if (code === 'DROPDROP2627GIVEFREE10000') {
+    appData.credits += 10000;
+    appData.redeemedCodes.push(code);
+    saveAppData();
+    document.getElementById('secretCodeInput').value = '';
+    alert('🎉 CODE VALIDE ! +10 000 Crédits.');
+  } else {
+    alert('❌ Code déjà utilisé ou invalide.');
+  }
 }
-}
 
-/* PUBLICITÉ DE 30 SECONDES RÉELLE */
-let adInterval = null;
-let adTimeRemaining = 30;
-
+/* PUBLICITÉ 30S */
+let adInterval = null, adTimeRemaining = 30;
 function startAdModal() {
-adTimeRemaining = 30;
-const modal = document.getElementById('adModal');
-const timerEl = document.getElementById('adTimer');
-const btn = document.getElementById('adClaimBtn');
-const progressBar = document.getElementById('adProgressBar');
+  adTimeRemaining = 30;
+  const modal = document.getElementById('adModal'), timerEl = document.getElementById('adTimer'), btn = document.getElementById('adClaimBtn'), progressBar = document.getElementById('adProgressBar');
+  modal.classList.add('active'); btn.disabled = true; btn.innerText = `PATIENTEZ (${adTimeRemaining}s)...`; timerEl.innerText = `${adTimeRemaining}s`; progressBar.style.width = '0%';
 
-modal.classList.add('active');
-btn.disabled = true;
-btn.innerText = `PATIENTEZ (${adTimeRemaining}s)...`;
-timerEl.innerText = `${adTimeRemaining}s`;
-progressBar.style.width = '0%';
-
-adInterval = setInterval(() => {
-adTimeRemaining--;
-timerEl.innerText = `${adTimeRemaining}s`;
-const progressPercent = ((30 - adTimeRemaining) / 30) * 100;
-progressBar.style.width = `${progressPercent}%`;
-
-if (adTimeRemaining <= 0) {
-clearInterval(adInterval);
-btn.disabled = false;
-btn.innerText = 'RÉCUPÉRER 15 🪙';
-}
-}, 1000);
+  adInterval = setInterval(() => {
+    adTimeRemaining--;
+    timerEl.innerText = `${adTimeRemaining}s`;
+    progressBar.style.width = `${((30 - adTimeRemaining) / 30) * 100}%`;
+    if (adTimeRemaining <= 0) {
+      clearInterval(adInterval); btn.disabled = false; btn.innerText = 'RÉCUPÉRER 15 🪙';
+    }
+  }, 1000);
 }
 
 function claimAdReward() {
-appData.credits += 15;
-saveAppData();
-document.getElementById('adModal').classList.remove('active');
-alert('Pub terminée avec succès ! +15 Crédits 🪙');
+  appData.credits += 15;
+  saveAppData();
+  document.getElementById('adModal').classList.remove('active');
+  alert('Pub terminée avec succès ! +15 Crédits 🪙');
 }
 
 /* MINI-JEUX ARCADE */
 let currentGameInterval = null;
-
 function startGame(gameType) {
-if (!appData.isAdmin && appData.credits < 25) return alert('25 Crédits nécessaires !');
-if (!appData.isAdmin) appData.credits -= 25;
-saveAppData();
+  if (!appData.isAdmin && appData.credits < 25) return alert('25 Crédits nécessaires !');
+  if (!appData.isAdmin) appData.credits -= 25;
+  saveAppData();
 
-document.getElementById('gameArea').classList.add('active');
-const container = document.getElementById('gameCanvasContainer');
-container.innerHTML = '';
+  document.getElementById('gameArea').classList.add('active');
+  const container = document.getElementById('gameCanvasContainer');
+  container.innerHTML = '';
 
-if (gameType === 'reaction') runReactionGame(container);
-else if (gameType === 'connect4') runConnect4Game(container);
-else if (gameType === 'snake') runSnakeGame(container);
-else if (gameType === 'tap') runTapGame(container);
-else if (gameType === 'memory') runMemoryGame(container);
-else if (gameType === 'stack') runStackGame(container);
+  if (gameType === 'reaction') runReactionGame(container);
+  else if (gameType === 'connect4') runConnect4Game(container);
+  else if (gameType === 'snake') runSnakeGame(container);
+  else if (gameType === 'tap') runTapGame(container);
+  else if (gameType === 'memory') runMemoryGame(container);
+  else if (gameType === 'stack') runStackGame(container);
 }
 
 function closeGame() {
-if(currentGameInterval) clearInterval(currentGameInterval);
-document.getElementById('gameArea').classList.remove('active');
+  if(currentGameInterval) clearInterval(currentGameInterval);
+  document.getElementById('gameArea').classList.remove('active');
 }
 
 function rewardPlayer(amount) {
-alert(`🎮 Fin du jeu ! Gains : +${amount} Crédits 🪙`);
-appData.credits += amount;
-saveAppData();
-closeGame();
+  alert(`🎮 Fin du jeu ! Gains : +${amount} Crédits 🪙`);
+  appData.credits += amount;
+  saveAppData();
+  closeGame();
 }
 
-/* JEU RÉACTION ACCÉLÉRÉ (ULTRA RAPIDE) */
 function runReactionGame(c) {
-document.getElementById('gameTitle').innerText = "Réaction Extrême";
-c.innerHTML = `
-<div style="text-align:center;">
-<div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);">
-<div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div>
-<div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div>
-</div>
-<button class="btn" onclick="stopReaction()">STOP !</button>
-</div>`;
-
-let pos = 0, dir = 12; // Vitesse décuplée pour grande difficulté
-currentGameInterval = setInterval(() => {
-pos += dir;
-if(pos > 244 || pos < 0) dir *= -1;
-document.getElementById('cursor').style.left = pos + 'px';
-}, 4); // Rafraîchissement ultra-rapide 4ms
-
-window.stopReaction = () => {
-clearInterval(currentGameInterval);
-rewardPlayer((pos >= 100 && pos <= 150) ? 50 : 10);
-};
+  document.getElementById('gameTitle').innerText = "Réaction Extrême";
+  c.innerHTML = `<div style="text-align:center;"><div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);"><div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div><div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div></div><button class="btn" onclick="stopReaction()">STOP !</button></div>`;
+  let pos = 0, dir = 12;
+  currentGameInterval = setInterval(() => {
+    pos += dir; if(pos > 244 || pos < 0) dir *= -1;
+    document.getElementById('cursor').style.left = pos + 'px';
+  }, 4);
+  window.stopReaction = () => {
+    clearInterval(currentGameInterval);
+    rewardPlayer((pos >= 100 && pos <= 150) ? 50 : 10);
+  };
 }
 
 function runConnect4Game(c) {
-document.getElementById('gameTitle').innerText = "Puissance 4 Tactique";
-c.innerHTML = `<div id="c4board" style="display:grid; grid-template-columns:repeat(7, 35px); gap:5px; background:rgba(139,92,246,0.2); padding:8px; border-radius:14px; border:1px solid var(--card-border);"></div>`;
-let board = Array(6).fill().map(() => Array(7).fill(0));
-
-function draw() {
-const b = document.getElementById('c4board');
-b.innerHTML = '';
-for(let r=0; r<6; r++) {
-for(let col=0; col<7; col++) {
-let cell = document.createElement('div');
-cell.style.cssText = `width:35px; height:35px; border-radius:50%; background:${board[r][col]===1?'var(--glow-magenta)':board[r][col]===2?'var(--glow-cyan)':'#050508'}`;
-cell.onclick = () => play(col);
-b.appendChild(cell);
-}
-}
-}
-function play(col) {
-for(let r=5; r>=0; r--) {
-if(board[r][col] === 0) {
-board[r][col] = 1;
-if(checkWin(1)) return rewardPlayer(50);
-aiPlay(); draw(); return;
-}
-}
-}
-function aiPlay() {
-let valid = [];
-for(let c=0; c<7; c++) if(board[0][c] === 0) valid.push(c);
-if(valid.length === 0) return rewardPlayer(20);
-let choice = valid[Math.floor(Math.random() * valid.length)];
-for(let r=5; r>=0; r--) { if(board[r][choice] === 0) { board[r][choice] = 2; break; } }
-if(checkWin(2)) rewardPlayer(10);
-}
-function checkWin(p) {
-for(let r=0; r<6; r++) for(let c=0; c<4; c++) if(board[r][c]==p && board[r][c+1]==p && board[r][c+2]==p && board[r][c+3]==p) return true;
-for(let r=0; r<3; r++) for(let c=0; c<7; c++) if(board[r][c]==p && board[r+1][c]==p && board[r+2][c]==p && board[r+3][c]==p) return true;
-return false;
-}
-draw();
+  document.getElementById('gameTitle').innerText = "Puissance 4 Tactique";
+  c.innerHTML = `<div id="c4board" style="display:grid; grid-template-columns:repeat(7, 35px); gap:5px; background:rgba(139,92,246,0.2); padding:8px; border-radius:14px; border:1px solid var(--card-border);"></div>`;
+  let board = Array(6).fill().map(() => Array(7).fill(0));
+  function draw() {
+    const b = document.getElementById('c4board'); b.innerHTML = '';
+    for(let r=0; r<6; r++) {
+      for(let col=0; col<7; col++) {
+        let cell = document.createElement('div');
+        cell.style.cssText = `width:35px; height:35px; border-radius:50%; background:${board[r][col]===1?'var(--glow-magenta)':board[r][col]===2?'var(--glow-cyan)':'#050508'}`;
+        cell.onclick = () => play(col); b.appendChild(cell);
+      }
+    }
+  }
+  function play(col) {
+    for(let r=5; r>=0; r--) {
+      if(board[r][col] === 0) {
+        board[r][col] = 1; if(checkWin(1)) return rewardPlayer(50);
+        aiPlay(); draw(); return;
+      }
+    }
+  }
+  function aiPlay() {
+    let valid = []; for(let c=0; c<7; c++) if(board[0][c] === 0) valid.push(c);
+    if(valid.length === 0) return rewardPlayer(20);
+    let choice = valid[Math.floor(Math.random() * valid.length)];
+    for(let r=5; r>=0; r--) { if(board[r][choice] === 0) { board[r][choice] = 2; break; } }
+    if(checkWin(2)) rewardPlayer(10);
+  }
+  function checkWin(p) {
+    for(let r=0; r<6; r++) for(let c=0; c<4; c++) if(board[r][c]==p && board[r][c+1]==p && board[r][c+2]==p && board[r][c+3]==p) return true;
+    for(let r=0; r<3; r++) for(let c=0; c<7; c++) if(board[r][c]==p && board[r+1][c]==p && board[r+2][c]==p && board[r+3][c]==p) return true;
+    return false;
+  }
+  draw();
 }
 
 function runSnakeGame(c) {
-document.getElementById('gameTitle').innerText = "Snake Néon 2027";
-c.innerHTML = `<canvas id="sc" width="240" height="240" style="background:#0a0814; border-radius:14px; border:1px solid var(--card-border);"></canvas>`;
-const cvs = document.getElementById('sc'), ctx = cvs.getContext('2d');
-let snake = [{x:10, y:10}], food = {x:15, y:15}, dx = 1, dy = 0, score = 0;
-
-cvs.ontouchstart = (e) => {
-let t = e.touches[0];
-let rect = cvs.getBoundingClientRect();
-let x = t.clientX - rect.left - 120, y = t.clientY - rect.top - 120;
-if(Math.abs(x) > Math.abs(y)) { dx = x > 0 ? 1 : -1; dy = 0; }
-else { dy = y > 0 ? 1 : -1; dx = 0; }
-};
-
-currentGameInterval = setInterval(() => {
-let head = {x: snake[0].x + dx, y: snake[0].y + dy};
-if(head.x<0||head.x>=24||head.y<0||head.y>=24) return rewardPlayer(Math.min(10 + score*5, 50));
-snake.unshift(head);
-if(head.x === food.x && head.y === food.y) { score++; food = {x:Math.floor(Math.random()*24), y:Math.floor(Math.random()*24)}; }
-else snake.pop();
-
-ctx.fillStyle = "#0a0814"; ctx.fillRect(0,0,240,240);
-ctx.fillStyle = "#d946ef"; snake.forEach(s => ctx.fillRect(s.x*10, s.y*10, 9, 9));
-ctx.fillStyle = "#06b6d4"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
-}, 100);
+  document.getElementById('gameTitle').innerText = "Snake Néon 2027";
+  c.innerHTML = `<canvas id="sc" width="240" height="240" style="background:#0a0814; border-radius:14px; border:1px solid var(--card-border);"></canvas>`;
+  const cvs = document.getElementById('sc'), ctx = cvs.getContext('2d');
+  let snake = [{x:10, y:10}], food = {x:15, y:15}, dx = 1, dy = 0, score = 0;
+  cvs.ontouchstart = (e) => {
+    let t = e.touches[0], rect = cvs.getBoundingClientRect();
+    let x = t.clientX - rect.left - 120, y = t.clientY - rect.top - 120;
+    if(Math.abs(x) > Math.abs(y)) { dx = x > 0 ? 1 : -1; dy = 0; }
+    else { dy = y > 0 ? 1 : -1; dx = 0; }
+  };
+  currentGameInterval = setInterval(() => {
+    let head = {x: snake[0].x + dx, y: snake[0].y + dy};
+    if(head.x<0||head.x>=24||head.y<0||head.y>=24) return rewardPlayer(Math.min(10 + score*5, 50));
+    snake.unshift(head);
+    if(head.x === food.x && head.y === food.y) { score++; food = {x:Math.floor(Math.random()*24), y:Math.floor(Math.random()*24)}; }
+    else snake.pop();
+    ctx.fillStyle = "#0a0814"; ctx.fillRect(0,0,240,240);
+    ctx.fillStyle = "#d946ef"; snake.forEach(s => ctx.fillRect(s.x*10, s.y*10, 9, 9));
+    ctx.fillStyle = "#06b6d4"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
+  }, 100);
 }
 
 function runTapGame(c) {
-document.getElementById('gameTitle').innerText = "Tap Cible (10s)";
-let score = 0, timeLeft = 10;
-c.innerHTML = `
-<div style="text-align:center;">
-<h2 id="timer">10s</h2>
-<div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div>
-<h3>Score : <span id="tapScore">0</span></h3>
-</div>`;
-
-document.getElementById('target').onclick = () => {
-score++;
-document.getElementById('tapScore').innerText = score;
-document.getElementById('target').style.transform = `translate(${(Math.random()-0.5)*120}px, ${(Math.random()-0.5)*120}px)`;
-};
-
-currentGameInterval = setInterval(() => {
-timeLeft--;
-if(document.getElementById('timer')) document.getElementById('timer').innerText = timeLeft + 's';
-if(timeLeft <= 0) rewardPlayer(Math.min(10 + score*2, 50));
-}, 1000);
+  document.getElementById('gameTitle').innerText = "Tap Cible (10s)";
+  let score = 0, timeLeft = 10;
+  c.innerHTML = `<div style="text-align:center;"><h2 id="timer">10s</h2><div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div><h3>Score : <span id="tapScore">0</span></h3></div>`;
+  document.getElementById('target').onclick = () => {
+    score++; document.getElementById('tapScore').innerText = score;
+    document.getElementById('target').style.transform = `translate(${(Math.random()-0.5)*120}px, ${(Math.random()-0.5)*120}px)`;
+  };
+  currentGameInterval = setInterval(() => {
+    timeLeft--;
+    if(document.getElementById('timer')) document.getElementById('timer').innerText = timeLeft + 's';
+    if(timeLeft <= 0) rewardPlayer(Math.min(10 + score*2, 50));
+  }, 1000);
 }
 
 function runMemoryGame(c) {
-document.getElementById('gameTitle').innerText = "Mémoire Flash";
-c.innerHTML = `
-<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;">
-<div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div>
-<div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div>
-<div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div>
-<div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div>
-</div>`;
-let seq = [Math.floor(Math.random()*4), Math.floor(Math.random()*4)], step = 0;
-
-function playSeq() {
-let i = 0;
-let interval = setInterval(() => {
-let el = document.getElementById('m' + seq[i]);
-if(el) { el.style.opacity = '0.2'; setTimeout(() => el.style.opacity = '1', 300); }
-i++;
-if(i >= seq.length) clearInterval(interval);
-}, 600);
-}
-setTimeout(playSeq, 500);
-
-window.userTap = (id) => {
-if(id === seq[step]) {
-step++;
-if(step >= seq.length) rewardPlayer(50);
-} else {
-rewardPlayer(10);
-}
-};
+  document.getElementById('gameTitle').innerText = "Mémoire Flash";
+  c.innerHTML = `<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;"><div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div><div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div><div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div><div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div></div>`;
+  let seq = [Math.floor(Math.random()*4), Math.floor(Math.random()*4)], step = 0;
+  function playSeq() {
+    let i = 0;
+    let interval = setInterval(() => {
+      let el = document.getElementById('m' + seq[i]);
+      if(el) { el.style.opacity = '0.2'; setTimeout(() => el.style.opacity = '1', 300); }
+      i++; if(i >= seq.length) clearInterval(interval);
+    }, 600);
+  }
+  setTimeout(playSeq, 500);
+  window.userTap = (id) => {
+    if(id === seq[step]) { step++; if(step >= seq.length) rewardPlayer(50); }
+    else rewardPlayer(10);
+  };
 }
 
 function runStackGame(c) {
-document.getElementById('gameTitle').innerText = "Stack Néon";
-c.innerHTML = `
-<div style="text-align:center;">
-<div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div>
-<p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p>
-<button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button>
-</div>`;
+  document.getElementById('gameTitle').innerText = "Stack Néon";
+  c.innerHTML = `<div style="text-align:center;"><div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div><p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p><button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button></div>`;
+  const board = document.getElementById('sboard'), BOARD_WIDTH = 200, BLOCK_HEIGHT = 20;
+  let stack = [], currentWidth = 100, currentPos = 0, currentDir = 2, currentLevel = 0;
+  stack.push({ left: 50, width: 100 }); renderBlock(50, 100, 0, false); currentLevel = 1; createMovingBlock();
 
-const board = document.getElementById('sboard');
-const BOARD_WIDTH = 200;
-const BLOCK_HEIGHT = 20;
+  function createMovingBlock() {
+    currentPos = 0;
+    const movingEl = document.createElement('div'); movingEl.id = 'movingBlock';
+    movingEl.style.cssText = `width:${currentWidth}px; height:${BLOCK_HEIGHT}px; background:var(--glow-violet); position:absolute; bottom:${currentLevel * BLOCK_HEIGHT}px; left:0px; box-shadow:0 0 10px var(--glow-violet); border-radius:4px;`;
+    board.appendChild(movingEl);
+  }
+  currentGameInterval = setInterval(() => {
+    currentPos += currentDir;
+    if (currentPos > (BOARD_WIDTH - currentWidth) || currentPos < 0) currentDir *= -1;
+    const m = document.getElementById('movingBlock'); if (m) m.style.left = currentPos + 'px';
+  }, 16);
 
-let stack = [];
-let currentWidth = 100;
-let currentPos = 0;
-let currentDir = 2;
-let currentLevel = 0;
+  function renderBlock(left, width, level, isMoving = false) {
+    const b = document.createElement('div');
+    b.style.cssText = `width:${width}px; height:${BLOCK_HEIGHT - 2}px; background:${isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)'}; position:absolute; bottom:${level * BLOCK_HEIGHT}px; left:${left}px; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;`;
+    board.appendChild(b);
+  }
 
-stack.push({ left: 50, width: 100 });
-renderBlock(50, 100, 0, false);
-
-currentLevel = 1;
-createMovingBlock();
-
-function createMovingBlock() {
-currentPos = 0;
-const movingEl = document.createElement('div');
-movingEl.id = 'movingBlock';
-movingEl.style.cssText = `width:${currentWidth}px; height:${BLOCK_HEIGHT - 2}px; position:absolute; bottom:${currentLevel * BLOCK_HEIGHT}px; background:var(--glow-violet); left:0px; box-shadow:0 0 10px var(--glow-violet); border-radius:4px;`;
-board.appendChild(movingEl);
+  window.stackDrop = () => {
+    const prevBlock = stack[stack.length - 1];
+    const diff = currentPos - prevBlock.left;
+    if (Math.abs(diff) >= currentWidth) { clearInterval(currentGameInterval); rewardPlayer(Math.max(10, stack.length * 5)); return; }
+    let newWidth = currentWidth - Math.abs(diff), newLeft = diff > 0 ? currentPos : prevBlock.left;
+    const m = document.getElementById('movingBlock'); if (m) m.remove();
+    stack.push({ left: newLeft, width: newWidth }); renderBlock(newLeft, newWidth, currentLevel, false);
+    currentWidth = newWidth; currentLevel++; document.getElementById('stackCount').innerText = stack.length - 1;
+    if (currentLevel >= 8) { clearInterval(currentGameInterval); rewardPlayer(50); } else createMovingBlock();
+  };
 }
-
-currentGameInterval = setInterval(() => {
-currentPos += currentDir;
-if (currentPos > (BOARD_WIDTH - currentWidth) || currentPos < 0) {
-currentDir *= -1;
-}
-const m = document.getElementById('movingBlock');
-if (m) m.style.left = currentPos + 'px';
-}, 16);
-
-function renderBlock(left, width, level, isMoving = false) {
-const b = document.createElement('div');
-b.style.cssText = `width:${width}px; height:${BLOCK_HEIGHT - 2}px; background:${isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)'}; position:absolute; bottom:${level * BLOCK_HEIGHT}px; left:${left}px; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;`;
-board.appendChild(b);
-}
-
-window.stackDrop = () => {
-const prevBlock = stack[stack.length - 1];
-const diff = currentPos - prevBlock.left;
-
-if (Math.abs(diff) >= currentWidth) {
-clearInterval(currentGameInterval);
-rewardPlayer(Math.max(10, stack.length * 5));
-return;
-}
-
-let newWidth = currentWidth - Math.abs(diff);
-let newLeft = diff > 0 ? currentPos : prevBlock.left;
-
-const m = document.getElementById('movingBlock');
-if (m) m.remove();
-
-stack.push({ left: newLeft, width: newWidth });
-renderBlock(newLeft, newWidth, currentLevel, false);
-
-currentWidth = newWidth;
-currentLevel++;
-document.getElementById('stackCount').innerText = stack.length - 1;
-
-if (currentLevel >= 8) {
-clearInterval(currentGameInterval);
-rewardPlayer(50);
-} else {
-createMovingBlock();
-}
-};
-}
-
-loadAppData();
 </script>
 </body>
 </html>
