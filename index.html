@@ -545,6 +545,10 @@ appData.redeemedCodes = data.redeemedCodes || [];
 db.ref('friend_codes/' + appData.friendId).set(user.uid);
 listenToTrades();
 updateUI();
+}).catch((error) => {
+console.error("Erreur de récupération des données utilisateur :", error);
+appData.currentUser = { email: user.email, username: user.email.split('@')[0], uid: user.uid };
+updateUI();
 });
 } else {
 appData.currentUser = null;
