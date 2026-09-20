@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
-<!-- Inclusion du SDK Stripe pour les paiements par Carte Bancaire -->
+<!-- SDK Stripe pour la redirection bancaire -->
 <script src="https://js.stripe.com/v3/"></script>
 <style>
 :root {
@@ -188,18 +188,18 @@ html, body {
       </div>
     </section>
 
-    <!-- 3. BOUTIQUE (SYSTEME CB STRIPE INTEGRÉ) -->
+    <!-- 3. BOUTIQUE (SYSTEME CB REDIRECTION STRIPE) -->
     <section id="scr-shop" class="screen">
       <div class="glass-card">
-        <div class="card-title"><span>ACHAT DE CRÉDITS (PAIEMENT CB SÉCURISÉ)</span></div>
-        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Achète des crédits par Carte Bancaire. Les paiements sont sécurisés et reversés directement.</p>
+        <div class="card-title"><span>ACHAT DE CRÉDITS (CB SÉCURISÉ)</span></div>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Achète des crédits par Carte Bancaire. Redirection immédiate vers le serveur de paiement.</p>
 
         <div class="shop-item">
           <div class="shop-info">
             <h4>Pack Starter</h4>
             <p>+1 000 🪙</p>
           </div>
-          <button class="btn" style="width:auto; padding:8px 16px;" onclick="payWithStripe(0.99, 1000)">0,99 €</button>
+          <button class="btn" style="width:auto; padding:8px 16px;" onclick="payWithStripe('price_1000credits')">0,99 €</button>
         </div>
 
         <div class="shop-item">
@@ -207,7 +207,7 @@ html, body {
             <h4>Pack Pro</h4>
             <p>+6 000 🪙 (+20% offert)</p>
           </div>
-          <button class="btn" style="width:auto; padding:8px 16px;" onclick="payWithStripe(4.99, 6000)">4,99 €</button>
+          <button class="btn" style="width:auto; padding:8px 16px;" onclick="payWithStripe('price_6000credits')">4,99 €</button>
         </div>
 
         <div class="shop-item">
@@ -215,16 +215,16 @@ html, body {
             <h4>Pack Ultime</h4>
             <p>+15 000 🪙 (+50% offert)</p>
           </div>
-          <button class="btn" style="width:auto; padding:8px 16px;" onclick="payWithStripe(9.99, 15000)">9,99 €</button>
+          <button class="btn" style="width:auto; padding:8px 16px;" onclick="payWithStripe('price_15000credits')">9,99 €</button>
         </div>
       </div>
     </section>
 
-    <!-- 4. COLLECTION ÉLARGIE -->
+    <!-- 4. COLLECTION (2000 OBJETS) -->
     <section id="scr-collection" class="screen">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <span style="font-family:'Space Grotesk'; font-size:0.9rem; font-weight:900;">COLLECTION</span>
-        <span style="font-size:0.75rem; color:var(--primary-cyan); font-weight:800;" id="colCount">0 / 0</span>
+        <span style="font-size:0.75rem; color:var(--primary-cyan); font-weight:800;" id="colCount">0 / 2000</span>
       </div>
       <div class="grid-3" id="collectionGrid"></div>
     </section>
@@ -282,52 +282,41 @@ html, body {
 </div>
 
 <script>
-/* INITALISATION STRIPE (A Remplacer par ta clé publique Stripe : pk_live_...) */
+// Cle Stripe
 const stripe = Stripe('pk_test_TYooMQauvd3q5451x44bfG6y00c8B3051R');
 
-/* BASE DE DONNÉES ENRICHIE DE MULTIPLES CATEGORIES ET RARETES */
-const itemsDB = [
-  // CATEGORIE: MEME
-  { id: 1, name: 'Doge Original', cat: 'Meme', emoji: '🐕', rarity: 'rare', unlocked: false },
-  { id: 2, name: 'Gigachad', cat: 'Meme', emoji: '🗿', rarity: 'epic', unlocked: false },
-  { id: 3, name: 'Pop Cat', cat: 'Meme', emoji: '🐱', rarity: 'common', unlocked: false },
-  { id: 4, name: 'Pepe the Frog', cat: 'Meme', emoji: '🐸', rarity: 'rare', unlocked: false },
-  { id: 5, name: 'Nyan Cat', cat: 'Meme', emoji: '🌈', rarity: 'epic', unlocked: false },
-  { id: 6, name: 'Grumpy Cat', cat: 'Meme', emoji: '😾', rarity: 'rare', unlocked: false },
-  
-  // CATEGORIE: TIKTOK / TRENDS
-  { id: 7, name: 'Chill Guy', cat: 'TikTok', emoji: '🧢', rarity: 'epic', unlocked: false },
-  { id: 8, name: 'NPC Ice Cream', cat: 'TikTok', emoji: '🍦', rarity: 'common', unlocked: false },
-  { id: 9, name: 'Grimace Shake', cat: 'TikTok', emoji: '🥤', rarity: 'rare', unlocked: false },
-  { id: 10, name: 'Sigma Face', cat: 'TikTok', emoji: '😏', rarity: 'epic', unlocked: false },
-  { id: 11, name: 'Mewing Pass', cat: 'TikTok', emoji: '🤫', rarity: 'rare', unlocked: false },
+/* GENERATEUR AUTOMATIQUE DE 2000 OBJETS AVEC CATEGORIES ET RARETES */
+const categories = ['TikTok', 'Meme', 'Pop Culture', 'Gaming', 'Food', 'Tech', 'Légendaire'];
+const emojisList = ['🐕', '🗿', '🐱', '🐸', '🧢', '🍦', '🥤', '😏', '🤫', '⚔️', '🃏', '🕹️', '🥽', '🏆', '🍕', '🌮', '🍩', '👑', '💎', '🥇', '🚀', '🔥', '⚡', '🤖', '👾'];
+const raritiesList = ['common', 'rare', 'epic', 'legendary'];
 
-  // CATEGORIE: POP CULTURE & GAMING
-  { id: 12, name: 'Sabre Laser', cat: 'Pop Culture', emoji: '⚔️', rarity: 'epic', unlocked: false },
-  { id: 13, name: 'Carte Master', cat: 'Gaming', emoji: '🃏', rarity: 'rare', unlocked: false },
-  { id: 14, name: 'Console Retro', cat: 'Gaming', emoji: '🕹️', rarity: 'rare', unlocked: false },
-  { id: 15, name: 'Casque VR', cat: 'Tech', emoji: '🥽', rarity: 'epic', unlocked: false },
-  { id: 16, name: 'Trophée Or', cat: 'Gaming', emoji: '🏆', rarity: 'legendary', unlocked: false },
+const itemsDB = [];
 
-  // CATEGORIE: NOURRITURE & DIVERS
-  { id: 17, name: 'Pizza Sacrée', cat: 'Food', emoji: '🍕', rarity: 'common', unlocked: false },
-  { id: 18, name: 'Taco Céleste', cat: 'Food', emoji: '🌮', rarity: 'common', unlocked: false },
-  { id: 19, name: 'Donut Doré', cat: 'Food', emoji: '🍩', rarity: 'rare', unlocked: false },
-
-  // CATEGORIE: LÉGENDAIRE & ULTRA RARE
-  { id: 20, name: 'Couronne Royale', cat: 'Légendaire', emoji: '👑', rarity: 'legendary', unlocked: false },
-  { id: 21, name: 'Diamant Brut', cat: 'Légendaire', emoji: '💎', rarity: 'legendary', unlocked: false },
-  { id: 22, name: 'Lingot d\'Or', cat: 'Légendaire', emoji: '🥇', rarity: 'legendary', unlocked: false },
-  { id: 23, name: 'Fuseée Spatiale', cat: 'Légendaire', emoji: '🚀', rarity: 'legendary', unlocked: false },
-
-  // OBJET ULTIME : 1 MILLION DE CREDITS
-  { id: 51, name: '⚡ DROP Administrateur', cat: 'Godlike', emoji: '⚡', rarity: 'admin', unlocked: false, price: 1000000 }
-];
-
-// Remplissage automatique pour compléter à 50 objets de base
-for(let i=24; i<=50; i++) {
-  itemsDB.push({ id: i, name: `Objet #${i}`, cat: 'Collection', emoji: '🎁', rarity: 'common', unlocked: false });
+// Generation des 1999 objets
+for (let i = 1; i < 2000; i++) {
+  const cat = categories[i % categories.length];
+  const emoji = emojisList[i % emojisList.length];
+  const rarity = raritiesList[i % raritiesList.length];
+  itemsDB.push({
+    id: i,
+    name: `${cat} #${i}`,
+    cat: cat,
+    emoji: emoji,
+    rarity: rarity,
+    unlocked: false
+  });
 }
+
+// L'objet 2000 : DROP ADMINISTRATEUR A 1 MILLION
+itemsDB.push({
+  id: 2000,
+  name: '⚡ DROP Administrateur',
+  cat: 'Godlike',
+  emoji: '⚡',
+  rarity: 'admin',
+  unlocked: false,
+  price: 1000000
+});
 
 let appData = {
   credits: 100,
@@ -341,7 +330,18 @@ let currentAuthMode = 'login';
 
 function loadAppData() {
   const saved = localStorage.getItem('drop_app_mobile_v2');
-  if (saved) appData = JSON.parse(saved);
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    appData.credits = parsed.credits;
+    appData.redeemedCodes = parsed.redeemedCodes || [];
+    appData.currentUser = parsed.currentUser || null;
+    appData.isAdmin = parsed.isAdmin || false;
+    
+    // Fusion des objets debloques sauvegardes
+    if (parsed.items && parsed.items.length === 2000) {
+      appData.items = parsed.items;
+    }
+  }
   updateUI();
 }
 
@@ -383,26 +383,25 @@ function switchTab(id, btn) {
   if (btn) btn.classList.add('active');
 }
 
-/* PAIEMENT CB SECURISE VIA STRIPE */
-function payWithStripe(amountEUR, creditReward) {
+/* VRAIE REDIRECTION VERS L'INTERFACE DE PAIEMENT STRIPE */
+function payWithStripe(priceId) {
   if (!appData.currentUser) {
     alert('⚠️ Veuillez vous connecter ou créer un compte avant d\'effectuer un achat.');
     switchTab('scr-account', document.querySelectorAll('.nav-item')[4]);
     return;
   }
 
-  // Simulation d'intégration redirection Stripe Checkout
-  const confirmPay = confirm(`Redirection vers la page de paiement sécurisée Stripe (${amountEUR.toFixed(2)} €).\n\nUne fois le paiement validé, vous recevrez ${creditReward} 🪙.`);
-  
-  if (confirmPay) {
-    // Dans un environnement de production réel avec backend, on appelle :
-    // stripe.redirectToCheckout({ sessionId: SESSION_ID });
-    
-    // Simulation instantanée pour démonstration immédiate :
-    appData.credits += creditReward;
-    saveAppData();
-    alert(`✅ Paiement CB réussi ! Votre compte a été crédité de ${creditReward} 🪙.`);
-  }
+  // Redirection vers le serveur de paiement Stripe
+  stripe.redirectToCheckout({
+    lineItems: [{ price: priceId, quantity: 1 }],
+    mode: 'payment',
+    successUrl: window.location.href + '?payment=success',
+    cancelUrl: window.location.href + '?payment=cancel',
+  }).then(function (result) {
+    if (result.error) {
+      alert(result.error.message);
+    }
+  });
 }
 
 /* AUTHENTIFICATION */
@@ -465,25 +464,25 @@ function redeemSecretCode() {
 /* OPEN DROPS */
 function openRandomDrop() {
   if (!appData.isAdmin && appData.credits < 150) return alert('150 Crédits requis !');
-  const locked = appData.items.filter(i => !i.unlocked && i.id !== 51);
+  const locked = appData.items.filter(i => !i.unlocked && i.id !== 2000);
   
-  if (locked.length === 0 && !appData.items.find(i=>i.id===51 && !i.unlocked)) {
+  if (locked.length === 0 && !appData.items.find(i=>i.id===2000 && !i.unlocked)) {
     return alert('Toute la collection est débloquée !');
   }
 
   if (!appData.isAdmin) appData.credits -= 150;
   
   let picked;
-  if (!appData.isAdmin && appData.credits >= 1000000 && !appData.items.find(i=>i.id===51).unlocked) {
-    picked = appData.items.find(i=>i.id===51);
+  if (!appData.isAdmin && appData.credits >= 1000000 && !appData.items.find(i=>i.id===2000).unlocked) {
+    picked = appData.items.find(i=>i.id===2000);
   } else {
-    picked = locked[Math.floor(Math.random() * locked.length)] || appData.items.find(i=>i.id===51);
+    picked = locked[Math.floor(Math.random() * locked.length)] || appData.items.find(i=>i.id===2000);
   }
 
   picked.unlocked = true;
   saveAppData();
 
-  if(picked.id === 51) {
+  if(picked.id === 2000) {
     triggerAnnihilation();
   } else {
     alert(`🎉 OBJET DÉBLOQUÉ : ${picked.emoji} ${picked.name} [${picked.cat}]`);
@@ -508,18 +507,29 @@ function renderCollection() {
   grid.innerHTML = '';
   let unlockedCount = 0;
 
+  // Affichage optimise (limitation du DOM aux 100 premiers ou objets debloques pour fluidite)
   appData.items.forEach(item => {
     if (item.unlocked) unlockedCount++;
-    const div = document.createElement('div');
-    div.className = 'collection-item ' + (item.unlocked ? '' : 'locked');
-    div.innerHTML = `
-      <div class="rarity-dot" style="background:var(--rarity-${item.rarity || 'common'})"></div>
-      <div class="emoji">${item.emoji}</div>
-      <div class="name">${item.unlocked ? item.name : (item.id === 51 ? '1M 🪙' : '???')}</div>
-      <div class="cat-badge">${item.cat}</div>
-    `;
-    grid.appendChild(div);
   });
+
+  const displayLimit = 150; // Nombre max affiche dans la grille pour eviter le lag
+  let countDisplayed = 0;
+
+  appData.items.forEach(item => {
+    if (countDisplayed < displayLimit || item.unlocked) {
+      const div = document.createElement('div');
+      div.className = 'collection-item ' + (item.unlocked ? '' : 'locked');
+      div.innerHTML = `
+        <div class="rarity-dot" style="background:var(--rarity-${item.rarity || 'common'})"></div>
+        <div class="emoji">${item.emoji}</div>
+        <div class="name">${item.unlocked ? item.name : (item.id === 2000 ? '1M 🪙' : '???')}</div>
+        <div class="cat-badge">${item.cat}</div>
+      `;
+      grid.appendChild(div);
+      countDisplayed++;
+    }
+  });
+
   document.getElementById('colCount').innerText = `${unlockedCount} / ${appData.items.length}`;
 }
 
