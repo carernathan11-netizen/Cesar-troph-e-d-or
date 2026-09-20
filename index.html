@@ -624,15 +624,36 @@ userRef.set(data).catch(err => console.warn('Création profil DB:', err));
 
 appData.currentUser.username = data.username || appData.currentUser.username;
 appData.credits = Number(data.credits) || 0;
-appData.friendId = data.friendId || fallbackFriendId;
+const storedFriendId = data.friendId || '';
+// Les anciens comptes avaient #DROP-XXXXXXXX. On les migre automatiquement
+// vers #DROP-<UID complet>, qui permet maintenant l'envoi direct des demandes.
+const storedFriendSuffix = friendCodeKey(storedFriendId).slice(5);
+const needsFriendIdMigration = !storedFriendSuffix || storedFriendSuffix.length < 20;
+appData.friendId = needsFriendIdMigration ? fallbackFriendId : storedFriendId;
 appData.friends = Array.isArray(data.friends) ? data.friends : [];
+
+// Les amitiés partagées sont stockées séparément pour éviter qu'un joueur
+// ait besoin d'écrire dans le profil Firebase d'un autre joueur.
+try {
+  const fs = await withTimeout(db.ref('friendships/' + user.uid).once('value'), 5000, 'Firebase ne répond pas pour les amitiés.');
+  const sharedFriends = fs.val() || {};
+  const merged = Object.keys(sharedFriends).map(uid => sharedFriends[uid]).filter(Boolean);
+  const byUid = {};
+  appData.friends.forEach(f => { if (f && f.uid) byUid[f.uid] = f; });
+  merged.forEach(f => { if (f.uid) byUid[f.uid] = f; });
+  appData.friends = Object.values(byUid);
+} catch (friendErr) {
+  console.warn('Amitiés partagées:', friendErr);
+}
 appData.isAdmin = data.isAdmin === true || isAdminEmail;
 appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes : [];
 
-// Écriture secondaire, elle aussi non bloquante.
-db.ref('friend_codes/' + friendCodeKey(appData.friendId)).set(user.uid)
-.catch(err => console.warn('Enregistrement ID ami:', err));
+// Migration silencieuse de l'ancien ID court vers le nouvel ID complet.
+if (needsFriendIdMigration) {
+  db.ref('users/' + user.uid + '/friendId').set(appData.friendId)
+    .catch(err => console.warn('Migration ID ami:', err));
+}
 
 listenToTrades();
 listenToFriendRequests();
@@ -686,12 +707,16 @@ await loadFirebaseUserProfile(user);
 });
 
 function generateFriendCode(uid) {
-return '#DROP-' + uid.substring(0, 8).toUpperCase();
+// L'ID contient désormais le UID Firebase complet.
+// Cela permet de retrouver directement le destinataire sans devoir lire
+// un index public friend_codes, qui était la source du blocage.
+return '#DROP-' + String(uid || '').trim();
 }
-// Firebase interdit # dans les clés Realtime Database.
-// On affiche #DROP-XXXXXXXX à l'écran, mais on stocke DROP-XXXXXXXX comme clé.
+
+// Normalise un ID affiché. Le nouvel ID est #DROP-<UID Firebase complet>.
 function friendCodeKey(code) {
-return String(code || '').trim().toUpperCase().replace(/^#/, '');
+// Ne pas mettre le UID en majuscules : les UID Firebase sont sensibles à la casse.
+return String(code || '').trim().replace(/^#/, '');
 }
 
 
@@ -708,6 +733,7 @@ redeemedCodes: appData.redeemedCodes
 }
 updateUI();
 }
+
 function updateUI() {
 document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
 
@@ -746,7 +772,6 @@ document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')
 document.getElementById(id).classList.add('active');
 if (btn) btn.classList.add('active');
 }
-
 function switchCategory(catKey, tabBtn) {
 activeCategory = catKey;
 document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
@@ -830,7 +855,6 @@ saveAppData();
 
 const picked = pool[Math.floor(Math.random() * pool.length)];
 picked.unlocked = true;
-
 isDropping = true;
 const card = document.getElementById('dropCard');
 const btn = document.getElementById('btnDrop');
@@ -962,7 +986,6 @@ appData.isAdmin = isAdminEmail; appData.catalogs = initialCatalogs; appData.rede
 updateUI();
 
 db.ref('users/' + u.uid).set(initialData).catch(err => console.warn('Profil inscription:', err));
-db.ref('friend_codes/' + friendCodeKey(fId)).set(u.uid).catch(err => console.warn('Code ami inscription:', err));
 listenToTrades(); listenToFriendRequests();
 showToast('✨ Compte créé avec succès !', 'success');
 }
@@ -993,44 +1016,50 @@ function sendFriendRequest() {
 if (!appData.currentUser) return showToast('❌ Connectez-vous pour ajouter un ami.', 'error');
 
 const input = document.getElementById('addFriendInput');
-const raw = input.value.trim().toUpperCase();
+const raw = input.value.trim();
 const key = friendCodeKey(raw);
-if (!key || !key.startsWith('DROP-')) {
-return showToast("❌ ID invalide. Exemple : #DROP-ABC12345", 'error');
+const targetUid = /^DROP-/i.test(key) ? key.slice(5).trim() : '';
+
+if (!targetUid || targetUid.length < 20) {
+return showToast('❌ ID invalide. Utilisez le nouvel ID affiché dans le profil.', 'error');
+}
+if (targetUid === appData.currentUser.uid) {
+return showToast('❌ Vous ne pouvez pas vous ajouter vous-même.', 'error');
 }
 
 const btn = input.nextElementSibling;
-if (btn) btn.disabled = true;
-// Les anciennes versions pouvaient avoir tenté d'utiliser # dans la clé Firebase.
-// La nouvelle version utilise uniquement DROP-XXXXXXXX comme clé réelle.
-db.ref('friend_codes/' + key).once('value')
-.then(snapshot => {
-const targetUid = snapshot.val();
-if (!targetUid) throw new Error("Cet ID Ami n'existe pas.");
-if (targetUid === appData.currentUser.uid) throw new Error('Vous ne pouvez pas vous ajouter vous-même.');
-if ((appData.friends || []).some(f => f.uid === targetUid)) throw new Error('Cet utilisateur est déjà dans vos amis.');
+if (btn) { btn.disabled = true; btn.innerText = 'ENVOI...'; }
 
-// Ne jamais lire le dossier friend_requests d'un autre joueur ici :
-// cela provoque un PERMISSION_DENIED avec des règles Firebase sécurisées.
-const reqId = 'req_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
-return db.ref('friend_requests/' + targetUid + '/' + reqId).set({
-senderUid: appData.currentUser.uid,
-senderName: appData.currentUser.username,
-senderFriendId: appData.friendId,
-status: 'pending',
-createdAt: firebase.database.ServerValue.TIMESTAMP
-});
-})
+// Plus besoin de friend_codes : l'ID contient directement le UID Firebase.
+// La demande est écrite sous le compte du destinataire, avec le UID de
+// l'expéditeur comme clé. Cela évite les lectures croisées interdites.
+const requestRef = db.ref('friend_requests/' + targetUid + '/' + appData.currentUser.uid);
+const requestData = {
+  senderUid: appData.currentUser.uid,
+  senderName: appData.currentUser.username,
+  senderFriendId: appData.friendId,
+  status: 'pending',
+  createdAt: firebase.database.ServerValue.TIMESTAMP
+};
+
+withTimeout(requestRef.set(requestData), 8000, 'Firebase refuse ou ne répond pas pour les demandes d’amis.')
 .then(() => {
 input.value = '';
 showToast("✅ Demande d'ami envoyée !", 'success');
 })
 .catch(err => {
 console.error('sendFriendRequest:', err);
+if (err && err.code === 'PERMISSION_DENIED') {
+showToast('❌ Firebase bloque les demandes d’amis. Il faut autoriser leur création dans les règles.', 'error');
+} else {
 showToast('❌ ' + (err.message || 'Impossible d’envoyer la demande.'), 'error');
-})
-.finally(() => { if (btn) btn.disabled = false; });
 }
+})
+.finally(() => {
+if (btn) { btn.disabled = false; btn.innerText = 'AJOUTER'; }
+});
+}
+
 function listenToFriendRequests() {
 if (!appData.currentUser) return;
 db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
@@ -1038,12 +1067,10 @@ const requests = snapshot.val();
 const listEl = document.getElementById('friendRequestsList');
 if (!listEl) return;
 listEl.innerHTML = '';
-
 if (!requests) {
 listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
 return;
 }
-
 let count = 0;
 Object.keys(requests).forEach(reqId => {
 const req = requests[reqId];
@@ -1051,18 +1078,17 @@ if (req && req.status === 'pending') {
 count++;
 const div = document.createElement('div');
 div.className = 'request-card-box';
-div.innerHTML = `<div style="font-size:0.8rem;"><b>${req.senderName}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${req.senderFriendId || ''})</span></div>
+const safeName = String(req.senderName || 'Joueur').replace(/'/g, "\\'");
+const safeFriendId = String(req.senderFriendId || '').replace(/'/g, "\\'");
+div.innerHTML = `<div style="font-size:0.8rem;"><b>${req.senderName || 'Joueur'}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${req.senderFriendId || ''})</span></div>
 <div style="display:flex; gap:6px; margin-top:8px;">
-<button class="btn btn-success" style="padding:6px; font-size:0.7rem;" onclick="acceptFriendRequest('${reqId}', '${req.senderUid}', '${String(req.senderName || '').replace(/'/g, "\'")}', '${req.senderFriendId || ''}')">ACCEPTER</button>
+<button class="btn btn-success" style="padding:6px; font-size:0.7rem;" onclick="acceptFriendRequest('${reqId}', '${req.senderUid}', '${safeName}', '${safeFriendId}')">ACCEPTER</button>
 <button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="refuseFriendRequest('${reqId}')">REFUSER</button>
 </div>`;
 listEl.appendChild(div);
 }
 });
-
-if (count === 0) {
-listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
-}
+if (count === 0) listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
 }, error => {
 console.error('listenToFriendRequests:', error);
 const listEl = document.getElementById('friendRequestsList');
@@ -1071,26 +1097,37 @@ if (listEl) listEl.innerHTML = '<i style="color:var(--danger); font-size:0.75rem
 }
 
 function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
-if (!appData.friends.some(f => f.uid === senderUid)) {
-appData.friends.push({ uid: senderUid, username: senderName, friendId: senderFriendId });
+if (!appData.currentUser || !senderUid) return;
+if ((appData.friends || []).some(f => f.uid === senderUid)) {
+  db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove();
+  return showToast('Cet utilisateur est déjà votre ami.', 'error');
 }
 
-db.ref('users/' + senderUid + '/friends').once('value').then(snap => {
-let friendList = snap.val() || [];
-if (!friendList.some(f => f.uid === appData.currentUser.uid)) {
-friendList.push({ uid: appData.currentUser.uid, username: appData.currentUser.username, friendId: appData.friendId });
-db.ref('users/' + senderUid + '/friends').set(friendList);
-}
+const me = { uid: appData.currentUser.uid, username: appData.currentUser.username, friendId: appData.friendId };
+const them = { uid: senderUid, username: senderName || 'Joueur', friendId: senderFriendId || ('#DROP-' + senderUid) };
+const updates = {};
+updates['friendships/' + me.uid + '/' + senderUid] = them;
+updates['friendships/' + senderUid + '/' + me.uid] = me;
+updates['friend_requests/' + me.uid + '/' + reqId] = null;
+
+withTimeout(db.ref().update(updates), 8000, 'Firebase ne répond pas pour la validation de la demande.')
+.then(() => {
+appData.friends.push(them);
+try { localStorage.setItem('drop2027_profile_' + me.uid, JSON.stringify({username: appData.currentUser.username, credits: appData.credits, friendId: appData.friendId, friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, redeemedCodes: appData.redeemedCodes})); } catch (_) {}
+updateUI();
+showToast('🎉 Vous êtes désormais ami avec ' + (senderName || 'ce joueur') + ' !', 'success');
+})
+.catch(err => {
+console.error('acceptFriendRequest:', err);
+showToast('❌ Impossible d’accepter la demande : ' + (err.message || err), 'error');
 });
-
-db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove();
-saveAppData();
-showToast('🎉 Vous êtes désormais ami avec ' + senderName + ' !', 'success');
 }
 
 function refuseFriendRequest(reqId) {
-db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove();
-showToast("Demande refusée.", 'success');
+if (!appData.currentUser) return;
+withTimeout(db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove(), 8000, 'Firebase ne répond pas.')
+.then(() => showToast('Demande refusée.', 'success'))
+.catch(err => showToast('❌ Impossible de refuser : ' + (err.message || err), 'error'));
 }
 
 function renderFriendsUI() {
@@ -1153,7 +1190,6 @@ const trades = snapshot.val();
 const tl = document.getElementById('tradesList');
 if(!tl) return;
 tl.innerHTML = '';
-
 if (!trades) { tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>'; return; }
 
 let count = 0;
@@ -1273,6 +1309,7 @@ function startAdModal() {
 adTimeRemaining = 30;
 const modal = document.getElementById('adModal'), timerEl = document.getElementById('adTimer'), btn = document.getElementById('adClaimBtn'), progressBar = document.getElementById('adProgressBar');
 modal.classList.add('active'); btn.disabled = true; btn.innerText = 'PATIENTEZ (' + adTimeRemaining + 's)...'; timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = '0%';
+
 adInterval = setInterval(() => {
 adTimeRemaining--;
 timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = ((30 - adTimeRemaining) / 30) * 100 + '%';
@@ -1299,7 +1336,6 @@ saveAppData();
 document.getElementById('gameArea').classList.add('active');
 const container = document.getElementById('gameCanvasContainer');
 container.innerHTML = '';
-
 if (gameType === 'reaction') runReactionGame(container);
 else if (gameType === 'connect4') runConnect4Game(container);
 else if (gameType === 'snake') runSnakeGame(container);
@@ -1476,4 +1512,4 @@ if (currentLevel >= 8) { clearInterval(currentGameInterval); rewardPlayer(50); }
 }
 </script>
 </body>
-</html>
+  </html>
