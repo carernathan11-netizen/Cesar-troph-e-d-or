@@ -3,22 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>GENESIS — The Evolutionary Collection Game</title>
+  <title>DROP — Collectionne ce que personne d'autre ne possède.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #040508;
-      --card-bg: rgba(14, 18, 27, 0.75);
-      --card-border: rgba(0, 242, 254, 0.18);
-      --genesis-cyan: #00f2fe;
-      --genesis-violet: #7928ca;
-      --accent-gold: #ffb700;
-      --accent-green: #00e676;
-      --rarity-epic: #b026ff;
-      --text-main: #f3f4f6;
-      --text-muted: #8b95a5;
+      --bg-dark: #0a0b10;
+      --surface-dark: #12141d;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-border: rgba(255, 255, 255, 0.08);
+      
+      --cyan: #00f0ff;
+      --coral: #ff2a6d;
+      --lime: #05ffa1;
+      --violet: #7000ff;
+      --gold: #ffb800;
+      
+      --text-main: #ffffff;
+      --text-muted: #8e95a5;
+      
+      --rarity-common: #a0a5b5;
+      --rarity-rare: #00f0ff;
+      --rarity-epic: #ff2a6d;
+      --rarity-legendary: #ffb800;
+      --rarity-iconic: #7000ff;
     }
 
     * {
@@ -40,316 +49,343 @@
       overflow: hidden;
     }
 
-    /* Fond Étoilé Dynamique Canvas */
-    #bg-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* App Viewport Mobile-First */
+    /* App Shell Mobile First (390x844 ratio) */
     .app-viewport {
       width: 100%;
-      max-width: 440px;
+      max-width: 420px;
       height: 100vh;
-      max-height: 900px;
-      background: rgba(8, 11, 19, 0.85);
+      max-height: 880px;
+      background: var(--bg-dark);
       position: relative;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 0 50px rgba(0, 242, 254, 0.15);
-      z-index: 1;
+      box-shadow: 0 0 80px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 240, 255, 0.15);
     }
 
-    @media (min-width: 480px) {
+    @media (min-width: 440px) {
       .app-viewport {
-        border-radius: 36px;
-        height: 94vh;
+        border-radius: 40px;
+        height: 92vh;
         border: 1px solid var(--card-border);
       }
     }
 
     /* Header HUD */
     .hud-header {
-      position: relative;
-      z-index: 10;
       padding: 16px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(4, 5, 8, 0.7);
-      backdrop-filter: blur(12px);
+      background: rgba(10, 11, 16, 0.85);
+      backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--card-border);
+      z-index: 20;
     }
 
     .brand-logo {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', sans-serif;
       font-weight: 900;
-      font-size: 1.1rem;
-      letter-spacing: 2px;
-      background: linear-gradient(135deg, var(--genesis-cyan), var(--genesis-violet));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      color: #fff;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
-    .currency-badge {
-      background: rgba(0, 242, 254, 0.08);
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    .user-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--card-border);
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 20px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--genesis-cyan);
-      transition: transform 0.2s;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      font-family: 'Space Grotesk', sans-serif;
     }
 
-    .currency-badge.bump {
-      transform: scale(1.15);
-      border-color: var(--accent-gold);
-      color: var(--accent-gold);
+    .pill-credits {
+      color: var(--gold);
+      border-color: rgba(255, 184, 0, 0.3);
     }
 
-    /* Router Screen Container */
+    /* Container de Vues */
     .screen-container {
       flex: 1;
       position: relative;
-      z-index: 5;
       overflow-y: auto;
       padding: 16px;
       scrollbar-width: none;
     }
-
     .screen-container::-webkit-scrollbar { display: none; }
 
     .screen {
       display: none;
-      animation: fadeIn 0.3s ease-out forwards;
+      animation: fadeIn 0.25s ease-out forwards;
     }
-
     .screen.active { display: block; }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Signature Glass Card Genesis */
-    .genesis-card {
-      background: var(--card-bg);
+    /* Cards & Elements Visuels */
+    .drop-card {
+      background: var(--surface-dark);
       border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 18px;
-      margin-bottom: 14px;
-      backdrop-filter: blur(20px);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .genesis-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: linear-gradient(180deg, var(--genesis-cyan), var(--genesis-violet));
-    }
-
-    /* Creature Display Showcase */
-    .creature-showcase {
-      background: radial-gradient(circle at 50% 40%, rgba(176, 38, 255, 0.15) 0%, rgba(14, 18, 27, 0.9) 75%);
-      border: 1px solid var(--rarity-epic);
       border-radius: 28px;
       padding: 20px;
-      text-align: center;
+      margin-bottom: 16px;
       position: relative;
-    }
-
-    .creature-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .rarity-pill {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      padding: 4px 10px;
-      border-radius: 8px;
-      background: rgba(176, 38, 255, 0.2);
-      border: 1px solid var(--rarity-epic);
-      color: #e2a2ff;
-    }
-
-    .possession-rate {
-      font-size: 0.7rem;
-      color: var(--accent-gold);
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* Canvas pour la Créature Vivante */
-    .creature-canvas-container {
-      width: 180px;
-      height: 180px;
-      margin: 10px auto;
-      position: relative;
-    }
-
-    #creatureCanvas {
-      width: 100%;
-      height: 100%;
-    }
-
-    .creature-title-group h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: 1px;
-    }
-
-    .mutation-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(0, 242, 254, 0.1);
-      border: 1px solid var(--genesis-cyan);
-      color: var(--genesis-cyan);
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-top: 6px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* Creature Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 18px;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 12px;
-      border-radius: 16px;
-    }
-
-    .stat-box {
-      text-align: center;
-    }
-
-    .stat-label {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-
-    .stat-value {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    .stat-bar {
-      height: 4px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 2px;
-      margin-top: 4px;
       overflow: hidden;
     }
 
-    .stat-fill {
-      height: 100%;
-      background: var(--genesis-cyan);
-    }
-
-    /* Collection Counter Bar */
-    .collection-banner {
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(0, 242, 254, 0.05);
-      border: 1px solid var(--card-border);
-      padding: 12px 16px;
-      border-radius: 16px;
-      margin-bottom: 14px;
     }
 
-    .collection-title {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-muted);
+    /* Hero Drop Card */
+    .hero-drop {
+      background: radial-gradient(circle at 50% 30%, rgba(112, 0, 255, 0.25) 0%, rgba(18, 20, 29, 0.95) 70%);
+      border: 1px solid rgba(112, 0, 255, 0.4);
+      text-align: center;
+      padding: 30px 20px;
     }
 
-    .collection-count {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: var(--genesis-cyan);
+    .drop-item-preview {
+      width: 140px;
+      height: 140px;
+      margin: 15px auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4.5rem;
+      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+      animation: float 4s ease-in-out infinite;
     }
 
-    /* Action Buttons & Missions */
-    .btn-claim {
-      width: 100%;
-      padding: 14px;
-      border-radius: 16px;
-      border: none;
-      background: linear-gradient(135deg, var(--accent-gold), #ff8800);
-      color: #040508;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(3deg); }
+    }
+
+    .item-number {
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 0.85rem;
-      letter-spacing: 0.5px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--cyan);
+      background: rgba(0, 240, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .item-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .item-quote {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 20px;
+      border: none;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 900;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 20px rgba(255, 183, 0, 0.3);
-      transition: all 0.2s;
+      gap: 10px;
+      box-shadow: 0 8px 25px rgba(0, 240, 255, 0.25);
+      transition: transform 0.1s, box-shadow 0.2s;
     }
+    .btn:active { transform: scale(0.97); }
 
-    .btn-claim:active { transform: scale(0.97); }
-
-    .btn-claim.done {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-muted);
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
       box-shadow: none;
-      cursor: default;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--card-border);
     }
 
-    /* Navigation Dock Bottom */
-    .nav-dock {
+    /* Grilles et Filtres */
+    .filter-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scrollbar-width: none;
+      margin-bottom: 16px;
+    }
+    .filter-scroll::-webkit-scrollbar { display: none; }
+
+    .filter-chip {
+      padding: 8px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .filter-chip.active {
+      background: var(--cyan);
+      color: #000;
+      border-color: var(--cyan);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+    /* Vignettes de Collection */
+    .collection-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 14px;
+      text-align: center;
       position: relative;
-      z-index: 10;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .collection-item:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+    .collection-item.locked {
+      opacity: 0.35;
+      filter: grayscale(1);
+    }
+    .collection-item .emoji { font-size: 2.2rem; margin-bottom: 6px; }
+    .collection-item .name { font-size: 0.75rem; font-weight: 800; }
+    .collection-item .num { font-size: 0.65rem; color: var(--text-muted); font-family: 'Space Grotesk'; }
+
+    /* Badge Rareté */
+    .rarity-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    /* Mini-jeu Memory Styles */
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .memory-card {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .memory-card.flipped {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--cyan);
+      transform: rotateY(180deg);
+    }
+    .memory-card.matched {
+      background: rgba(5, 255, 161, 0.15);
+      border-color: var(--lime);
+      visibility: visible;
+    }
+
+    /* Musée Personal Room View */
+    .room-viewport {
+      height: 220px;
+      background: linear-gradient(180deg, #181b26 0%, #0d0e14 100%);
+      border-radius: 24px;
+      border: 1px solid var(--card-border);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 20px;
+      overflow: hidden;
+    }
+    .pedestal {
+      width: 70px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px 12px 0 0;
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .pedestal-item {
+      position: absolute;
+      top: -35px;
+      font-size: 2.2rem;
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+    }
+
+    /* Navigation Dock */
+    .nav-dock {
       padding: 12px 16px;
-      background: rgba(4, 5, 8, 0.9);
+      background: rgba(10, 11, 16, 0.95);
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--card-border);
       display: flex;
       justify-content: space-around;
+      z-index: 20;
     }
 
     .nav-item {
@@ -359,312 +395,444 @@
       gap: 4px;
       color: var(--text-muted);
       font-size: 0.65rem;
-      font-weight: 700;
+      font-weight: 800;
       background: none;
       border: none;
       cursor: pointer;
       transition: color 0.2s;
     }
+    .nav-item.active { color: var(--cyan); }
+    .nav-icon { font-size: 1.3rem; }
 
-    .nav-item.active {
-      color: var(--genesis-cyan);
+    /* Modal Fiche Objet */
+    .modal-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(16px);
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
+    .modal-overlay.active { display: flex; }
 
-    .nav-icon { font-size: 1.2rem; }
+    .modal-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--cyan);
+      border-radius: 32px;
+      padding: 24px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 50px rgba(0, 240, 255, 0.2);
+    }
   </style>
 </head>
 <body>
-
-  <!-- Fond Étoilé Dynamique -->
-  <canvas id="bg-canvas"></canvas>
 
   <div class="app-viewport">
 
     <!-- Header HUD -->
     <header class="hud-header">
       <div class="brand-logo">
-        <span>⚙️</span> GENESIS
+        <div class="brand-dot"></div>
+        DROP
       </div>
-
-      <div class="currency-badge" id="currencyBadge">
-        <span>💎</span>
-        <span id="creditVal">1 250</span>
+      <div class="user-stats">
+        <div class="pill">
+          <span>⭐</span>
+          <span>NIV. <span id="lvlVal">17</span></span>
+        </div>
+        <div class="pill pill-credits">
+          <span>🪙</span>
+          <span id="creditVal">2 840</span>
+        </div>
       </div>
     </header>
 
-    <!-- Content Router Screen -->
+    <!-- Ecran Router -->
     <main class="screen-container">
 
-      <!-- SCREEN DASHBOARD JEU -->
-      <section id="scr-dashboard" class="screen active">
-
-        <!-- Barre de Collection Globale -->
-        <div class="collection-banner">
-          <span class="collection-title">INDEX DE COLLECTION</span>
-          <span class="collection-count">9 / 120 <span style="font-size:0.7rem; color:var(--text-muted);">(7.5%)</span></span>
-        </div>
-
-        <!-- Fiche de la Créature Active -->
-        <div class="creature-showcase">
-          <div class="creature-header">
-            <span class="rarity-pill">ÉPIQUE</span>
-            <span class="possession-rate">🔥 2.8% DES JOUEURS</span>
+      <!-- SCREEN 1: HOME (LE DROP DU JOUR) -->
+      <section id="scr-home" class="screen active">
+        <div class="drop-card hero-drop">
+          <div class="card-title">
+            <span>TON DROP DU JOUR</span>
+            <span style="color:var(--lime); font-weight:800;">GRATUIT</span>
           </div>
 
-          <!-- Zone Canvas de la Créature Animée -->
-          <div class="creature-canvas-container">
-            <canvas id="creatureCanvas" width="180" height="180"></canvas>
-          </div>
+          <div class="drop-item-preview" id="heroEmoji">❓</div>
+          <div class="item-number" id="heroNum">OBJET #0482</div>
+          <div class="item-name" id="heroName">Capsule Mystère</div>
+          <div class="item-quote" id="heroQuote">«« Tu n'étais pas censé tomber dessus. »»</div>
 
-          <div class="creature-title-group">
-            <h2>ASTRA-KAEL #009</h2>
-            <div class="mutation-tag">🧬 PRISMATIC MUTATION</div>
-          </div>
-
-          <!-- Statistiques de la Créature -->
-          <div class="stats-grid">
-            <div class="stat-box">
-              <div class="stat-label">ATTAQUE</div>
-              <div class="stat-value">72</div>
-              <div class="stat-bar"><div class="stat-fill" style="width: 72%;"></div></div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">ÉNERGIE</div>
-              <div class="stat-value" style="color:var(--accent-gold);">91</div>
-              <div class="stat-bar"><div class="stat-fill" style="width: 91%; background:var(--accent-gold);"></div></div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">EXPLORATION</div>
-              <div class="stat-value" style="color:var(--accent-green);">64</div>
-              <div class="stat-bar"><div class="stat-fill" style="width: 64%; background:var(--accent-green);"></div></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mission avec Bouton de Récompense Dynamique -->
-        <div class="genesis-card" style="margin-top: 14px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); letter-spacing:1px; font-family:'Orbitron';">MISSION DISPONIBLE</span>
-            <span style="font-size:0.7rem; color:var(--accent-green); font-weight:700;">COMPLÉTÉE</span>
-          </div>
-          <div style="font-weight:700; font-size:0.9rem; margin-bottom:12px;">Découvrir 1 nouvelle mutation Prismatic</div>
-          
-          <button class="btn-claim" id="claimBtn" onclick="claimReward()">
-            <span>RÉCUPÉRER +150 💎</span>
+          <button class="btn" id="btnDiscover" onclick="triggerDropDiscovery()">
+            <span>DÉCOUVRIR LE DROP</span>
           </button>
         </div>
 
+        <div class="drop-card">
+          <div class="card-title">
+            <span>DÉFI QUOTIDIEN</span>
+            <span style="color:var(--gold);">+100 🪙</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div>
+              <div style="font-weight:800; font-size:0.9rem;">Master du Memory</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Réalise un sans-faute en moins de 30s</div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto; padding:8px 14px; font-size:0.75rem;" onclick="switchTab('scr-games')">JOUER</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 2: MINI-JEUX (MEMORY PLAYABLE) -->
+      <section id="scr-games" class="screen">
+        <div class="drop-card">
+          <div class="card-title">
+            <span>MINI-JEU • MEMORY</span>
+            <span style="color:var(--cyan);" id="gameTimer">00:30</span>
+          </div>
+
+          <div id="gameOverlay" style="text-align:center; padding:10px 0;">
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Retrouve les paires d'objets pour gagner des DROP Credits.</p>
+            <button class="btn" onclick="startMemoryGame()">LANCER LA PARTIE</button>
+          </div>
+
+          <div class="memory-grid" id="memoryBoard" style="display:none;"></div>
+        </div>
+
+        <div class="drop-card">
+          <div class="card-title">AUTRES MODULES DE JEU</div>
+          <div class="grid-2">
+            <div class="collection-item" onclick="playSound('click'); alert('Module STACK bientôt disponible dans la Saison 01 !')">
+              <div class="emoji">📦</div>
+              <div class="name">STACK</div>
+            </div>
+            <div class="collection-item" onclick="playSound('click'); alert('Module REACTION bientôt disponible !')">
+              <div class="emoji">⚡</div>
+              <div class="name">REACTION</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: COLLECTION -->
+      <section id="scr-collection" class="screen">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900;">COLLECTION</span>
+          <span style="font-family:'Space Grotesk'; font-size:0.85rem; color:var(--cyan); font-weight:800;">248 / 2 000</span>
+        </div>
+
+        <div class="filter-scroll">
+          <div class="filter-chip active" onclick="filterCollection('ALL', this)">TOUS</div>
+          <div class="filter-chip" onclick="filterCollection('RETRO', this)">📼 RETRO</div>
+          <div class="filter-chip" onclick="filterCollection('FOOD', this)">🍔 FOOD</div>
+          <div class="filter-chip" onclick="filterCollection('ABSURD', this)">😂 ABSURD</div>
+          <div class="filter-chip" onclick="filterCollection('TECH', this)">📱 TECH</div>
+        </div>
+
+        <div class="grid-3" id="collectionGrid"></div>
+      </section>
+
+      <!-- SCREEN 4: MY DROP (LE MUSÉE) -->
+      <section id="scr-mydrop" class="screen">
+        <div class="drop-card">
+          <div class="card-title">
+            <span>GALERIE PERSONNEL • ROOM 01</span>
+            <span style="color:var(--violet); font-weight:800;">FAVORITES</span>
+          </div>
+
+          <div class="room-viewport">
+            <div class="pedestal">
+              <div class="pedestal-item">📼</div>
+            </div>
+            <div class="pedestal">
+              <div class="pedestal-item">🪩</div>
+            </div>
+            <div class="pedestal">
+              <div class="pedestal-item">🍩</div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px; display:flex; gap:10px;">
+            <button class="btn btn-secondary" style="font-size:0.8rem;" onclick="playSound('click'); alert('Personnalisation du sol et de l\'éclairage mise à jour !')">🎨 DÉCORER</button>
+            <button class="btn btn-secondary" style="font-size:0.8rem;" onclick="playSound('click'); alert('Lien de votre galerie publique copié dans le presse-papier !')">🔗 PARTAGER</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 5: PROFIL -->
+      <section id="scr-profile" class="screen">
+        <div class="drop-card" style="text-align:center;">
+          <div style="width:70px; height:70px; background:linear-gradient(135deg, var(--cyan), var(--violet)); border-radius:24px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:900;">N</div>
+          <h3 style="font-family:'Space Grotesk'; font-size:1.2rem;">Nathan CARER</h3>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;">LIGUE DIAMOND • MEMBRE DEPUIS LA SAISON 01</p>
+
+          <div class="grid-2" style="text-align:left;">
+            <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:16px;">
+              <div style="font-size:0.7rem; color:var(--text-muted);">Objets Totaux</div>
+              <div style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900; color:var(--cyan);">248</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:16px;">
+              <div style="font-size:0.7rem; color:var(--text-muted);">Collections Complètes</div>
+              <div style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900; color:var(--lime);">14</div>
+            </div>
+          </div>
+        </div>
       </section>
 
     </main>
 
     <!-- Navigation Dock -->
     <nav class="nav-dock">
-      <button class="nav-item active">
-        <span class="nav-icon">🐾</span>
-        <span>Créature</span>
+      <button class="nav-item active" onclick="switchTab('scr-home', this)">
+        <span class="nav-icon">⚡</span>
+        <span>HOME</span>
       </button>
-      <button class="nav-item">
-        <span class="nav-icon">🗺️</span>
-        <span>Exploration</span>
+      <button class="nav-item" onclick="switchTab('scr-games', this)">
+        <span class="nav-icon">🎮</span>
+        <span>JOUER</span>
       </button>
-      <button class="nav-item">
-        <span class="nav-icon">🔮</span>
-        <span>Capsules</span>
+      <button class="nav-item" onclick="switchTab('scr-collection', this)">
+        <span class="nav-icon">🗃️</span>
+        <span>COLLECTION</span>
       </button>
-      <button class="nav-item">
-        <span class="nav-icon">📖</span>
-        <span>Index</span>
+      <button class="nav-item" onclick="switchTab('scr-mydrop', this)">
+        <span class="nav-icon">🏛️</span>
+        <span>MY DROP</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('scr-profile', this)">
+        <span class="nav-icon">👤</span>
+        <span>PROFIL</span>
       </button>
     </nav>
+
+    <!-- Modal Fiche Objet -->
+    <div class="modal-overlay" id="itemModal">
+      <div class="modal-card">
+        <div style="font-size:4rem; margin-bottom:10px;" id="mEmoji">📼</div>
+        <div class="item-number" id="mNum">OBJET #012</div>
+        <div class="item-name" id="mName">Cassette VHS Rétro</div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin:10px 0 20px;" id="mStory">Contient un enregistrement amateur d'une fête de l'an 2000. Le ruban saute un peu à la minute 14.</p>
+        <button class="btn" onclick="closeModal()">FERMER</button>
+      </div>
+    </div>
 
   </div>
 
   <script>
     /* ===================================================
-       1. FOND ÉTOILÉ DYNAMIQUE (Canvas Space)
+       1. SYNTHÉTISEUR AUDIO AVANCÉ (Web Audio API)
        =================================================== */
-    const bgCanvas = document.getElementById('bg-canvas');
-    const bgCtx = bgCanvas.getContext('2d');
+    let audioCtx = null;
 
-    function resizeBg() {
-      bgCanvas.width = window.innerWidth;
-      bgCanvas.height = window.innerHeight;
-    }
-    resizeBg();
-    window.addEventListener('resize', resizeBg);
-
-    const stars = Array.from({ length: 60 }, () => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      size: Math.random() * 2,
-      alpha: Math.random(),
-      speed: 0.005 + Math.random() * 0.015
-    }));
-
-    function drawBg() {
-      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-      stars.forEach(star => {
-        star.alpha += star.speed;
-        if (star.alpha > 1 || star.alpha < 0) star.speed = -star.speed;
-        bgCtx.fillStyle = `rgba(0, 242, 254, ${Math.abs(star.alpha) * 0.5})`;
-        bgCtx.beginPath();
-        bgCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        bgCtx.fill();
-      });
-      requestAnimationFrame(drawBg);
-    }
-    drawBg();
-
-    /* ===================================================
-       2. CRÉATURE ANIMÉE VIVANTE (Canvas 2D)
-       =================================================== */
-    const cCanvas = document.getElementById('creatureCanvas');
-    const ctx = cCanvas.getContext('2d');
-
-    let tick = 0;
-    let blinkTimer = 0;
-    let isBlinking = false;
-
-    function drawCreature() {
-      ctx.clearRect(0, 0, 180, 180);
-      tick += 0.04;
-
-      const centerX = 90;
-      const centerY = 90 + Math.sin(tick) * 5; // Mouvement de respiration / flottaison
-
-      // 1. Aura d'Habitat Prismatic
-      const gradient = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, 65);
-      gradient.addColorStop(0, 'rgba(0, 242, 254, 0.4)');
-      gradient.addColorStop(0.6, 'rgba(176, 38, 255, 0.2)');
-      gradient.addColorStop(1, 'transparent');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 65, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 2. Corps Astral de la Créature
-      ctx.fillStyle = '#0f172a';
-      ctx.strokeStyle = '#00f2fe';
-      ctx.lineWidth = 3;
-
-      ctx.beginPath();
-      // Tête / Corps de type "Astra-Kael" (Forme organique Sci-Fi)
-      ctx.moveTo(centerX - 35, centerY - 10);
-      ctx.bezierCurveTo(centerX - 40, centerY - 45, centerX + 40, centerY - 45, centerX + 35, centerY - 10);
-      ctx.bezierCurveTo(centerX + 50, centerY + 30, centerX - 50, centerY + 30, centerX - 35, centerY - 10);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // Cornes Célestes
-      ctx.strokeStyle = '#b026ff';
-      ctx.beginPath();
-      ctx.moveTo(centerX - 20, centerY - 35);
-      ctx.lineTo(centerX - 38, centerY - 55);
-      ctx.moveTo(centerX + 20, centerY - 35);
-      ctx.lineTo(centerX + 38, centerY - 55);
-      ctx.stroke();
-
-      // 3. Yeux Expressifs avec Clignotement
-      blinkTimer++;
-      if (blinkTimer > 120) {
-        isBlinking = true;
-        if (blinkTimer > 130) {
-          isBlinking = false;
-          blinkTimer = 0;
-        }
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
-
-      ctx.fillStyle = '#00f2fe';
-      if (!isBlinking) {
-        // Oeil Gauche
-        ctx.beginPath();
-        ctx.arc(centerX - 14, centerY - 10, 6, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Oeil Droit
-        ctx.beginPath();
-        ctx.arc(centerX + 14, centerY - 10, 6, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Pupilles brillantes
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(centerX - 12, centerY - 12, 2, 0, Math.PI * 2);
-        ctx.arc(centerX + 16, centerY - 12, 2, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        // Yeux fermés (Ligne)
-        ctx.strokeStyle = '#00f2fe';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(centerX - 20, centerY - 10);
-        ctx.lineTo(centerX - 8, centerY - 10);
-        ctx.moveTo(centerX + 8, centerY - 10);
-        ctx.lineTo(centerX + 20, centerY - 10);
-        ctx.stroke();
-      }
-
-      // 4. Particules en flottaison autour de la créature
-      for (let i = 0; i < 3; i++) {
-        const pAngle = tick + (i * 2);
-        const px = centerX + Math.cos(pAngle) * 45;
-        const py = centerY + Math.sin(pAngle * 0.8) * 35;
-        ctx.fillStyle = i % 2 === 0 ? '#00f2fe' : '#ffb700';
-        ctx.beginPath();
-        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      requestAnimationFrame(drawCreature);
     }
-    drawCreature();
 
-    /* ===================================================
-       3. LOGIQUE JEU & RÉCOMPENSES
-       =================================================== */
-    let credits = 1250;
-    let claimed = false;
+    function playSound(type) {
+      initAudio();
+      if (!audioCtx) return;
 
-    // Web Audio Synthétiseur minimal
-    function playRewardSound() {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-      osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.2); // C6
-
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.3);
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+      } else if (type === 'drop') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'win') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(783, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+      }
     }
 
-    function claimReward() {
-      if (claimed) return;
-      claimed = true;
+    /* ===================================================
+       2. DONNÉES DU CATALOGUE
+       =================================================== */
+    const itemsData = [
+      { num: '#001', name: 'Canette Rétro', cat: 'FOOD', emoji: '🥤', rarity: 'var(--rarity-common)', story: 'Encore pétillante après 30 ans passés dans un grenier.' },
+      { num: '#012', name: 'Cassette VHS', cat: 'RETRO', emoji: '📼', rarity: 'var(--rarity-rare)', story: 'Bande magnétique usée. Contient un anniversaire de 1998.' },
+      { num: '#048', name: 'Boule Disco', cat: 'RETRO', emoji: '🪩', rarity: 'var(--rarity-epic)', story: 'Réfracte la lumière et transforme chaque pièce en samedi soir.' },
+      { num: '#099', name: 'Donut Absurde', cat: 'FOOD', emoji: '🍩', rarity: 'var(--rarity-common)', story: 'Glaçage bleu néon. Goût totalement indéterminé.' },
+      { num: '#104', name: 'Console Portable', cat: 'TECH', emoji: '🎮', rarity: 'var(--rarity-legendary)', story: 'Écran monochrome. Le bouton B doit être pressé très fort.' },
+      { num: '#202', name: 'Glaçon Éternel', cat: 'ABSURD', emoji: '🧊', rarity: 'var(--rarity-iconic)', story: 'Ne fond jamais, même au centre du soleil.' },
+      { num: '#310', name: 'Canard en Plastique', cat: 'ABSURD', emoji: '🦆', rarity: 'var(--rarity-common)', story: 'Semble vous fixer avec une sagesse ancestrale.' },
+      { num: '#412', name: 'Casque Studio', cat: 'TECH', emoji: '🎧', rarity: 'var(--rarity-rare)', story: 'Isole à 100% du bruit du monde extérieur.' }
+    ];
 
-      playRewardSound();
-      credits += 150;
-
-      // Animation du compteur de crédits
-      const creditEl = document.getElementById('creditVal');
-      const badgeEl = document.getElementById('currencyBadge');
+    /* ===================================================
+       3. ROUTEUR ET FILTRES
+       =================================================== */
+    function switchTab(screenId, btnEl) {
+      playSound('click');
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       
-      creditEl.innerText = credits.toLocaleString();
-      badgeEl.classList.add('bump');
-      setTimeout(() => badgeEl.classList.remove('bump'), 300);
+      document.getElementById(screenId).classList.add('active');
+      if (btnEl) btnEl.classList.add('active');
+    }
 
-      // Mise à jour du bouton
-      const btn = document.getElementById('claimBtn');
-      btn.classList.add('done');
-      btn.innerHTML = '<span>✓ RÉCOMPENSE RÉCUPÉRÉE</span>';
+    function renderCollection(filter = 'ALL') {
+      const grid = document.getElementById('collectionGrid');
+      grid.innerHTML = '';
+
+      itemsData.forEach(item => {
+        if (filter !== 'ALL' && item.cat !== filter) return;
+
+        const div = document.createElement('div');
+        div.className = 'collection-item';
+        div.onclick = () => openModal(item);
+        div.innerHTML = `
+          <div class="rarity-dot" style="background:${item.rarity};"></div>
+          <div class="emoji">${item.emoji}</div>
+          <div class="name">${item.name}</div>
+          <div class="num">${item.num}</div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+    renderCollection();
+
+    function filterCollection(cat, chip) {
+      playSound('click');
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderCollection(cat);
+    }
+
+    /* ===================================================
+       4. ANIMATION RÉVÉLATION LE DROP DU JOUR
+       =================================================== */
+    let dropDiscovered = false;
+
+    function triggerDropDiscovery() {
+      if (dropDiscovered) return;
+      playSound('drop');
+
+      const btn = document.getElementById('btnDiscover');
+      btn.innerText = 'RÉVÉLATION...';
+      btn.style.opacity = '0.5';
+
+      setTimeout(() => {
+        playSound('win');
+        dropDiscovered = true;
+        document.getElementById('heroEmoji').innerText = '🪩';
+        document.getElementById('heroName').innerText = 'Boule Disco 1979';
+        document.getElementById('heroQuote').innerText = '«« Épicentre d'une nuit sans fin. »»';
+        btn.innerText = 'DÉCOUVRE DANS TA COLLECTION';
+        btn.className = 'btn btn-secondary';
+        btn.style.opacity = '1';
+        btn.onclick = () => switchTab('scr-collection');
+
+        // Mettre à jour les crédits (+250)
+        let c = parseInt(document.getElementById('creditVal').innerText.replace(' ', '')) + 250;
+        document.getElementById('creditVal').innerText = c.toLocaleString();
+      }, 1000);
+    }
+
+    /* ===================================================
+       5. MINI-JEU MEMORY FONCTIONNEL
+       =================================================== */
+    const memoryEmojis = ['🥤', '📼', '🍩', '🎮', '🥤', '📼', '🍩', '🎮'];
+    let flippedCards = [];
+    let matchedPairs = 0;
+
+    function startMemoryGame() {
+      playSound('click');
+      document.getElementById('gameOverlay').style.display = 'none';
+      const board = document.getElementById('memoryBoard');
+      board.style.display = 'grid';
+      board.innerHTML = '';
+      flippedCards = [];
+      matchedPairs = 0;
+
+      // Shuffle
+      const shuffled = [...memoryEmojis].sort(() => Math.random() - 0.5);
+
+      shuffled.forEach((emoji, index) => {
+        const card = document.createElement('div');
+        card.className = 'memory-card';
+        card.dataset.emoji = emoji;
+        card.dataset.index = index;
+        card.onclick = () => flipMemoryCard(card);
+        board.appendChild(card);
+      });
+    }
+
+    function flipMemoryCard(card) {
+      if (flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+      playSound('click');
+      card.classList.add('flipped');
+      card.innerText = card.dataset.emoji;
+      flippedCards.push(card);
+
+      if (flippedCards.length === 2) {
+        if (flippedCards[0].dataset.emoji === flippedCards[1].dataset.emoji) {
+          setTimeout(() => {
+            playSound('win');
+            flippedCards[0].classList.add('matched');
+            flippedCards[1].classList.add('matched');
+            flippedCards = [];
+            matchedPairs++;
+
+            if (matchedPairs === 4) {
+              alert('VICTOIRE ! +100 DROP Credits gagnés !');
+              let c = parseInt(document.getElementById('creditVal').innerText.replace(' ', '')) + 100;
+              document.getElementById('creditVal').innerText = c.toLocaleString();
+              document.getElementById('gameOverlay').style.display = 'block';
+              document.getElementById('memoryBoard').style.display = 'none';
+            }
+          }, 300);
+        } else {
+          setTimeout(() => {
+            flippedCards[0].classList.remove('flipped');
+            flippedCards[0].innerText = '';
+            flippedCards[1].classList.remove('flipped');
+            flippedCards[1].innerText = '';
+            flippedCards = [];
+          }, 800);
+        }
+      }
+    }
+
+    /* ===================================================
+       6. MODAL FICHE OBJET
+       =================================================== */
+    function openModal(item) {
+      playSound('click');
+      document.getElementById('mEmoji').innerText = item.emoji;
+      document.getElementById('mNum').innerText = `OBJET ${item.num}`;
+      document.getElementById('mName').innerText = item.name;
+      document.getElementById('mStory').innerText = item.story;
+      document.getElementById('itemModal').classList.add('active');
+    }
+
+    function closeModal() {
+      playSound('click');
+      document.getElementById('itemModal').classList.remove('active');
     }
   </script>
 </body>
