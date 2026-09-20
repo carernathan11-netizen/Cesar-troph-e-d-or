@@ -1,601 +1,550 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CÉSAR — Le Trophée d'Or | Expérience Immersive</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOLDEN CLAW — La Pince des César</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0c10;
+      --card-bg: rgba(22, 24, 29, 0.85);
+      --gold: #d4af37;
+      --gold-light: #fff2a8;
+      --gold-glow: rgba(212, 175, 55, 0.35);
+      --text: #f5f5f7;
+      --text-muted: #8e8e93;
+      --border: rgba(255, 255, 255, 0.1);
+    }
 
-<!-- Fonts Google : SF Pro Look (Inter & Playfair Display) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
 
-<!-- Three.js pour le Trophée 3D en métal liquide -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
 
-<style>
-:root {
---bg-dark: #08080a;
---gold-primary: #d4af37;
---gold-light: #fff2a8;
---gold-glow: rgba(212, 175, 55, 0.25);
---glass-bg: rgba(255, 255, 255, 0.03);
---glass-border: rgba(255, 255, 255, 0.08);
---text-main: #f5f5f7;
---text-muted: #86868b;
-}
+    /* Ambient Glow Background */
+    .bg-glow {
+      position: fixed;
+      top: -10vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      height: 70vh;
+      background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(90px);
+    }
 
-* {
-box-sizing: border-box;
-margin: 0;
-padding: 0;
-user-select: none;
-}
+    /* Modal d'inscription */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
 
-body {
-background-color: var(--bg-dark);
-color: var(--text-main);
-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-overflow-x: hidden;
-min-height: 100vh;
-display: flex;
-flex-direction: column;
-align-items: center;
-}
+    .auth-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
 
-/* Ambient Glow Apple Style */
-.ambient-glow {
-position: fixed;
-top: -20vh;
-left: 50%;
-transform: translateX(-50%);
-width: 80vw;
-height: 60vh;
-background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
-pointer-events: none;
-z-index: 0;
-filter: blur(80px);
-}
+    .auth-card h1 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff, var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-/* Header Apple Glass */
-header {
-position: fixed;
-top: 20px;
-width: 90%;
-max-width: 1100px;
-padding: 12px 28px;
-background: var(--glass-bg);
-backdrop-filter: blur(20px);
--webkit-backdrop-filter: blur(20px);
-border: 1px solid var(--glass-border);
-border-radius: 40px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-z-index: 100;
-transition: all 0.3s ease;
-}
+    .auth-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+    }
 
-.logo {
-font-family: 'Playfair Display', serif;
-font-weight: 800;
-font-size: 1.1rem;
-letter-spacing: 2px;
-background: linear-gradient(135deg, #fff, var(--gold-primary));
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-}
+    .auth-input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      margin-bottom: 20px;
+      transition: border 0.3s;
+    }
 
-.audio-btn {
-background: rgba(212, 175, 55, 0.1);
-border: 1px solid rgba(212, 175, 55, 0.3);
-color: var(--gold-light);
-padding: 8px 18px;
-border-radius: 20px;
-font-size: 0.8rem;
-font-weight: 600;
-cursor: pointer;
-display: flex;
-align-items: center;
-gap: 8px;
-transition: all 0.3s ease;
-}
+    .auth-input:focus {
+      border-color: var(--gold);
+    }
 
-.audio-btn:hover {
-background: var(--gold-primary);
-color: #000;
-box-shadow: 0 0 15px var(--gold-glow);
-}
+    .btn-gold {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--gold), #b8860b);
+      color: #000;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
 
-/* Main Container */
-main {
-width: 100%;
-max-width: 1200px;
-margin-top: 100px;
-display: flex;
-flex-direction: column;
-align-items: center;
-z-index: 1;
-padding: 0 20px;
-}
+    .btn-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px var(--gold-glow);
+    }
 
-/* Hero Section */
-.hero {
-text-align: center;
-margin-top: 20px;
-}
+    /* Interface Principale du Jeu */
+    .game-wrapper {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      max-width: 480px;
+      padding: 20px;
+    }
 
-.hero-badge {
-display: inline-block;
-padding: 6px 16px;
-border-radius: 30px;
-background: rgba(255, 255, 255, 0.05);
-border: 1px solid var(--glass-border);
-font-size: 0.75rem;
-text-transform: uppercase;
-letter-spacing: 3px;
-color: var(--gold-primary);
-margin-bottom: 20px;
-}
+    .header-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
 
-.hero h1 {
-font-family: 'Playfair Display', serif;
-font-size: clamp(2.5rem, 6vw, 4.5rem);
-font-weight: 800;
-line-height: 1.1;
-margin-bottom: 15px;
-background: linear-gradient(180deg, #ffffff 30%, #a1a1a6 100%);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-}
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
 
-.hero p {
-color: var(--text-muted);
-font-size: 1.1rem;
-max-width: 600px;
-margin: 0 auto;
-font-weight: 300;
-}
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
 
-/* Canvas 3D Canvas Container */
-#canvas-container {
-width: 100%;
-height: 380px;
-position: relative;
-cursor: grab;
-}
+    .stat-val {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--gold-light);
+    }
 
-#canvas-container:active {
-cursor: grabbing;
-}
+    /* Canvas de la Pince Arcade */
+    #arcadeCanvas {
+      background: #111318;
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 20px rgba(212, 175, 55, 0.1);
+      width: 100%;
+      height: 420px;
+    }
 
-/* Game Card Box (Apple Glassmorphism) */
-.game-card {
-width: 100%;
-max-width: 750px;
-background: var(--glass-bg);
-backdrop-filter: blur(30px);
--webkit-backdrop-filter: blur(30px);
-border: 1px solid var(--glass-border);
-border-radius: 28px;
-padding: 35px;
-margin-bottom: 60px;
-box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
-position: relative;
-overflow: hidden;
-}
+    /* Panneau de Contrôle */
+    .controls-panel {
+      width: 100%;
+      display: flex;
+      gap: 10px;
+    }
 
-.game-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 25px;
-border-bottom: 1px solid var(--glass-border);
-padding-bottom: 15px;
-}
+    .btn-ctrl {
+      flex: 1;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
 
-.category-title {
-font-size: 0.85rem;
-text-transform: uppercase;
-letter-spacing: 2px;
-color: var(--gold-primary);
-font-weight: 600;
-}
+    .btn-ctrl:active {
+      background: rgba(212, 175, 55, 0.2);
+    }
 
-.score-badge {
-font-size: 0.9rem;
-font-weight: 700;
-color: var(--text-main);
-}
+    .btn-drop {
+      background: linear-gradient(135deg, var(--gold), #b8860b);
+      color: #000;
+      border: none;
+    }
 
-.synopsis-box {
-margin-bottom: 30px;
-}
+    .ad-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px dashed var(--gold);
+      color: var(--gold-light);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
-.synopsis-box h3 {
-font-family: 'Playfair Display', serif;
-font-size: 1.6rem;
-margin-bottom: 10px;
-}
+    /* Modal Pub simulée */
+    .ad-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+      text-align: center;
+    }
 
-.synopsis-box p {
-color: #c7c7cc;
-line-height: 1.6;
-font-size: 1rem;
-}
+    .ad-box {
+      border: 1px solid var(--border);
+      padding: 30px;
+      border-radius: 20px;
+      background: #181920;
+      max-width: 350px;
+    }
 
-.options-grid {
-display: grid;
-grid-template-columns: 1fr;
-gap: 12px;
-}
-
-.option-btn {
-background: rgba(255, 255, 255, 0.03);
-border: 1px solid var(--glass-border);
-padding: 16px 20px;
-border-radius: 16px;
-color: var(--text-main);
-font-size: 0.95rem;
-text-align: left;
-cursor: pointer;
-transition: all 0.25s ease;
-display: flex;
-align-items: center;
-justify-content: space-between;
-}
-
-.option-btn:hover {
-background: rgba(212, 175, 55, 0.1);
-border-color: var(--gold-primary);
-transform: translateY(-2px);
-}
-
-.option-btn.correct {
-background: rgba(46, 204, 113, 0.2) !important;
-border-color: #2ecc71 !important;
-color: #2ecc71;
-}
-
-.option-btn.wrong {
-background: rgba(231, 76, 60, 0.2) !important;
-border-color: #e74c3c !important;
-color: #e74c3c;
-}
-
-/* Result Screen overlay */
-.result-screen {
-display: none;
-text-align: center;
-padding: 20px 0;
-}
-
-.result-screen h2 {
-font-family: 'Playfair Display', serif;
-font-size: 2.2rem;
-color: var(--gold-light);
-margin-bottom: 15px;
-}
-
-.restart-btn {
-background: linear-gradient(135deg, var(--gold-primary), #b8860b);
-color: #000;
-font-weight: 700;
-border: none;
-padding: 14px 32px;
-border-radius: 30px;
-cursor: pointer;
-margin-top: 25px;
-font-size: 1rem;
-transition: all 0.3s ease;
-}
-
-.restart-btn:hover {
-transform: scale(1.05);
-box-shadow: 0 0 25px var(--gold-glow);
-}
-
-footer {
-color: var(--text-muted);
-font-size: 0.8rem;
-margin-bottom: 30px;
-text-align: center;
-}
-</style>
+    .ad-timer {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--gold);
+      margin: 20px 0;
+    }
+  </style>
 </head>
 <body>
 
-<div class="ambient-glow"></div>
+  <div class="bg-glow"></div>
 
-<!-- Header Floating Bar -->
-<header>
-<div class="logo">ACADÉMIE CÉSAR</div>
-<button class="audio-btn" id="audioToggle">
-<span>🎵</span> <span id="audioText">Activer l'ambiance</span>
-</button>
-</header>
+  <!-- Ecran d'inscription Email -->
+  <div class="auth-overlay" id="authModal">
+    <div class="auth-card">
+      <h1>CÉSAR CLAW</h1>
+      <p>Entrez votre e-mail pour recevoir 10 crédits cadeaux et accéder à la pince.</p>
+      <form onsubmit="handleAuth(event)">
+        <input type="email" id="userEmail" class="auth-input" placeholder="nom@exemple.com" required>
+        <button type="submit" class="btn-gold">Recevoir 10 Crédits</button>
+      </form>
+    </div>
+  </div>
 
-<main>
-<!-- Hero Section -->
-<div class="hero">
-<div class="hero-badge">Jury Officiel 2026</div>
-<h1>Attribuez le Trophée d'Or</h1>
-<p>Passez au cribles les pitchs de l'année. Analysez les scénarios, devinez le gagnant et remportez le Trophée des César.</p>
-</div>
+  <!-- Modal Pub Interstitielle (Simulée) -->
+  <div class="ad-overlay" id="adModal">
+    <div class="ad-box">
+      <div style="font-size: 0.75rem; color: var(--text-muted); letter-spacing: 2px;">SPONSOR PUBLICITAIRE</div>
+      <h2 style="margin-top: 10px; color: #fff;">Académie des César 2026</h2>
+      <p style="font-size: 0.85rem; color: #aaa; margin-top: 5px;">Regardez cette vidéo pour débloquer +5 Crédits de jeu.</p>
+      <div class="ad-timer" id="adTimer">30</div>
+      <p style="font-size: 0.75rem; color: var(--text-muted);">Récompense créditée automatiquement à la fin du décompte.</p>
+    </div>
+  </div>
 
-<!-- Interactive 3D Trophy (Three.js Container) -->
-<div id="canvas-container"></div>
+  <!-- Zone de Jeu -->
+  <div class="game-wrapper">
+    <div class="header-bar">
+      <div class="stat-box">
+        <span class="stat-label">Joueur</span>
+        <span class="stat-val" id="displayMail" style="font-size: 0.85rem;">-</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Score</span>
+        <span class="stat-val" id="scoreVal">0 pts</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Crédits</span>
+        <span class="stat-val" id="creditsVal">0</span>
+      </div>
+    </div>
 
-<!-- Interactive Game Box -->
-<div class="game-card">
-<div id="game-content">
-<div class="game-header">
-<span class="category-title" id="cat-title">Catégorie : Meilleur Scénario Original</span>
-<span class="score-badge" id="score-count">Score : 0 / 3</span>
-</div>
+    <!-- Canvas Arcade -->
+    <canvas id="arcadeCanvas" width="400" height="420"></canvas>
 
-<div class="synopsis-box">
-<h3 id="film-title">"Chargement..."</h3>
-<p id="film-desc">Chargement des fichiers de l'Académie...</p>
-</div>
+    <!-- Contrôles -->
+    <div class="controls-panel">
+      <button class="btn-ctrl" onclick="moveClaw(-15)">◄</button>
+      <button class="btn-ctrl btn-drop" onclick="dropClaw()">LANCER</button>
+      <button class="btn-ctrl" onclick="moveClaw(15)">►</button>
+    </div>
 
-<div class="options-grid" id="options-container">
-<!-- Dynamically inserted options -->
-</div>
-</div>
+    <button class="ad-btn" onclick="watchAd()">
+      <span>🎬</span> Regarder une pub (+5 Crédits)
+    </button>
+  </div>
 
-<!-- Final Screen -->
-<div class="result-screen" id="result-screen">
-<h2>Délibération Terminée</h2>
-<p id="final-verdict">Vous avez prouvé votre instinct de grand cinéphile.</p>
-<button class="restart-btn" onclick="restartGame()">Relancer la Cérémonie</button>
-</div>
-</div>
-</main>
+  <script>
+    /* ===================================================
+       1. GESTION DES ETATS ET CREDITS
+       =================================================== */
+    let credits = 0;
+    let score = 0;
+    let email = "";
+    let audioCtx = null;
 
-<footer>
-<p>Conçu pour Vercel • Métal Liquide WebGL & Web Audio API</p>
-</footer>
+    function handleAuth(e) {
+      e.preventDefault();
+      email = document.getElementById('userEmail').value;
+      credits = 10;
+      document.getElementById('displayMail').innerText = email.split('@')[0];
+      document.getElementById('creditsVal').innerText = credits;
+      document.getElementById('authModal').style.display = 'none';
+      initAudio();
+      playBgMusic();
+    }
 
-<script>
-/* ===================================================
-1. DEEP CINEMATIC AUDIO (Web Audio API - Synthesizer)
-=================================================== */
-let audioCtx = null;
-let isPlaying = false;
-let osc1, osc2, gainNode;
+    function watchAd() {
+      const modal = document.getElementById('adModal');
+      const timerEl = document.getElementById('adTimer');
+      modal.style.display = 'flex';
+      let left = 30;
+      timerEl.innerText = left;
 
-function initAudio() {
-if (audioCtx) return;
-audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const interval = setInterval(() => {
+        left--;
+        timerEl.innerText = left;
+        if (left <= 0) {
+          clearInterval(interval);
+          modal.style.display = 'none';
+          credits += 5;
+          document.getElementById('creditsVal').innerText = credits;
+          playWinSound();
+        }
+      }, 1000);
+    }
 
-// Oscillators pour un son de nappes spatiales / Zimmer
-osc1 = audioCtx.createOscillator();
-osc2 = audioCtx.createOscillator();
-gainNode = audioCtx.createGain();
+    /* ===================================================
+       2. SYSTEME AUDIO SYNTHETIQUE (Web Audio API)
+       =================================================== */
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
 
-osc1.type = 'sine';
-osc1.frequency.setValueAtTime(110, audioCtx.currentTime); // A2 Note
+    function playBgMusic() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(130, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+    }
 
-osc2.type = 'triangle';
-osc2.frequency.setValueAtTime(164.81, audioCtx.currentTime); // E3 Note
+    function playWinSound() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.4); // C6
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(now + 0.4);
+    }
 
-// LFO pour l'effet de respiration fluide
-const lfo = audioCtx.createOscillator();
-const lfoGain = audioCtx.createGain();
-lfo.frequency.value = 0.2; // Très lent
-lfoGain.gain.value = 0.05;
-lfo.connect(gainNode.gain);
-lfo.start();
+    function playLoseSound() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.linearRampToValueAtTime(110, now + 0.5);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(now + 0.5);
+    }
 
-gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    /* ===================================================
+       3. MOTEUR DE JEU CANVAS 2D (LA PINCE A TROPHEES)
+       =================================================== */
+    const canvas = document.getElementById('arcadeCanvas');
+    const ctx = canvas.getContext('2d');
 
-osc1.connect(gainNode);
-osc2.connect(gainNode);
-gainNode.connect(audioCtx.destination);
+    let clawX = canvas.width / 2;
+    let clawY = 40;
+    let clawState = 'idle'; // 'idle', 'dropping', 'grabbing', 'returning'
+    let grabbedItem = null;
 
-osc1.start();
-osc2.start();
-}
+    // Trophées positionnés au fond de la machine
+    const trophies = [
+      { x: 60, y: 370, radius: 18, points: 10, color: '#d4af37' },
+      { x: 130, y: 375, radius: 15, points: 20, color: '#fff2a8' },
+      { x: 200, y: 370, radius: 22, points: 5,  color: '#cd7f32' },
+      { x: 270, y: 375, radius: 16, points: 15, color: '#d4af37' },
+      { x: 340, y: 370, radius: 20, points: 50, color: '#e5e4e2' }
+    ];
 
-const audioBtn = document.getElementById('audioToggle');
-const audioText = document.getElementById('audioText');
+    function moveClaw(dir) {
+      if (clawState !== 'idle') return;
+      clawX += dir;
+      if (clawX < 40) clawX = 40;
+      if (clawX > canvas.width - 40) clawX = canvas.width - 40;
+    }
 
-audioBtn.addEventListener('click', () => {
-if (!audioCtx) initAudio();
+    function dropClaw() {
+      if (clawState !== 'idle') return;
+      if (credits <= 0) {
+        alert("Crédits insuffisants ! Regardez une pub pour recharger.");
+        return;
+      }
+      credits--;
+      document.getElementById('creditsVal').innerText = credits;
+      clawState = 'dropping';
+    }
 
-if (isPlaying) {
-audioCtx.suspend();
-audioText.innerText = "Activer l'ambiance";
-isPlaying = false;
-} else {
-audioCtx.resume();
-audioText.innerText = "Désactiver l'ambiance";
-isPlaying = true;
-}
-});
+    function updateGame() {
+      // Logique de descente/remontée de la pince
+      if (clawState === 'dropping') {
+        clawY += 4;
+        if (clawY >= 340) {
+          clawState = 'grabbing';
+          // Détections de collision avec les trophées
+          trophies.forEach(t => {
+            if (Math.abs(t.x - clawX) < 25 && !grabbedItem) {
+              grabbedItem = t;
+            }
+          });
+          setTimeout(() => { clawState = 'returning'; }, 500);
+        }
+      } else if (clawState === 'returning') {
+        clawY -= 3;
+        if (grabbedItem) {
+          grabbedItem.y = clawY + 25;
+          grabbedItem.x = clawX;
+        }
+        if (clawY <= 40) {
+          clawState = 'idle';
+          if (grabbedItem) {
+            // Chance de faire tomber le trophée en haut (suspense)
+            if (Math.random() > 0.25) {
+              score += grabbedItem.points;
+              document.getElementById('scoreVal').innerText = score + " pts";
+              playWinSound();
+              // Réinitialisation du trophée au sol
+              grabbedItem.y = 370;
+              grabbedItem.x = Math.random() * 300 + 50;
+            } else {
+              playLoseSound();
+              grabbedItem.y = 370;
+            }
+            grabbedItem = null;
+          } else {
+            playLoseSound();
+          }
+        }
+      }
 
-/* ===================================================
-2. THREE.JS : TROPHÉE EN MÉTAL LIQUIDE D'OR 3D
-=================================================== */
-const container = document.getElementById('canvas-container');
-const scene = new THREE.Scene();
+      render();
+      requestAnimationFrame(updateGame);
+    }
 
-const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-camera.position.z = 6;
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-container.appendChild(renderer.domElement);
+      // Dessin des trophées
+      trophies.forEach(t => {
+        ctx.save();
+        ctx.fillStyle = t.color;
+        ctx.beginPath();
+        // Socle
+        ctx.fillRect(t.x - 10, t.y, 20, 10);
+        // Corps du Trophée
+        ctx.arc(t.x, t.y - 10, t.radius / 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
 
-// Geometry : Forme abstraite cubique/organique style Trophée des César
-const geometry = new THREE.BoxGeometry(1.6, 2.6, 1.2, 32, 32, 32);
+      // Dessin du câble
+      ctx.strokeStyle = '#8e8e93';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(clawX, 0);
+      ctx.lineTo(clawX, clawY);
+      ctx.stroke();
 
-// Material : Métal liquide or brillant avec reflets
-const material = new THREE.MeshPhysicalMaterial({
-color: 0xd4af37,
-metalness: 0.95,
-roughness: 0.15,
-clearcoat: 1.0,
-clearcoatRoughness: 0.1,
-reflectivity: 1.0
-});
+      // Dessin de la Pince en Métal
+      ctx.save();
+      ctx.translate(clawX, clawY);
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 5;
 
-const trophy = new THREE.Mesh(geometry, material);
-scene.add(trophy);
+      // Tête de la pince
+      ctx.fillStyle = '#222';
+      ctx.fillRect(-15, -10, 30, 15);
 
-// Lumières de studio type Keynote Apple
-const light1 = new THREE.DirectionalLight(0xfff5cc, 3);
-light1.position.set(5, 5, 5);
-scene.add(light1);
+      // Bras gauche et droit
+      const openAngle = (clawState === 'grabbing') ? 0.2 : 0.6;
+      
+      // Bras gauche
+      ctx.beginPath();
+      ctx.moveTo(-10, 5);
+      ctx.lineTo(-25 * Math.cos(openAngle), 25 * Math.sin(openAngle));
+      ctx.stroke();
 
-const light2 = new THREE.DirectionalLight(0xffaa00, 2);
-light2.position.set(-5, -5, -2);
-scene.add(light2);
+      // Bras droit
+      ctx.beginPath();
+      ctx.moveTo(10, 5);
+      ctx.lineTo(25 * Math.cos(openAngle), 25 * Math.sin(openAngle));
+      ctx.stroke();
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-scene.add(ambientLight);
+      ctx.restore();
+    }
 
-// Animation liquide (déformation ondulante de la géométrie)
-const clock = new THREE.Clock();
-const count = geometry.attributes.position.count;
-const initialPositions = geometry.attributes.position.clone();
-
-function animate() {
-requestAnimationFrame(animate);
-const elapsedTime = clock.getElapsedTime();
-
-// Rotation fluide
-trophy.rotation.y = elapsedTime * 0.4;
-trophy.rotation.x = Math.sin(elapsedTime * 0.3) * 0.1;
-
-// Effet Métal Liquide Ondulant
-const positionAttribute = geometry.attributes.position;
-for (let i = 0; i < count; i++) {
-const x = initialPositions.getX(i);
-const y = initialPositions.getY(i);
-const z = initialPositions.getZ(i);
-
-const wave = Math.sin(elapsedTime * 2 + y * 2) * 0.04;
-positionAttribute.setXYZ(i, x + wave, y + wave, z + wave);
-}
-geometry.computeVertexNormals();
-positionAttribute.needsUpdate = true;
-
-renderer.render(scene, camera);
-}
-
-animate();
-
-// Redimensionnement fluide
-window.addEventListener('resize', () => {
-camera.aspect = container.clientWidth / container.clientHeight;
-camera.updateProjectionMatrix();
-renderer.setSize(container.clientWidth, container.clientHeight);
-});
-
-/* ===================================================
-3. GAME LOGIC : LE JURY DES CÉSAR
-=================================================== */
-const questions = [
-{
-category: "Meilleur Scénario Original",
-title: "Un drame intime & mystérieux",
-synopsis: "Un homme retrouve une lettre scellée datant de 15 ans écrite par son propre père disparu. Elle contient les coordonnées précises d'un lieu en Bretagne où un secret va bouleverser son existence.",
-options: [
-{ text: "Attribuer le César du Meilleur Scénario", correct: true },
-{ text: "Rejeter pour manque de suspense", correct: false },
-{ text: "Classer en Comédie Dramatique", correct: false }
- ]
-},
-{
-category: "Meilleure Réalisation",
-title: "Une expérience visuelle en plan-séquence",
-synopsis: "Un film entièrement tourné dans une nuit d'orage, où la caméra suit sans couper 4 personnages dont les destins s'entrecroisent dans un théâtre historique.",
-options: [
-{ text: "Nominé pour la Casserole d'Or", correct: false },
-{ text: "Attribuer le César de la Meilleure Réalisation", correct: true },
-{ text: "Couper au montage", correct: false }
- ]
-},
-{
-category: "Révélation Masculine",
-title: "Une interprétation magistrale",
-synopsis: "Un jeune comédien incarne un rôle complexe d'artiste incompris, mêlant intensité dramatique, silences poignants et présence scénique saisissante.",
-options: [
-{ text: "Inscrire pour le César de la Révélation", correct: true },
-{ text: "Attribuer le rôle à une doublure", correct: false },
-{ text: "Passer au projet suivant", correct: false }
- ]
-}
-];
-
-let currentQ = 0;
-let score = 0;
-
-function loadQuestion() {
-const q = questions[currentQ];
-document.getElementById('cat-title').innerText = Catégorie : ${q.category}; document.getElementById('score-count').innerText =Score : ${score} / ${questions.length}`;
-document.getElementById('film-title').innerText = q.title;
-document.getElementById('film-desc').innerText = q.synopsis;
-
-const optsContainer = document.getElementById('options-container');
-optsContainer.innerHTML = '';
-
-q.options.forEach((opt) => {
-const btn = document.createElement('button');
-btn.className = 'option-btn';
-btn.innerHTML = <span&gt;${opt.text}</span> <span>→</span>`;
-btn.onclick = () => selectOption(btn, opt.correct);
-optsContainer.appendChild(btn);
-});
-}
-
-function selectOption(btn, isCorrect) {
-const allBtns = document.querySelectorAll('.option-btn');
-allBtns.forEach(b => b.style.pointerEvents = 'none');
-
-if (isCorrect) {
-btn.classList.add('correct');
-score++;
-} else {
-btn.classList.add('wrong');
-}
-
-setTimeout(() => {
-currentQ++;
-if (currentQ < questions.length) {
-loadQuestion();
-} else {
-showResults();
-}
-}, 1200);
-}
-
-function showResults() {
-document.getElementById('game-content').style.display = 'none';
-const resScreen = document.getElementById('result-screen');
-resScreen.style.display = 'block';
-
-const verdict = document.getElementById('final-verdict');
-if (score === questions.length) {
-verdict.innerText = "Score Parfait ! L'Académie vous décerne le titre de Grand Président du Jury des César 2026.";
-} else {
-verdict.innerText = Vous avez obtenu ${score} sur ${questions.length}. Votre vision cinématographique a marqué la cérémonie !;
-}
-}
-
-function restartGame() {
-currentQ = 0;
-score = 0;
-document.getElementById('game-content').style.display = 'block';
-document.getElementById('result-screen').style.display = 'none';
-loadQuestion();
-}
-
-// Lancement du jeu
-loadQuestion();
-</script>
+    // Lancement de la boucle de rendu
+    requestAnimationFrame(updateGame);
+  </script>
 </body>
 </html>
+ 
