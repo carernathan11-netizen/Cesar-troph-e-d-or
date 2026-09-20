@@ -49,7 +49,6 @@
       overflow: hidden;
     }
 
-    /* App Shell Mobile First */
     .app-viewport {
       width: 100%;
       max-width: 420px;
@@ -71,7 +70,7 @@
       }
     }
 
-    /* Header HUD */
+    /* HUD Header */
     .hud-header {
       padding: 16px 20px;
       display: flex;
@@ -126,7 +125,6 @@
       border-color: rgba(255, 184, 0, 0.3);
     }
 
-    /* Container de Vues */
     .screen-container {
       flex: 1;
       position: relative;
@@ -147,7 +145,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Cards & Elements Visuels */
     .drop-card {
       background: var(--surface-dark);
       border: 1px solid var(--card-border);
@@ -170,7 +167,6 @@
       align-items: center;
     }
 
-    /* Hero Drop Card */
     .hero-drop {
       background: radial-gradient(circle at 50% 30%, rgba(112, 0, 255, 0.25) 0%, rgba(18, 20, 29, 0.95) 70%);
       border: 1px solid rgba(112, 0, 255, 0.4);
@@ -224,7 +220,6 @@
       margin-bottom: 20px;
     }
 
-    /* Buttons */
     .btn {
       width: 100%;
       padding: 16px;
@@ -253,7 +248,6 @@
       border: 1px solid var(--card-border);
     }
 
-    /* Grilles et Filtres */
     .filter-scroll {
       display: flex;
       gap: 8px;
@@ -284,7 +278,6 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
-    /* Vignettes de Collection */
     .collection-item {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--card-border);
@@ -312,7 +305,7 @@
       right: 10px;
     }
 
-    /* Mini-jeu Memory Styles */
+    /* Styles Mini-jeux */
     .memory-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -329,15 +322,54 @@
       justify-content: center;
       font-size: 1.8rem;
       cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
     }
-    .memory-card.flipped {
-      background: rgba(0, 240, 255, 0.15);
-      border-color: var(--cyan);
+    .memory-card.flipped { background: rgba(0, 240, 255, 0.15); border-color: var(--cyan); }
+    .memory-card.matched { background: rgba(5, 255, 161, 0.15); border-color: var(--lime); }
+
+    /* Arena Stack */
+    .stack-arena {
+      height: 220px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      padding-bottom: 10px;
     }
-    .memory-card.matched {
-      background: rgba(5, 255, 161, 0.15);
-      border-color: var(--lime);
+    .stack-block {
+      height: 24px;
+      background: linear-gradient(90deg, var(--cyan), var(--violet));
+      border-radius: 6px;
+      position: absolute;
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    /* Arena Reaction */
+    .reaction-bar-bg {
+      height: 24px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      position: relative;
+      margin: 25px 0;
+      overflow: hidden;
+    }
+    .reaction-target {
+      position: absolute;
+      left: 45%; width: 10%; height: 100%;
+      background: rgba(5, 255, 161, 0.4);
+      border-left: 2px solid var(--lime);
+      border-right: 2px solid var(--lime);
+    }
+    .reaction-pointer {
+      width: 6px; height: 100%;
+      background: #fff;
+      position: absolute;
+      left: 0;
+      box-shadow: 0 0 10px #fff;
     }
 
     /* Musée Personal Room View */
@@ -369,6 +401,21 @@
       font-size: 2.2rem;
       filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
     }
+
+    /* Formulaires Auth */
+    .auth-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .auth-input:focus { border-color: var(--cyan); }
 
     /* Navigation Dock */
     .nav-dock {
@@ -448,7 +495,7 @@
     <!-- Ecran Router -->
     <main class="screen-container">
 
-      <!-- SCREEN 1: HOME (LE DROP DU JOUR) -->
+      <!-- SCREEN 1: HOME -->
       <section id="scr-home" class="screen active">
         <div class="drop-card hero-drop">
           <div class="card-title">
@@ -471,45 +518,67 @@
             <span>DÉFI QUOTIDIEN</span>
             <span style="color:var(--gold);">+100 🪙</span>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <div style="font-weight:800; font-size:0.9rem;">Master du Memory</div>
-              <div style="font-size:0.75rem; color:var(--text-muted);">Réalise un sans-faute en moins de 30s</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Réalise un sans-faute</div>
             </div>
             <button class="btn btn-secondary" style="width:auto; padding:8px 14px; font-size:0.75rem;" onclick="switchTab('scr-games')">JOUER</button>
           </div>
         </div>
       </section>
 
-      <!-- SCREEN 2: MINI-JEUX (MEMORY PLAYABLE) -->
+      <!-- SCREEN 2: MINI-JEUX -->
       <section id="scr-games" class="screen">
+        
+        <!-- MODULE MEMORY -->
         <div class="drop-card">
           <div class="card-title">
             <span>MINI-JEU • MEMORY</span>
-            <span style="color:var(--cyan);" id="gameTimer">00:30</span>
+            <span style="color:var(--cyan);">+100 🪙</span>
           </div>
-
-          <div id="gameOverlay" style="text-align:center; padding:10px 0;">
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Retrouve les paires d'objets pour gagner des DROP Credits.</p>
-            <button class="btn" onclick="startMemoryGame()">LANCER LA PARTIE</button>
+          <div id="memoryOverlay" style="text-align:center;">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Retrouve les paires d'objets.</p>
+            <button class="btn" onclick="startMemoryGame()">LANCER MEMORY</button>
           </div>
-
           <div class="memory-grid" id="memoryBoard" style="display:none;"></div>
         </div>
 
+        <!-- MODULE STACK -->
         <div class="drop-card">
-          <div class="card-title">AUTRES MODULES DE JEU</div>
-          <div class="grid-2">
-            <div class="collection-item" onclick="playSound('click'); alert('Module STACK bientôt disponible dans la Saison 01 !')">
-              <div class="emoji">📦</div>
-              <div class="name">STACK</div>
-            </div>
-            <div class="collection-item" onclick="playSound('click'); alert('Module REACTION bientôt disponible !')">
-              <div class="emoji">⚡</div>
-              <div class="name">REACTION</div>
-            </div>
+          <div class="card-title">
+            <span>MINI-JEU • STACK</span>
+            <span style="color:var(--cyan);">+150 🪙</span>
+          </div>
+          <div id="stackOverlay" style="text-align:center;">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Empile les blocs au bon moment.</p>
+            <button class="btn" onclick="startStackGame()">LANCER STACK</button>
+          </div>
+          <div id="stackGameArea" style="display:none;">
+            <div class="stack-arena" id="stackArena"></div>
+            <button class="btn" style="margin-top:10px;" onclick="placeStackBlock()">EMPILER !</button>
           </div>
         </div>
+
+        <!-- MODULE REACTION -->
+        <div class="drop-card">
+          <div class="card-title">
+            <span>MINI-JEU • REACTION</span>
+            <span style="color:var(--cyan);">+120 🪙</span>
+          </div>
+          <div id="reactionOverlay" style="text-align:center;">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Stoppe le pointeur dans la zone verte.</p>
+            <button class="btn" onclick="startReactionGame()">LANCER REACTION</button>
+          </div>
+          <div id="reactionGameArea" style="display:none; text-align:center;">
+            <div class="reaction-bar-bg">
+              <div class="reaction-target"></div>
+              <div class="reaction-pointer" id="reactionPointer"></div>
+            </div>
+            <button class="btn" onclick="stopReaction()">STOP !</button>
+          </div>
+        </div>
+
       </section>
 
       <!-- SCREEN 3: COLLECTION -->
@@ -530,7 +599,7 @@
         <div class="grid-3" id="collectionGrid"></div>
       </section>
 
-      <!-- SCREEN 4: MY DROP (LE MUSÉE) -->
+      <!-- SCREEN 4: MY DROP -->
       <section id="scr-mydrop" class="screen">
         <div class="drop-card">
           <div class="card-title">
@@ -551,20 +620,20 @@
           </div>
 
           <div style="margin-top:16px; display:flex; gap:10px;">
-            <button class="btn btn-secondary" style="font-size:0.8rem;" onclick="playSound('click'); alert('Personnalisation du sol et de l\'éclairage mise à jour !')">🎨 DÉCORER</button>
-            <button class="btn btn-secondary" style="font-size:0.8rem;" onclick="playSound('click'); alert('Lien de votre galerie publique copié dans le presse-papier !')">🔗 PARTAGER</button>
+            <button class="btn btn-secondary" style="font-size:0.8rem;" onclick="playSound('click'); alert('Décoration enregistrée !')">🎨 DÉCORER</button>
+            <button class="btn btn-secondary" style="font-size:0.8rem;" onclick="playSound('click'); alert('Lien copié !')">🔗 PARTAGER</button>
           </div>
         </div>
       </section>
 
-      <!-- SCREEN 5: PROFIL -->
+      <!-- SCREEN 5: PROFIL / SYNCHRO CLOUD -->
       <section id="scr-profile" class="screen">
         <div class="drop-card" style="text-align:center;">
-          <div style="width:70px; height:70px; background:linear-gradient(135deg, var(--cyan), var(--violet)); border-radius:24px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:900;">N</div>
-          <h3 style="font-family:'Space Grotesk'; font-size:1.2rem;">Nathan CARER</h3>
-          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;">LIGUE DIAMOND • MEMBRE DEPUIS LA SAISON 01</p>
+          <div style="width:70px; height:70px; background:linear-gradient(135deg, var(--cyan), var(--violet)); border-radius:24px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:900;" id="profAvatar">N</div>
+          <h3 style="font-family:'Space Grotesk'; font-size:1.2rem;" id="profName">Joueur Invité</h3>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:16px;" id="profStatus">COMPTE LOCAL (NON SAUVEGARDÉ EN LIGNE)</p>
 
-          <div class="grid-2" style="text-align:left;">
+          <div class="grid-2" style="text-align:left; margin-bottom:16px;">
             <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:16px;">
               <div style="font-size:0.7rem; color:var(--text-muted);">Objets Totaux</div>
               <div style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900; color:var(--cyan);">248</div>
@@ -574,6 +643,18 @@
               <div style="font-family:'Space Grotesk'; font-size:1.1rem; font-weight:900; color:var(--lime);">14</div>
             </div>
           </div>
+        </div>
+
+        <!-- SYNCHRO / LOGIN CARD -->
+        <div class="drop-card" id="authSection">
+          <div class="card-title">
+            <span>SYNCHRONISATION MULTI-APPAREILS</span>
+          </div>
+          <form onsubmit="handleAuth(event)">
+            <input type="email" id="authEmail" class="auth-input" placeholder="Ton e-mail" required>
+            <input type="password" id="authPass" class="auth-input" placeholder="Ton mot de passe" required>
+            <button type="submit" class="btn" style="margin-top:6px;">SE CONNECTER / S'INSCRIRE</button>
+          </form>
         </div>
       </section>
 
@@ -609,7 +690,7 @@
         <div style="font-size:4rem; margin-bottom:10px;" id="mEmoji">📼</div>
         <div class="item-number" id="mNum">OBJET #012</div>
         <div class="item-name" id="mName">Cassette VHS Rétro</div>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin:10px 0 20px;" id="mStory">Contient un enregistrement amateur d'une fête de l'an 2000. Le ruban saute un peu à la minute 14.</p>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin:10px 0 20px;" id="mStory">Contient un enregistrement amateur d'une fête de l'an 2000.</p>
         <button class="btn" onclick="closeModal()">FERMER</button>
       </div>
     </div>
@@ -617,53 +698,112 @@
   </div>
 
   <script>
-    /* 1. MOTEUR AUDIO (Web Audio API) */
+    /* 1. MOTEUR AUDIO */
     let audioCtx = null;
-
     function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-
     function playSound(type) {
       try {
         initAudio();
         if (!audioCtx) return;
-
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        osc.connect(gain); gain.connect(audioCtx.destination);
 
         if (type === 'click') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
           gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
           osc.start(); osc.stop(audioCtx.currentTime + 0.05);
         } else if (type === 'drop') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(200, audioCtx.currentTime);
           osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.3);
           gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
           osc.start(); osc.stop(audioCtx.currentTime + 0.3);
         } else if (type === 'win') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(523, audioCtx.currentTime);
           osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
           osc.frequency.setValueAtTime(783, audioCtx.currentTime + 0.2);
           gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
           osc.start(); osc.stop(audioCtx.currentTime + 0.4);
         }
-      } catch (e) {
-        console.log('Audio pas encore activé par geste utilisateur');
+      } catch (e) {}
+    }
+
+    /* 2. SYSTÈME DE SAUVEGARDE AUTO ET COMPTE EN LIGNE */
+    let gameState = {
+      credits: 2840,
+      level: 17,
+      dropDiscovered: false,
+      userEmail: null
+    };
+
+    function saveState() {
+      localStorage.setItem('drop_gamestate', JSON.stringify(gameState));
+      if (gameState.userEmail) {
+        // Enregistre également la sauvegarde par e-mail dans la base locale (simulation cloud)
+        localStorage.setItem('drop_cloud_' + gameState.userEmail, JSON.stringify(gameState));
       }
     }
 
-    /* 2. CATALOGUE DONNÉES */
+    function loadState() {
+      const saved = localStorage.getItem('drop_gamestate');
+      if (saved) {
+        gameState = Object.assign(gameState, JSON.parse(saved));
+        updateUI();
+      }
+    }
+
+    function updateUI() {
+      document.getElementById('creditVal').innerText = gameState.credits.toLocaleString('fr-FR');
+      document.getElementById('lvlVal').innerText = gameState.level;
+
+      if (gameState.dropDiscovered) {
+        document.getElementById('heroEmoji').innerText = '🪩';
+        document.getElementById('heroName').innerText = 'Boule Disco 1979';
+        document.getElementById('heroQuote').innerText = '«« Épicentre d\'une nuit sans fin. »»';
+        const btn = document.getElementById('btnDiscover');
+        btn.innerText = 'VOIR DANS LA COLLECTION';
+        btn.className = 'btn btn-secondary';
+        btn.onclick = () => switchTab('scr-collection');
+      }
+
+      if (gameState.userEmail) {
+        document.getElementById('profName').innerText = gameState.userEmail.split('@')[0];
+        document.getElementById('profAvatar').innerText = gameState.userEmail.charAt(0).toUpperCase();
+        document.getElementById('profStatus').innerText = 'COMPTE SYNCHRONISÉ EN LIGNE';
+        document.getElementById('authSection').style.display = 'none';
+      }
+    }
+
+    function addCredits(amount) {
+      gameState.credits += amount;
+      updateUI();
+      saveState();
+    }
+
+    function handleAuth(e) {
+      e.preventDefault();
+      playSound('win');
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
+      
+      // Recherche si des données existent déjà pour cet e-mail
+      const cloudData = localStorage.getItem('drop_cloud_' + email);
+      if (cloudData) {
+        gameState = JSON.parse(cloudData);
+        alert('Compte synchronisé ! Tes données ont été restaurées sur cet appareil.');
+      } else {
+        gameState.userEmail = email;
+        alert('Compte créé ! Tes données sont désormais sauvegardées sous cet e-mail.');
+      }
+      saveState();
+      updateUI();
+    }
+
+    /* 3. CATALOGUE */
     const itemsData = [
       { num: '#001', name: 'Canette Rétro', cat: 'FOOD', emoji: '🥤', rarity: 'var(--rarity-common)', story: 'Encore pétillante après 30 ans passés dans un grenier.' },
       { num: '#012', name: 'Cassette VHS', cat: 'RETRO', emoji: '📼', rarity: 'var(--rarity-rare)', story: 'Bande magnétique usée. Contient un anniversaire de 1998.' },
@@ -675,33 +815,19 @@
       { num: '#412', name: 'Casque Studio', cat: 'TECH', emoji: '🎧', rarity: 'var(--rarity-rare)', story: 'Isole à 100% du bruit du monde extérieur.' }
     ];
 
-    /* 3. NAVIGATION ET RENDU */
     function switchTab(screenId, btnEl) {
       playSound('click');
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      
       document.getElementById(screenId).classList.add('active');
-      if (btnEl) {
-        btnEl.classList.add('active');
-      } else {
-        // Sélectionne le bouton correspondant si appelé depuis le code
-        const navBtns = document.querySelectorAll('.nav-item');
-        if (screenId === 'scr-home') navBtns[0].classList.add('active');
-        if (screenId === 'scr-games') navBtns[1].classList.add('active');
-        if (screenId === 'scr-collection') navBtns[2].classList.add('active');
-        if (screenId === 'scr-mydrop') navBtns[3].classList.add('active');
-        if (screenId === 'scr-profile') navBtns[4].classList.add('active');
-      }
+      if (btnEl) btnEl.classList.add('active');
     }
 
     function renderCollection(filter = 'ALL') {
       const grid = document.getElementById('collectionGrid');
       grid.innerHTML = '';
-
       itemsData.forEach(item => {
         if (filter !== 'ALL' && item.cat !== filter) return;
-
         const div = document.createElement('div');
         div.className = 'collection-item';
         div.onclick = () => openModal(item);
@@ -722,50 +848,32 @@
       renderCollection(cat);
     }
 
-    /* 4. RECOMPENSE "DROP DU JOUR" */
-    let dropDiscovered = false;
-
     function triggerDropDiscovery() {
-      if (dropDiscovered) return;
+      if (gameState.dropDiscovered) return;
       playSound('drop');
-
       const btn = document.getElementById('btnDiscover');
       btn.innerText = 'RÉVÉLATION...';
-      btn.style.opacity = '0.5';
-
       setTimeout(() => {
         playSound('win');
-        dropDiscovered = true;
-        document.getElementById('heroEmoji').innerText = '🪩';
-        document.getElementById('heroName').innerText = 'Boule Disco 1979';
-        document.getElementById('heroQuote').innerText = '«« Épicentre d\'une nuit sans fin. »»';
-        btn.innerText = 'VOIR DANS LA COLLECTION';
-        btn.className = 'btn btn-secondary';
-        btn.style.opacity = '1';
-        btn.onclick = () => switchTab('scr-collection');
-
-        let c = parseInt(document.getElementById('creditVal').innerText.replace(/\s/g, '')) + 250;
-        document.getElementById('creditVal').innerText = c.toLocaleString('fr-FR');
+        gameState.dropDiscovered = true;
+        addCredits(250);
       }, 1000);
     }
 
-    /* 5. MINI-JEU MEMORY */
+    /* 4. MINI-JEU MEMORY */
     const memoryEmojis = ['🥤', '📼', '🍩', '🎮', '🥤', '📼', '🍩', '🎮'];
     let flippedCards = [];
     let matchedPairs = 0;
 
     function startMemoryGame() {
       playSound('click');
-      document.getElementById('gameOverlay').style.display = 'none';
+      document.getElementById('memoryOverlay').style.display = 'none';
       const board = document.getElementById('memoryBoard');
-      board.style.display = 'grid';
-      board.innerHTML = '';
-      flippedCards = [];
-      matchedPairs = 0;
+      board.style.display = 'grid'; board.innerHTML = '';
+      flippedCards = []; matchedPairs = 0;
 
       const shuffled = [...memoryEmojis].sort(() => Math.random() - 0.5);
-
-      shuffled.forEach((emoji, index) => {
+      shuffled.forEach(emoji => {
         const card = document.createElement('div');
         card.className = 'memory-card';
         card.dataset.emoji = emoji;
@@ -776,10 +884,8 @@
 
     function flipMemoryCard(card) {
       if (flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) return;
-
       playSound('click');
-      card.classList.add('flipped');
-      card.innerText = card.dataset.emoji;
+      card.classList.add('flipped'); card.innerText = card.dataset.emoji;
       flippedCards.push(card);
 
       if (flippedCards.length === 2) {
@@ -788,30 +894,113 @@
             playSound('win');
             flippedCards[0].classList.add('matched');
             flippedCards[1].classList.add('matched');
-            flippedCards = [];
-            matchedPairs++;
+            flippedCards = []; matchedPairs++;
 
             if (matchedPairs === 4) {
               alert('VICTOIRE ! +100 DROP Credits gagnés !');
-              let c = parseInt(document.getElementById('creditVal').innerText.replace(/\s/g, '')) + 100;
-              document.getElementById('creditVal').innerText = c.toLocaleString('fr-FR');
-              document.getElementById('gameOverlay').style.display = 'block';
+              addCredits(100);
+              document.getElementById('memoryOverlay').style.display = 'block';
               document.getElementById('memoryBoard').style.display = 'none';
             }
           }, 300);
         } else {
           setTimeout(() => {
-            flippedCards[0].classList.remove('flipped');
-            flippedCards[0].innerText = '';
-            flippedCards[1].classList.remove('flipped');
-            flippedCards[1].innerText = '';
+            flippedCards[0].classList.remove('flipped'); flippedCards[0].innerText = '';
+            flippedCards[1].classList.remove('flipped'); flippedCards[1].innerText = '';
             flippedCards = [];
           }, 800);
         }
       }
     }
 
-    /* 6. MODAL OBJET */
+    /* 5. MINI-JEU STACK */
+    let stackInterval = null;
+    let stackPos = 0;
+    let stackDir = 3;
+    let stackLevel = 0;
+
+    function startStackGame() {
+      playSound('click');
+      document.getElementById('stackOverlay').style.display = 'none';
+      document.getElementById('stackGameArea').style.display = 'block';
+      const arena = document.getElementById('stackArena');
+      arena.innerHTML = '';
+      stackLevel = 0;
+      spawnStackBlock();
+    }
+
+    function spawnStackBlock() {
+      const arena = document.getElementById('stackArena');
+      const block = document.createElement('div');
+      block.className = 'stack-block';
+      block.id = 'activeBlock';
+      block.style.width = '100px';
+      block.style.bottom = (stackLevel * 26) + 'px';
+      arena.appendChild(block);
+
+      stackPos = 0;
+      clearInterval(stackInterval);
+      stackInterval = setInterval(() => {
+        stackPos += stackDir;
+        if (stackPos > 240 || stackPos < 0) stackDir *= -1;
+        block.style.left = stackPos + 'px';
+      }, 20);
+    }
+
+    function placeStackBlock() {
+      playSound('click');
+      clearInterval(stackInterval);
+      const block = document.getElementById('activeBlock');
+      block.id = '';
+      stackLevel++;
+
+      if (stackLevel >= 5) {
+        playSound('win');
+        alert('EXCELLENT ! Empilement parfait ! +150 DROP Credits');
+        addCredits(150);
+        document.getElementById('stackOverlay').style.display = 'block';
+        document.getElementById('stackGameArea').style.display = 'none';
+      } else {
+        spawnStackBlock();
+      }
+    }
+
+    /* 6. MINI-JEU REACTION */
+    let reactInterval = null;
+    let reactPos = 0;
+    let reactDir = 4;
+
+    function startReactionGame() {
+      playSound('click');
+      document.getElementById('reactionOverlay').style.display = 'none';
+      document.getElementById('reactionGameArea').style.display = 'block';
+      const ptr = document.getElementById('reactionPointer');
+      reactPos = 0;
+
+      clearInterval(reactInterval);
+      reactInterval = setInterval(() => {
+        reactPos += reactDir;
+        if (reactPos > 95 || reactPos < 0) reactDir *= -1;
+        ptr.style.left = reactPos + '%';
+      }, 15);
+    }
+
+    function stopReaction() {
+      playSound('click');
+      clearInterval(reactInterval);
+
+      if (reactPos >= 42 && reactPos <= 54) {
+        playSound('win');
+        alert('PERFECT ! Réflexe incroyable ! +120 DROP Credits');
+        addCredits(120);
+      } else {
+        alert('Aïe ! Hors zone. Réessaie !');
+      }
+      document.getElementById('reactionOverlay').style.display = 'block';
+      document.getElementById('reactionGameArea').style.display = 'none';
+    }
+
+    /* MODAL */
     function openModal(item) {
       playSound('click');
       document.getElementById('mEmoji').innerText = item.emoji;
@@ -820,13 +1009,13 @@
       document.getElementById('mStory').innerText = item.story;
       document.getElementById('itemModal').classList.add('active');
     }
-
     function closeModal() {
       playSound('click');
       document.getElementById('itemModal').classList.remove('active');
     }
 
-    // Rendu initial de la collection au chargement
+    // Initialisation
+    loadState();
     renderCollection();
   </script>
 </body>
