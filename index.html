@@ -3,29 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DROP — Mobile Edition</title>
+<title>DROP — Vision 2027</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
-<!-- SDK Stripe pour la redirection bancaire -->
 <script src="https://js.stripe.com/v3/"></script>
 <style>
 :root {
-  --bg-dark: #08090c;
-  --card-bg: rgba(20, 24, 33, 0.85);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --primary-cyan: #00f2fe;
-  --primary-violet: #7928ca;
-  --accent-gold: #ffd700;
-  --accent-green: #00e676;
-  --accent-red: #ff2a6d;
+  --bg-dark: #050508;
+  --glow-violet: #8b5cf6;
+  --glow-magenta: #d946ef;
+  --glow-cyan: #06b6d4;
+  --card-bg: rgba(15, 12, 29, 0.65);
+  --card-border: rgba(139, 92, 246, 0.25);
+  --card-border-glow: rgba(217, 70, 239, 0.5);
   --text-main: #f3f4f6;
-  --text-muted: #9ca3af;
-  --rarity-common: #9e9e9e;
-  --rarity-rare: #2196f3;
-  --rarity-epic: #9c27b0;
-  --rarity-legendary: #ff9800;
-  --rarity-admin: #ff0055;
+  --text-muted: #a1a1aa;
+  
+  --rarity-common: #a1a1aa;
+  --rarity-rare: #3b82f6;
+  --rarity-epic: #a855f7;
+  --rarity-legendary: #f59e0b;
+  --rarity-admin: #ec4899;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -37,6 +36,7 @@ html, body {
   overflow: hidden;
 }
 
+/* Fond animé 2027 avec lueurs violettes fluides */
 .app-viewport {
   width: 100vw;
   height: 100vh;
@@ -44,20 +44,46 @@ html, body {
   display: flex;
   flex-direction: column;
   position: relative;
-  background: radial-gradient(circle at 50% 0%, #151928 0%, #08090c 100%);
+  background: #050508;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(139, 92, 246, 0.25) 0px, transparent 50%),
+    radial-gradient(at 90% 20%, rgba(217, 70, 239, 0.2) 0px, transparent 50%),
+    radial-gradient(at 50% 80%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
 }
 
+/* Header futuriste */
 .hud-header {
-  height: 60px;
+  height: 65px;
   flex-shrink: 0;
-  padding: 0 16px;
+  padding: 0 20px;
   display: flex; justify-content: space-between; align-items: center;
-  background: rgba(8, 9, 12, 0.95); backdrop-filter: blur(12px);
+  background: rgba(10, 8, 20, 0.7); backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--card-border); z-index: 20;
+  box-shadow: 0 4px 30px rgba(139, 92, 246, 0.15);
 }
-.brand-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
-.brand-dot { width: 8px; height: 8px; background: var(--primary-cyan); border-radius: 50%; box-shadow: 0 0 10px var(--primary-cyan); }
-.pill { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); font-family: 'Space Grotesk', sans-serif; }
+.brand-logo { 
+  font-family: 'Space Grotesk', sans-serif; 
+  font-weight: 900; 
+  font-size: 1.3rem; 
+  letter-spacing: 3px; 
+  background: linear-gradient(135deg, #fff 30%, var(--glow-magenta));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display: flex; align-items: center; gap: 8px; 
+}
+.brand-dot { 
+  width: 10px; height: 10px; 
+  background: var(--glow-violet); 
+  border-radius: 50%; 
+  box-shadow: 0 0 12px var(--glow-magenta), 0 0 20px var(--glow-violet); 
+}
+.pill { 
+  background: rgba(139, 92, 246, 0.12); 
+  border: 1px solid var(--card-border-glow); 
+  padding: 6px 14px; border-radius: 20px; 
+  font-size: 0.9rem; font-weight: 800; color: #fff; 
+  font-family: 'Space Grotesk', sans-serif; 
+  box-shadow: 0 0 15px rgba(217, 70, 239, 0.2);
+}
 
 .screen-container { 
   flex: 1; 
@@ -67,53 +93,113 @@ html, body {
 }
 
 .screen { display: none; width: 100%; }
-.screen.active { display: flex; flex-direction: column; gap: 12px; }
+.screen.active { display: flex; flex-direction: column; gap: 14px; }
 
-.glass-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; backdrop-filter: blur(16px); }
-.card-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px; display: flex; justify-content: space-between; }
-.btn { width: 100%; padding: 14px; border-radius: 14px; border: none; background: linear-gradient(135deg, var(--primary-cyan), var(--primary-violet)); color: #fff; font-family: 'Space Grotesk', sans-serif; font-weight: 900; font-size: 0.85rem; cursor: pointer; text-align: center; }
-.btn-secondary { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); }
-.btn-danger { background: linear-gradient(135deg, var(--accent-red), #990000); }
-.input-field { width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); border-radius: 12px; color: #fff; font-family: inherit; margin-bottom: 8px; outline: none; }
+/* Cartes Glassmorphism 2027 */
+.glass-card { 
+  background: var(--card-bg); 
+  border: 1px solid var(--card-border); 
+  border-radius: 22px; 
+  padding: 18px; 
+  backdrop-filter: blur(25px); 
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  position: relative;
+  overflow: hidden;
+}
+.glass-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--glow-magenta), transparent);
+  opacity: 0.5;
+}
 
-.game-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+.card-title { 
+  font-family: 'Space Grotesk', sans-serif; 
+  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; 
+  color: var(--glow-cyan); margin-bottom: 12px; 
+  display: flex; justify-content: space-between; font-weight: 700;
+}
+
+.btn { 
+  width: 100%; padding: 14px; border-radius: 16px; border: none; 
+  background: linear-gradient(135deg, var(--glow-violet), var(--glow-magenta)); 
+  color: #fff; font-family: 'Space Grotesk', sans-serif; font-weight: 800; 
+  font-size: 0.9rem; cursor: pointer; text-align: center;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn:active { transform: scale(0.98); }
+.btn-secondary { 
+  background: rgba(255, 255, 255, 0.05); 
+  border: 1px solid var(--card-border); 
+  box-shadow: none;
+}
+.btn-danger { background: linear-gradient(135deg, #ef4444, #991b1b); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+
+.input-field { 
+  width: 100%; padding: 14px; 
+  background: rgba(15, 12, 29, 0.8); 
+  border: 1px solid var(--card-border); 
+  border-radius: 14px; color: #fff; font-family: inherit; margin-bottom: 10px; outline: none; 
+}
+.input-field:focus { border-color: var(--glow-magenta); box-shadow: 0 0 10px rgba(217, 70, 239, 0.3); }
+
+/* SYSTEME DE CLASSEUR (TABS CATÉGORIES) */
+.binder-tabs {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.binder-tabs::-webkit-scrollbar { display: none; }
+.binder-tab {
+  padding: 8px 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--card-border); font-size: 0.75rem; font-weight: 700;
+  color: var(--text-muted); whitespace: nowrap; cursor: pointer;
+}
+.binder-tab.active {
+  background: rgba(139, 92, 246, 0.25); border-color: var(--glow-magenta);
+  color: #fff; box-shadow: 0 0 12px rgba(217, 70, 239, 0.3);
+}
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.catalog-card {
+  background: rgba(20, 16, 38, 0.6); border: 1px solid var(--card-border);
+  border-radius: 16px; padding: 12px; text-align: center; position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+}
+.catalog-card .emoji { font-size: 2.2rem; margin: 6px 0; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+.catalog-card .item-name { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; }
+.catalog-card .item-price { font-size: 0.7rem; color: var(--glow-cyan); font-weight: 800; font-family: 'Space Grotesk'; }
+.catalog-card.locked { opacity: 0.5; filter: grayscale(0.8); }
+
+.game-card { 
+  background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); 
+  border-radius: 16px; padding: 14px; display: flex; justify-content: space-between; align-items: center; 
+}
 .game-info h4 { font-size: 0.85rem; color: #fff; }
 .game-info p { font-size: 0.7rem; color: var(--text-muted); }
 
-.game-modal { position: absolute; inset: 0; background: rgba(8, 9, 12, 0.98); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 16px; }
+.game-modal { position: absolute; inset: 0; background: rgba(5, 5, 8, 0.98); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 16px; }
 .game-modal.active { display: flex; }
 
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.collection-item { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 14px; padding: 8px; text-align: center; position: relative; }
-.collection-item .emoji { font-size: 1.6rem; margin-bottom: 2px; }
-.collection-item .name { font-size: 0.65rem; font-weight: 700; height: 22px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.collection-item .cat-badge { font-size: 0.5rem; text-transform: uppercase; padding: 2px 4px; border-radius: 4px; background: rgba(255,255,255,0.08); margin-top: 2px; }
-.collection-item.locked { filter: grayscale(1); opacity: 0.2; }
-.rarity-dot { width: 6px; height: 6px; border-radius: 50%; position: absolute; top: 6px; right: 6px; }
-
 .auth-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-.auth-tab { flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-align: center; }
-.auth-tab.active { background: rgba(0, 242, 254, 0.15); border-color: var(--primary-cyan); color: #fff; }
+.auth-tab { flex: 1; padding: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-align: center; }
+.auth-tab.active { background: rgba(139, 92, 246, 0.2); border-color: var(--glow-violet); color: #fff; }
 
-.shop-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; margin-bottom: 8px; }
+.shop-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; padding: 14px; margin-bottom: 10px; }
 .shop-info h4 { font-size: 0.9rem; color: #fff; }
-.shop-info p { font-size: 0.75rem; color: var(--accent-gold); font-weight: 800; }
+.shop-info p { font-size: 0.75rem; color: var(--glow-magenta); font-weight: 800; }
 
 .nav-dock { 
-  height: 65px; 
+  height: 70px; 
   flex-shrink: 0;
-  background: rgba(8, 9, 12, 0.98); 
-  backdrop-filter: blur(20px); 
+  background: rgba(10, 8, 20, 0.8); 
+  backdrop-filter: blur(25px); 
   border-top: 1px solid var(--card-border); 
-  display: flex; 
-  justify-content: space-around; 
-  align-items: center; 
-  z-index: 20; 
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  display: flex; justify-content: space-around; align-items: center; 
+  z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 20%; cursor: pointer; }
-.nav-item.active { color: var(--primary-cyan); }
-.nav-item .nav-icon { font-size: 1.2rem; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 20%; cursor: pointer; }
+.nav-item.active { color: var(--glow-magenta); text-shadow: 0 0 10px rgba(217, 70, 239, 0.5); }
+.nav-item .nav-icon { font-size: 1.3rem; }
 
 @keyframes glitchAnnihilate {
   0% { transform: translate(0); filter: hue-rotate(0deg); }
@@ -131,19 +217,19 @@ html, body {
 <div class="app-viewport" id="viewport">
 
   <header class="hud-header">
-    <div class="brand-logo"><div class="brand-dot"></div>DROP</div>
+    <div class="brand-logo"><div class="brand-dot"></div>DROP 2027</div>
     <div class="pill"><span>🪙</span><span id="creditVal">0</span></div>
   </header>
 
   <main class="screen-container">
 
-    <!-- 1. ACCUEIL / DROP -->
+    <!-- 1. ACCUEIL / DROP MYSTÈRE -->
     <section id="scr-home" class="screen active">
-      <div class="glass-card" style="text-align:center; padding:20px 10px;">
-        <div class="card-title"><span>DROP MYSTÈRE</span></div>
-        <div style="font-size:3.5rem; margin:5px 0;">📦</div>
-        <h3 style="font-family:'Space Grotesk'; font-size:1.1rem;">Coffre d'Objet</h3>
-        <p style="font-size:0.75rem; color:var(--text-muted); margin:5px 0 15px;">Obtiens un objet de collection aléatoire.</p>
+      <div class="glass-card" style="text-align:center; padding:24px 12px;">
+        <div class="card-title"><span>DROP MYSTÈRE ULTIME</span></div>
+        <div style="font-size:4rem; margin:10px 0; filter: drop-shadow(0 0 15px var(--glow-magenta));">🔮</div>
+        <h3 style="font-family:'Space Grotesk'; font-size:1.2rem;">Coffre d'Objet Aléatoire</h3>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin:6px 0 18px;">Débloque un article unique parmi toutes les catégories du classeur.</p>
         <button class="btn" onclick="openRandomDrop()">DÉBLOQUER (150 🪙)</button>
       </div>
 
@@ -153,46 +239,64 @@ html, body {
       </div>
     </section>
 
-    <!-- 2. MINI-JEUX -->
+    <!-- 2. CLASSEUR DE CATALOGUES (TİKTOK, MEMES, GAMING, ETC.) -->
+    <section id="scr-collection" class="screen">
+      <div class="glass-card">
+        <div class="card-title"><span>CLASSEUR DE CATALOGUES</span></div>
+        
+        <!-- Onglets du classeur -->
+        <div class="binder-tabs">
+          <div class="binder-tab active" onclick="switchCategory('tiktok', this)">📱 TikTok Trends</div>
+          <div class="binder-tab" onclick="switchCategory('memes', this)">🎭 Pop Culture & Mèmes</div>
+          <div class="binder-tab" onclick="switchCategory('gaming', this)">🎮 Gaming & Tech</div>
+          <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
+        </div>
+
+        <!-- Grille des objets du catalogue sélectionné -->
+        <div class="grid-2" id="catalogGrid"></div>
+      </div>
+    </section>
+
+    <!-- 3. MINI-JEUX -->
     <section id="scr-games" class="screen">
       <div class="glass-card">
         <div class="card-title"><span>ARCADE — GAIN DE CRÉDITS</span></div>
-        <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:10px;">Coût : 25 🪙 | Gain : 10 à 50 🪙</p>
+        <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:12px;">Coût : 25 🪙 | Gain : 10 à 50 🪙</p>
         
-        <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; flex-direction:column; gap:10px;">
           <div class="game-card">
             <div class="game-info"><h4>⚡ Réaction</h4><p>Stoppe le curseur dans le néon</p></div>
-            <button class="btn" style="width:auto; padding:6px 12px;" onclick="startGame('reaction')">JOUER</button>
+            <button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('reaction')">JOUER</button>
           </div>
           <div class="game-card">
             <div class="game-info"><h4>🔴 Puissance 4</h4><p>VS Robot Tactique (Minimax)</p></div>
-            <button class="btn" style="width:auto; padding:6px 12px;" onclick="startGame('connect4')">JOUER</button>
+            <button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('connect4')">JOUER</button>
           </div>
           <div class="game-card">
             <div class="game-info"><h4>🐍 Snake Néon</h4><p>Serpent tactile classique</p></div>
-            <button class="btn" style="width:auto; padding:6px 12px;" onclick="startGame('snake')">JOUER</button>
+            <button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('snake')">JOUER</button>
           </div>
           <div class="game-card">
             <div class="game-info"><h4>🥞 Stack Néon</h4><p>Empilement de blocs précis</p></div>
-            <button class="btn" style="width:auto; padding:6px 12px;" onclick="startGame('stack')">JOUER</button>
+            <button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('stack')">JOUER</button>
           </div>
           <div class="game-card">
             <div class="game-info"><h4>🎯 Tap Cible</h4><p>Touche les cibles en 10s</p></div>
-            <button class="btn" style="width:auto; padding:6px 12px;" onclick="startGame('tap')">JOUER</button>
+            <button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('tap')">JOUER</button>
           </div>
           <div class="game-card">
             <div class="game-info"><h4>🧠 Mémoire Flash</h4><p>Répète la séquence néon</p></div>
-            <button class="btn" style="width:auto; padding:6px 12px;" onclick="startGame('memory')">JOUER</button>
+            <button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('memory')">JOUER</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 3. BOUTIQUE (SYSTEME CB REDIRECTION STRIPE) -->
+    <!-- 4. BOUTIQUE (CB STRIPE) -->
     <section id="scr-shop" class="screen">
       <div class="glass-card">
         <div class="card-title"><span>ACHAT DE CRÉDITS (CB SÉCURISÉ)</span></div>
-        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Achète des crédits par Carte Bancaire. Redirection immédiate vers le serveur de paiement.</p>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:14px;">Redirection sécurisée vers la plateforme de paiement bancaire Stripe.</p>
 
         <div class="shop-item">
           <div class="shop-info">
@@ -220,16 +324,7 @@ html, body {
       </div>
     </section>
 
-    <!-- 4. COLLECTION (2000 OBJETS) -->
-    <section id="scr-collection" class="screen">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <span style="font-family:'Space Grotesk'; font-size:0.9rem; font-weight:900;">COLLECTION</span>
-        <span style="font-size:0.75rem; color:var(--primary-cyan); font-weight:800;" id="colCount">0 / 2000</span>
-      </div>
-      <div class="grid-3" id="collectionGrid"></div>
-    </section>
-
-    <!-- 5. COMPTE (INSCRIPTION / CONNEXION UNIQUE) -->
+    <!-- 5. COMPTE (CONNEXION UNIQUE / CODE PROMO) -->
     <section id="scr-account" class="screen">
       <div id="authSection" class="glass-card">
         <div class="auth-tabs">
@@ -257,24 +352,24 @@ html, body {
       <div class="glass-card">
         <div class="card-title"><span>CODE PROMO</span></div>
         <input type="text" id="secretCodeInput" class="input-field" placeholder="Entrez le code..." style="text-transform:uppercase;">
-        <button class="btn" onclick="redeemSecretCode()">VALIDER</button>
+        <button class="btn" onclick="redeemSecretCode()">VALIDER LE CODE</button>
       </div>
     </section>
 
   </main>
 
   <nav class="nav-dock">
-    <button class="nav-item active" onclick="switchTab('scr-home', this)"><span class="nav-icon">📦</span><span>DROP</span></button>
+    <button class="nav-item active" onclick="switchTab('scr-home', this)"><span class="nav-icon">🔮</span><span>DROP</span></button>
+    <button class="nav-item" onclick="switchTab('scr-collection', this)"><span class="nav-icon">📁</span><span>CLASSEUR</span></button>
     <button class="nav-item" onclick="switchTab('scr-games', this)"><span class="nav-icon">🎮</span><span>JEUX</span></button>
     <button class="nav-item" onclick="switchTab('scr-shop', this)"><span class="nav-icon">💎</span><span>SHOP</span></button>
-    <button class="nav-item" onclick="switchTab('scr-collection', this)"><span class="nav-icon">🗃️</span><span>OBJETS</span></button>
     <button class="nav-item" onclick="switchTab('scr-account', this)"><span class="nav-icon">👤</span><span>COMPTE</span></button>
   </nav>
 
   <div class="game-modal" id="gameArea">
     <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h3 style="font-family:'Space Grotesk';" id="gameTitle">Jeu</h3>
-      <button class="btn btn-danger" style="width:auto; padding:4px 10px;" onclick="closeGame()">QUITTER</button>
+      <button class="btn btn-danger" style="width:auto; padding:6px 12px;" onclick="closeGame()">QUITTER</button>
     </div>
     <div id="gameCanvasContainer" style="width:100%; display:flex; justify-content:center; align-items:center; flex:1;"></div>
   </div>
@@ -282,71 +377,67 @@ html, body {
 </div>
 
 <script>
-// Cle Stripe
 const stripe = Stripe('pk_test_TYooMQauvd3q5451x44bfG6y00c8B3051R');
 
-/* GENERATEUR AUTOMATIQUE DE 2000 OBJETS AVEC CATEGORIES ET RARETES */
-const categories = ['TikTok', 'Meme', 'Pop Culture', 'Gaming', 'Food', 'Tech', 'Légendaire'];
-const emojisList = ['🐕', '🗿', '🐱', '🐸', '🧢', '🍦', '🥤', '😏', '🤫', '⚔️', '🃏', '🕹️', '🥽', '🏆', '🍕', '🌮', '🍩', '👑', '💎', '🥇', '🚀', '🔥', '⚡', '🤖', '👾'];
-const raritiesList = ['common', 'rare', 'epic', 'legendary'];
+/* CATALOGUES STRUCTURES EN CLASSEUR */
+const CATALOGS = {
+  tiktok: [
+    { id: 101, name: "Anneau Lumineux LED", emoji: "💡", price: 200, unlocked: false },
+    { id: 102, name: "Micro-Cravate Sans Fil", emoji: "🎙️", price: 250, unlocked: false },
+    { id: 103, name: "Trépied Suivi Automatique", emoji: "📐", price: 350, unlocked: false },
+    { id: 104, name: "Projecteur Galaxie TikTok", emoji: "🌌", price: 500, unlocked: false },
+    { id: 105, name: "Gourde Motivante 2L", emoji: "🥤", price: 150, unlocked: false },
+    { id: 106, name: "Tapis Néon RGB", emoji: "🟪", price: 300, unlocked: false }
+  ],
+  memes: [
+    { id: 201, name: "Lunettes Thug Life 8-Bit", emoji: "🕶️", price: 180, unlocked: false },
+    { id: 202, name: "Statue Moai Moai", emoji: "🗿", price: 400, unlocked: false },
+    { id: 203, name: "Peluches Pieuvre Reversible", emoji: "🐙", price: 220, unlocked: false },
+    { id: 204, name: "Casquette Cap No Cap", emoji: "🧢", price: 150, unlocked: false },
+    { id: 205, name: "Badge Meme Doge Gold", emoji: "🐕", price: 600, unlocked: false }
+  ],
+  gaming: [
+    { id: 301, name: "Manette Pro Translucide", emoji: "🎮", price: 800, unlocked: false },
+    { id: 302, name: "Casque Audio Cyberpunk", emoji: "🎧", price: 1200, unlocked: false },
+    { id: 303, name: "Clavier Mécanique Custom", emoji: "⌨️", price: 1500, unlocked: false },
+    { id: 304, name: "Console Rétro Portable", emoji: "🕹️", price: 900, unlocked: false },
+    { id: 305, name: "Masque VR Next-Gen", emoji: "🥽", price: 2500, unlocked: false }
+  ],
+  secret: [
+    { id: 401, name: "Carte VIP Gold Access", emoji: "💳", price: 5000, unlocked: false },
+    { id: 402, name: "Trophée Créateur Diamant", emoji: "🏆", price: 10000, unlocked: false },
+    { id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false }
+  ]
+};
 
-const itemsDB = [];
-
-// Generation des 1999 objets
-for (let i = 1; i < 2000; i++) {
-  const cat = categories[i % categories.length];
-  const emoji = emojisList[i % emojisList.length];
-  const rarity = raritiesList[i % raritiesList.length];
-  itemsDB.push({
-    id: i,
-    name: `${cat} #${i}`,
-    cat: cat,
-    emoji: emoji,
-    rarity: rarity,
-    unlocked: false
-  });
-}
-
-// L'objet 2000 : DROP ADMINISTRATEUR A 1 MILLION
-itemsDB.push({
-  id: 2000,
-  name: '⚡ DROP Administrateur',
-  cat: 'Godlike',
-  emoji: '⚡',
-  rarity: 'admin',
-  unlocked: false,
-  price: 1000000
-});
+let activeCategory = 'tiktok';
 
 let appData = {
-  credits: 100,
+  credits: 0, // RESET STRICT A 0 CREDITS POUR TOUT LE MONDE
   redeemedCodes: [],
   currentUser: null,
   isAdmin: false,
-  items: JSON.parse(JSON.stringify(itemsDB))
+  catalogs: JSON.parse(JSON.stringify(CATALOGS))
 };
 
 let currentAuthMode = 'login';
 
 function loadAppData() {
-  const saved = localStorage.getItem('drop_app_mobile_v2');
+  const saved = localStorage.getItem('drop_app_mobile_2027');
   if (saved) {
     const parsed = JSON.parse(saved);
-    appData.credits = parsed.credits;
+    // On force la remise a zéro des crédits
+    appData.credits = 0;
     appData.redeemedCodes = parsed.redeemedCodes || [];
     appData.currentUser = parsed.currentUser || null;
     appData.isAdmin = parsed.isAdmin || false;
-    
-    // Fusion des objets debloques sauvegardes
-    if (parsed.items && parsed.items.length === 2000) {
-      appData.items = parsed.items;
-    }
+    if (parsed.catalogs) appData.catalogs = parsed.catalogs;
   }
   updateUI();
 }
 
 function saveAppData() {
-  localStorage.setItem('drop_app_mobile_v2', JSON.stringify(appData));
+  localStorage.setItem('drop_app_mobile_2027', JSON.stringify(appData));
   updateUI();
 }
 
@@ -363,7 +454,7 @@ function updateUI() {
 
     if (appData.isAdmin) {
       document.getElementById('userStatus').innerText = "👑 ADMINISTRATEUR SYSTEME (Accès Illimité)";
-      document.getElementById('userStatus').style.color = "var(--primary-cyan)";
+      document.getElementById('userStatus').style.color = "var(--glow-magenta)";
     } else {
       document.getElementById('userStatus').innerText = "🎮 Joueur Standard";
       document.getElementById('userStatus').style.color = "var(--text-muted)";
@@ -373,7 +464,7 @@ function updateUI() {
     profSec.style.display = 'none';
   }
 
-  renderCollection();
+  renderCatalogGrid();
 }
 
 function switchTab(id, btn) {
@@ -383,24 +474,113 @@ function switchTab(id, btn) {
   if (btn) btn.classList.add('active');
 }
 
-/* VRAIE REDIRECTION VERS L'INTERFACE DE PAIEMENT STRIPE */
+/* GESTION DU CLASSEUR */
+function switchCategory(catKey, tabBtn) {
+  activeCategory = catKey;
+  document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
+  if(tabBtn) tabBtn.classList.add('active');
+  renderCatalogGrid();
+}
+
+function renderCatalogGrid() {
+  const grid = document.getElementById('catalogGrid');
+  grid.innerHTML = '';
+  const currentItems = appData.catalogs[activeCategory] || [];
+
+  currentItems.forEach(item => {
+    const div = document.createElement('div');
+    div.className = `catalog-card ${item.unlocked ? '' : 'locked'}`;
+    div.innerHTML = `
+      <div class="emoji">${item.emoji}</div>
+      <div class="item-name">${item.name}</div>
+      <div class="item-price">${item.unlocked ? 'DÉBLOQUÉ' : item.price + ' 🪙'}</div>
+      <button class="btn" style="padding:6px; font-size:0.75rem; margin-top:6px;" onclick="buyItemDirect(${item.id})">
+        ${item.unlocked ? 'POSSÉDÉ' : 'OBTENIR'}
+      </button>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function buyItemDirect(id) {
+  let found = null;
+  Object.keys(appData.catalogs).forEach(cat => {
+    const item = appData.catalogs[cat].find(i => i.id === id);
+    if(item) found = item;
+  });
+
+  if (!found) return;
+  if (found.unlocked) return alert('Article déjà débloqué !');
+
+  if (!appData.isAdmin && appData.credits < found.price) {
+    return alert(`Crédits insuffisants ! Il faut ${found.price} 🪙 pour cet objet.`);
+  }
+
+  if (!appData.isAdmin) appData.credits -= found.price;
+  found.unlocked = true;
+
+  if (found.id === 2000) {
+    triggerAnnihilation();
+  } else {
+    alert(`🎉 FÉLICITATIONS ! Tu as obtenu : ${found.emoji} ${found.name}`);
+  }
+  saveAppData();
+}
+
+function openRandomDrop() {
+  if (!appData.isAdmin && appData.credits < 150) return alert('150 Crédits requis !');
+  
+  let allLocked = [];
+  Object.keys(appData.catalogs).forEach(cat => {
+    appData.catalogs[cat].forEach(item => {
+      if (!item.unlocked) allLocked.push(item);
+    });
+  });
+
+  if (allLocked.length === 0) return alert('Félicitations, tout le classeur est débloqué !');
+
+  if (!appData.isAdmin) appData.credits -= 150;
+
+  const picked = allLocked[Math.floor(Math.random() * allLocked.length)];
+  picked.unlocked = true;
+  saveAppData();
+
+  if (picked.id === 2000) {
+    triggerAnnihilation();
+  } else {
+    alert(`🔮 DROP RÉUSSI ! Tu as reçu : ${picked.emoji} ${picked.name}`);
+  }
+}
+
+function triggerAnnihilation() {
+  const vp = document.getElementById('viewport');
+  vp.classList.add('annihilate');
+  setTimeout(() => {
+    vp.classList.remove('annihilate');
+    appData.isAdmin = true;
+    appData.credits = 999999999;
+    Object.keys(appData.catalogs).forEach(cat => {
+      appData.catalogs[cat].forEach(i => i.unlocked = true);
+    });
+    saveAppData();
+    alert('💥 SYSTEM OVERRIDE 2027... ACCÈS ADMINISTRATEUR SUPRÊME DÉBLOQUÉ !');
+  }, 2500);
+}
+
+/* REDIRECTION STRIPE CB */
 function payWithStripe(priceId) {
   if (!appData.currentUser) {
-    alert('⚠️ Veuillez vous connecter ou créer un compte avant d\'effectuer un achat.');
+    alert('⚠️ Connexion requise avant paiement.');
     switchTab('scr-account', document.querySelectorAll('.nav-item')[4]);
     return;
   }
-
-  // Redirection vers le serveur de paiement Stripe
   stripe.redirectToCheckout({
     lineItems: [{ price: priceId, quantity: 1 }],
     mode: 'payment',
     successUrl: window.location.href + '?payment=success',
     cancelUrl: window.location.href + '?payment=cancel',
   }).then(function (result) {
-    if (result.error) {
-      alert(result.error.message);
-    }
+    if (result.error) alert(result.error.message);
   });
 }
 
@@ -422,15 +602,17 @@ function handleAuth(e) {
   if (email === 'carer.nathan11@gmail.com' && pass === 'dropadministrator20262027acces') {
     appData.isAdmin = true;
     appData.credits = 999999999;
-    appData.items.forEach(i => i.unlocked = true);
+    Object.keys(appData.catalogs).forEach(cat => {
+      appData.catalogs[cat].forEach(i => i.unlocked = true);
+    });
     appData.currentUser = { email, username: username || 'Gérant System' };
     saveAppData();
-    alert('⚡ CONNEXION GÉRANT DÉTECTÉE : Accès Administrateur accordé !');
+    alert('⚡ ACCÈS ADMINISTRATEUR CONFIRMÉ !');
   } else {
     appData.isAdmin = false;
     appData.currentUser = { email, username };
     saveAppData();
-    alert(currentAuthMode === 'login' ? '✅ Connexion réussie !' : '🎉 Compte créé avec succès !');
+    alert(currentAuthMode === 'login' ? '✅ Connexion réussie !' : '🎉 Compte créé !');
   }
 }
 
@@ -438,17 +620,14 @@ function logoutUser() {
   appData.currentUser = null;
   appData.isAdmin = false;
   saveAppData();
-  alert('Vous êtes déconnecté.');
+  alert('Déconnexion effectuée.');
 }
 
 function redeemSecretCode() {
   const code = document.getElementById('secretCodeInput').value.trim().toUpperCase();
   if (!code) return;
 
-  if (appData.redeemedCodes.includes(code)) {
-    alert('⚠️ Ce code a déjà été utilisé !');
-    return;
-  }
+  if (appData.redeemedCodes.includes(code)) return alert('⚠️ Code déjà utilisé !');
 
   if (code === 'DROPDROP2627GIVEFREE10000') {
     appData.credits += 10000;
@@ -461,89 +640,17 @@ function redeemSecretCode() {
   }
 }
 
-/* OPEN DROPS */
-function openRandomDrop() {
-  if (!appData.isAdmin && appData.credits < 150) return alert('150 Crédits requis !');
-  const locked = appData.items.filter(i => !i.unlocked && i.id !== 2000);
-  
-  if (locked.length === 0 && !appData.items.find(i=>i.id===2000 && !i.unlocked)) {
-    return alert('Toute la collection est débloquée !');
-  }
-
-  if (!appData.isAdmin) appData.credits -= 150;
-  
-  let picked;
-  if (!appData.isAdmin && appData.credits >= 1000000 && !appData.items.find(i=>i.id===2000).unlocked) {
-    picked = appData.items.find(i=>i.id===2000);
-  } else {
-    picked = locked[Math.floor(Math.random() * locked.length)] || appData.items.find(i=>i.id===2000);
-  }
-
-  picked.unlocked = true;
-  saveAppData();
-
-  if(picked.id === 2000) {
-    triggerAnnihilation();
-  } else {
-    alert(`🎉 OBJET DÉBLOQUÉ : ${picked.emoji} ${picked.name} [${picked.cat}]`);
-  }
-}
-
-function triggerAnnihilation() {
-  const vp = document.getElementById('viewport');
-  vp.classList.add('annihilate');
-  setTimeout(() => {
-    vp.classList.remove('annihilate');
-    appData.isAdmin = true;
-    appData.credits = 999999999;
-    appData.items.forEach(i => i.unlocked = true);
-    saveAppData();
-    alert('💥 LE SITE SE RÉGÉNÈRE... ACCÈS ADMINISTRATEUR ULTIME DÉBLOQUÉ !');
-  }, 2500);
-}
-
-function renderCollection() {
-  const grid = document.getElementById('collectionGrid');
-  grid.innerHTML = '';
-  let unlockedCount = 0;
-
-  // Affichage optimise (limitation du DOM aux 100 premiers ou objets debloques pour fluidite)
-  appData.items.forEach(item => {
-    if (item.unlocked) unlockedCount++;
-  });
-
-  const displayLimit = 150; // Nombre max affiche dans la grille pour eviter le lag
-  let countDisplayed = 0;
-
-  appData.items.forEach(item => {
-    if (countDisplayed < displayLimit || item.unlocked) {
-      const div = document.createElement('div');
-      div.className = 'collection-item ' + (item.unlocked ? '' : 'locked');
-      div.innerHTML = `
-        <div class="rarity-dot" style="background:var(--rarity-${item.rarity || 'common'})"></div>
-        <div class="emoji">${item.emoji}</div>
-        <div class="name">${item.unlocked ? item.name : (item.id === 2000 ? '1M 🪙' : '???')}</div>
-        <div class="cat-badge">${item.cat}</div>
-      `;
-      grid.appendChild(div);
-      countDisplayed++;
-    }
-  });
-
-  document.getElementById('colCount').innerText = `${unlockedCount} / ${appData.items.length}`;
-}
-
 function watchAd() {
   appData.credits += 15;
   saveAppData();
-  alert('Pub visionnée ! +15 Crédits.');
+  alert('Pub terminée ! +15 Crédits 🪙');
 }
 
-/* MINI JEUX */
+/* MINI-JEUX ARCADE */
 let currentGameInterval = null;
 
 function startGame(gameType) {
-  if (!appData.isAdmin && appData.credits < 25) return alert('Il faut 25 Crédits pour jouer !');
+  if (!appData.isAdmin && appData.credits < 25) return alert('25 Crédits nécessaires !');
   if (!appData.isAdmin) appData.credits -= 25;
   saveAppData();
 
@@ -565,7 +672,7 @@ function closeGame() {
 }
 
 function rewardPlayer(amount) {
-  alert(`🎮 Fin de partie ! Récompense : +${amount} Crédits 🪙`);
+  alert(`🎮 Fin du jeu ! Gains : +${amount} Crédits 🪙`);
   appData.credits += amount;
   saveAppData();
   closeGame();
@@ -574,9 +681,9 @@ function rewardPlayer(amount) {
 function runReactionGame(c) {
   document.getElementById('gameTitle').innerText = "Réaction Néon";
   c.innerHTML = `<div style="text-align:center;">
-    <div id="bar" style="width:250px; height:30px; background:#222; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px;">
-      <div style="position:absolute; left:100px; width:50px; height:100%; background:var(--accent-green);"></div>
-      <div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff;"></div>
+    <div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);">
+      <div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div>
+      <div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div>
     </div>
     <button class="btn" onclick="stopReaction()">STOP !</button>
   </div>`;
@@ -588,14 +695,13 @@ function runReactionGame(c) {
   }, 20);
   window.stopReaction = () => {
     clearInterval(currentGameInterval);
-    const win = pos >= 100 && pos <= 150;
-    rewardPlayer(win ? 50 : 10);
+    rewardPlayer((pos >= 100 && pos <= 150) ? 50 : 10);
   };
 }
 
 function runConnect4Game(c) {
-  document.getElementById('gameTitle').innerText = "Puissance 4 VS Robot";
-  c.innerHTML = `<div id="c4board" style="display:grid; grid-template-columns:repeat(7, 35px); gap:5px; background:#00d2ff; padding:8px; border-radius:10px;"></div>`;
+  document.getElementById('gameTitle').innerText = "Puissance 4 Tactique";
+  c.innerHTML = `<div id="c4board" style="display:grid; grid-template-columns:repeat(7, 35px); gap:5px; background:rgba(139,92,246,0.2); padding:8px; border-radius:14px; border:1px solid var(--card-border);"></div>`;
   let board = Array(6).fill().map(() => Array(7).fill(0));
   
   function draw() {
@@ -604,7 +710,7 @@ function runConnect4Game(c) {
     for(let r=0; r<6; r++) {
       for(let col=0; col<7; col++) {
         let cell = document.createElement('div');
-        cell.style.cssText = `width:35px; height:35px; border-radius:50%; background:${board[r][col]===1?'#ff2a6d':board[r][col]===2?'#ffd700':'#08090c'}`;
+        cell.style.cssText = `width:35px; height:35px; border-radius:50%; background:${board[r][col]===1?'var(--glow-magenta)':board[r][col]===2?'var(--glow-cyan)':'#050508'}`;
         cell.onclick = () => play(col);
         b.appendChild(cell);
       }
@@ -615,9 +721,7 @@ function runConnect4Game(c) {
       if(board[r][col] === 0) {
         board[r][col] = 1;
         if(checkWin(1)) return rewardPlayer(50);
-        aiPlay();
-        draw();
-        return;
+        aiPlay(); draw(); return;
       }
     }
   }
@@ -626,9 +730,7 @@ function runConnect4Game(c) {
     for(let c=0; c<7; c++) if(board[0][c] === 0) valid.push(c);
     if(valid.length === 0) return rewardPlayer(20);
     let choice = valid[Math.floor(Math.random() * valid.length)];
-    for(let r=5; r>=0; r--) {
-      if(board[r][choice] === 0) { board[r][choice] = 2; break; }
-    }
+    for(let r=5; r>=0; r--) { if(board[r][choice] === 0) { board[r][choice] = 2; break; } }
     if(checkWin(2)) rewardPlayer(10);
   }
   function checkWin(p) {
@@ -640,8 +742,8 @@ function runConnect4Game(c) {
 }
 
 function runSnakeGame(c) {
-  document.getElementById('gameTitle').innerText = "Snake Néon";
-  c.innerHTML = `<canvas id="sc" width="240" height="240" style="background:#10141e; border-radius:12px;"></canvas>`;
+  document.getElementById('gameTitle').innerText = "Snake Néon 2027";
+  c.innerHTML = `<canvas id="sc" width="240" height="240" style="background:#0a0814; border-radius:14px; border:1px solid var(--card-border);"></canvas>`;
   const cvs = document.getElementById('sc'), ctx = cvs.getContext('2d');
   let snake = [{x:10, y:10}], food = {x:15, y:15}, dx = 1, dy = 0, score = 0;
   
@@ -660,9 +762,9 @@ function runSnakeGame(c) {
     if(head.x === food.x && head.y === food.y) { score++; food = {x:Math.floor(Math.random()*24), y:Math.floor(Math.random()*24)}; }
     else snake.pop();
 
-    ctx.fillStyle = "#10141e"; ctx.fillRect(0,0,240,240);
-    ctx.fillStyle = "#00f2fe"; snake.forEach(s => ctx.fillRect(s.x*10, s.y*10, 9, 9));
-    ctx.fillStyle = "#ff2a6d"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
+    ctx.fillStyle = "#0a0814"; ctx.fillRect(0,0,240,240);
+    ctx.fillStyle = "#d946ef"; snake.forEach(s => ctx.fillRect(s.x*10, s.y*10, 9, 9));
+    ctx.fillStyle = "#06b6d4"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
   }, 100);
 }
 
@@ -671,17 +773,15 @@ function runTapGame(c) {
   let score = 0, timeLeft = 10;
   c.innerHTML = `<div style="text-align:center;">
     <h2 id="timer">10s</h2>
-    <div id="target" style="width:60px; height:60px; background:var(--accent-red); border-radius:50%; margin:30px auto; cursor:pointer;"></div>
+    <div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div>
     <h3>Score : <span id="tapScore">0</span></h3>
   </div>`;
 
-  const move = () => {
-    const t = document.getElementById('target');
-    if(t) {
-      t.style.transform = `translate(${(Math.random()-0.5)*120}px, ${(Math.random()-0.5)*120}px)`;
-    }
+  document.getElementById('target').onclick = () => { 
+    score++; 
+    document.getElementById('tapScore').innerText = score; 
+    document.getElementById('target').style.transform = `translate(${(Math.random()-0.5)*120}px, ${(Math.random()-0.5)*120}px)`;
   };
-  document.getElementById('target').onclick = () => { score++; document.getElementById('tapScore').innerText = score; move(); };
 
   currentGameInterval = setInterval(() => {
     timeLeft--;
@@ -693,10 +793,10 @@ function runTapGame(c) {
 function runMemoryGame(c) {
   document.getElementById('gameTitle').innerText = "Mémoire Flash";
   c.innerHTML = `<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;">
-    <div id="m0" style="height:80px; background:red; border-radius:10px;" onclick="userTap(0)"></div>
-    <div id="m1" style="height:80px; background:blue; border-radius:10px;" onclick="userTap(1)"></div>
-    <div id="m2" style="height:80px; background:green; border-radius:10px;" onclick="userTap(2)"></div>
-    <div id="m3" style="height:80px; background:yellow; border-radius:10px;" onclick="userTap(3)"></div>
+    <div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div>
+    <div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div>
+    <div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div>
+    <div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div>
   </div>`;
   let seq = [Math.floor(Math.random()*4), Math.floor(Math.random()*4)], step = 0;
   
@@ -724,10 +824,10 @@ function runMemoryGame(c) {
 function runStackGame(c) {
   document.getElementById('gameTitle').innerText = "Stack Néon";
   c.innerHTML = `<div style="text-align:center;">
-    <div id="sboard" style="width:200px; height:200px; background:#08090c; border:1px solid #333; position:relative; overflow:hidden;">
-      <div id="sblock" style="width:80px; height:20px; background:var(--primary-cyan); position:absolute; bottom:0; left:0;"></div>
+    <div id="sboard" style="width:200px; height:200px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px;">
+      <div id="sblock" style="width:80px; height:20px; background:var(--glow-violet); position:absolute; bottom:0; left:0; box-shadow:0 0 10px var(--glow-violet);"></div>
     </div>
-    <button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button>
+    <button class="btn" style="margin-top:12px;" onclick="stackDrop()">EMPILER</button>
   </div>`;
   let pos = 0, dir = 4, score = 0;
   currentGameInterval = setInterval(() => {
