@@ -508,7 +508,7 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS))
 let currentAuthMode = 'login';
 let isDropping = false;
 
-// ÉCOUTEUR DE CONNEXION FIREBASE CORRIGÉ & ROBUSTE
+// ÉCOUTEUR DE CONNEXION FIREBASE OPTIMISÉ
 auth.onAuthStateChanged((user) => {
 if (user) {
 const userRef = db.ref('users/' + user.uid);
@@ -546,7 +546,7 @@ db.ref('friend_codes/' + appData.friendId).set(user.uid);
 listenToTrades();
 updateUI();
 }).catch((error) => {
-console.error("Erreur de récupération des données utilisateur :", error);
+console.error("Erreur de récupération :", error);
 appData.currentUser = { email: user.email, username: user.email.split('@')[0], uid: user.uid };
 updateUI();
 });
@@ -804,7 +804,7 @@ db.ref('friend_codes/' + fId).set(u.uid);
 appData.currentUser = { email: u.email, username: initialData.username, uid: u.uid };
 updateUI();
 });
-}).catch(err => alert('❌ Erreur : ' + err.message));
+}).catch(err => alert('❌ Erreur d\'inscription : ' + err.message));
 } else {
 auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
 const u = userCredential.user;
@@ -832,7 +832,7 @@ appData.catalogs = data.catalogs || appData.catalogs;
 appData.redeemedCodes = data.redeemedCodes || [];
 updateUI();
 });
-}).catch(err => alert('❌ Erreur : ' + err.message));
+}).catch(err => alert('❌ Erreur de connexion : ' + err.message));
 }
 }
 
@@ -844,7 +844,6 @@ alert('Déconnexion effectuée.');
 });
 }
 
-/* SYSTÈMES AMIS & ÉCHANGES CORRIGÉS */
 function addFriend() {
 const code = document.getElementById('addFriendInput').value.trim().toUpperCase();
 if (!code) return alert("❌ Veuillez entrer un identifiant d'ami valide !");
