@@ -124,3 +124,1245 @@ display: flex; align-items: center; gap: 8px; max-width: 90vw; text-align: cente
 .binder-tab {
 padding: 8px 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.04);
 border: 1px solid var(--card-border); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); whitespace: nowrap; cursor: pointer;
+}
+.binder-tab.active { background: rgba(139, 92, 246, 0.25); border-color: var(--glow-magenta); color: #fff; box-shadow: 0 0 12px rgba(217, 70, 239, 0.3); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; position: relative; }
+.catalog-card {
+background: rgba(20, 16, 38, 0.6); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px;
+text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; z-index: 2;
+}
+.catalog-card .emoji { font-size: 2.2rem; margin: 6px 0; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+.catalog-card .item-name { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; min-height: 2.2em; display: flex; align-items: center; justify-content: center; }
+.catalog-card .item-price { font-size: 0.7rem; color: var(--glow-cyan); font-weight: 800; font-family: 'Space Grotesk'; }
+.catalog-card.locked { opacity: 0.6; filter: grayscale(0.6); }
+
+.football-bg-pattern {
+position: absolute; inset: 0; pointer-events: none; opacity: 0.08; z-index: 1;
+background-image: radial-gradient(#fff 2px, transparent 2px), radial-gradient(#fff 2px, transparent 2px);
+background-size: 40px 40px; background-position: 0 0, 20px 20px;
+display: flex; flex-wrap: wrap; justify-content: space-around; align-content: space-around; font-size: 2.5rem; overflow: hidden;
+}
+
+.game-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 16px; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
+.game-info h4 { font-size: 0.85rem; color: #fff; }
+.game-info p { font-size: 0.7rem; color: var(--text-muted); }
+
+.game-modal { position: absolute; inset: 0; background: rgba(5, 5, 8, 0.98); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 16px; }
+.game-modal.active { display: flex; }
+
+.auth-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.auth-tab { flex: 1; padding: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-align: center; }
+.auth-tab.active { background: rgba(139, 92, 246, 0.2); border-color: var(--glow-violet); color: #fff; }
+
+.nav-dock {
+height: 70px; flex-shrink: 0; background: rgba(10, 8, 20, 0.8); backdrop-filter: blur(25px);
+border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center;
+z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 20%; cursor: pointer; }
+.nav-item.active { color: var(--glow-magenta); text-shadow: 0 0 10px rgba(217, 70, 239, 0.5); }
+.nav-item .nav-icon { font-size: 1.3rem; }
+
+.drop-stage { width: 100%; height: 260px; perspective: 1000px; display: flex; justify-content: center; align-items: center; margin: 15px 0; position: relative; }
+.drop-card-3d { width: 160px; height: 220px; position: relative; transform-style: preserve-3d; transition: transform 1.2s cubic-bezier(0.4, 0.2, 0.2, 1); cursor: pointer; }
+.drop-card-3d.revealed { transform: rotateY(180deg); }
+.drop-card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 18px; border: 2px solid var(--glow-magenta); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(217, 70, 239, 0.4); background: rgba(15, 12, 29, 0.9); }
+.drop-card-back { background: linear-gradient(135deg, #100b26, #28124d); border-color: var(--glow-violet); }
+.drop-card-front { transform: rotateY(180deg); background: linear-gradient(135deg, #1f103c, #090514); border-color: var(--glow-cyan); padding: 10px; text-align: center; }
+
+@keyframes cardExplode {
+0% { transform: scale(1) rotateY(180deg); filter: brightness(1); }
+50% { transform: scale(1.3) rotateY(180deg); filter: brightness(3) drop-shadow(0 0 50px var(--glow-magenta)); }
+75% { transform: scale(0.9) rotateY(180deg); }
+100% { transform: scale(1) rotateY(180deg); filter: brightness(1); }
+}
+.drop-card-3d.exploding { animation: cardExplode 0.8s ease-out forwards; }
+
+.particle-burst { position: absolute; inset: 0; pointer-events: none; z-index: 10; display: flex; justify-content: center; align-items: center; }
+.particle { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--glow-magenta); box-shadow: 0 0 10px var(--glow-magenta); opacity: 0; }
+@keyframes particleFly { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
+.particle.active { animation: particleFly 0.8s ease-out forwards; }
+
+@keyframes glitchAnnihilate {
+0% { transform: translate(0); filter: hue-rotate(0deg); }
+20% { transform: translate(-10px, 10px) scale(1.1); filter: hue-rotate(90deg) invert(1); }
+40% { transform: translate(10px, -10px) skewX(20deg); }
+60% { transform: translate(-15px, -5px) scale(0.9); filter: hue-rotate(180deg); }
+80% { transform: translate(15px, 15px) skewY(-20deg); }
+100% { transform: translate(0) scale(0); opacity: 0; filter: contrast(200%); }
+}
+.annihilate { animation: glitchAnnihilate 2.5s forwards ease-in-out; }
+
+.ad-modal { position: fixed; inset: 0; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(20px); z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+.ad-modal.active { display: flex; }
+.ad-box { width: 100%; max-width: 340px; background: rgba(15, 12, 29, 0.9); border: 1px solid var(--glow-magenta); border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 0 30px rgba(217, 70, 239, 0.3); }
+.ad-screen { width: 100%; height: 180px; background: #000; border-radius: 16px; margin: 15px 0; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--card-border); position: relative; overflow: hidden; }
+.ad-progress { position: absolute; bottom: 0; left: 0; height: 6px; background: linear-gradient(90deg, var(--glow-violet), var(--glow-magenta)); width: 0%; transition: width 1s linear; }
+
+.friend-badge { background: rgba(139, 92, 246, 0.15); border: 1px solid var(--card-border); padding: 12px; border-radius: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.request-card-box { background: rgba(217, 70, 239, 0.08); border: 1px solid var(--card-border-glow); border-radius: 14px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; }
+.trade-card-box { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app-viewport" id="viewport">
+
+<div id="appToast" class="app-toast">
+<span id="toastIcon">ℹ️</span>
+<span id="toastMsg">Message</span>
+</div>
+
+<header class="hud-header">
+<div class="brand-logo"><div class="brand-dot"></div>DROP 2027</div>
+<div class="pill"><span>🪙</span><span id="creditVal">0</span></div>
+</header>
+
+<main class="screen-container">
+
+<!-- 1. ACCUEIL / DROP MYSTÈRE ANIMÉ -->
+<section id="scr-home" class="screen active">
+<div class="glass-card" style="text-align:center; padding:20px 12px;">
+<div class="card-title"><span>DROP MYSTÈRE ULTIME</span></div>
+
+<div class="drop-stage">
+<div class="particle-burst" id="particleBurst"></div>
+<div class="drop-card-3d" id="dropCard">
+<div class="drop-card-face drop-card-back">
+<div style="font-size:3.5rem; color:var(--glow-violet); font-weight:900; font-family:'Space Grotesk';">?</div>
+<div style="font-size:0.65rem; color:var(--text-muted); margin-top:5px; text-transform:uppercase; letter-spacing:1px;">Mystère</div>
+</div>
+<div class="drop-card-face drop-card-front" id="cardFront">
+<div style="font-size:3rem; margin-bottom:5px;" id="dropCardEmoji">🔮</div>
+<h4 style="font-size:0.85rem; font-family:'Space Grotesk';" id="dropCardName">Objet Mystère</h4>
+<p style="font-size:0.65rem; color:var(--glow-cyan); margin-top:4px;" id="dropCardRarity">Rareté</p>
+</div>
+</div>
+</div>
+
+<p style="font-size:0.75rem; color:var(--text-muted); margin:6px 0 14px;">Chances : <b>9/10</b> Classique & Rare | <b style="color:var(--glow-magenta);">1/10</b> Ultra Rare !</p>
+<button class="btn" id="btnDrop" onclick="openRandomDrop()">DÉBLOQUER (150 🪙)</button>
+</div>
+
+<div class="glass-card">
+<div class="card-title"><span>CRÉDITS GRATUITS</span></div>
+<button class="btn btn-secondary" onclick="startAdModal()">🎥 REGARDER UNE PUB (+15 🪙)</button>
+</div>
+</section>
+
+<!-- 2. CLASSEUR DE CATALOGUES -->
+<section id="scr-collection" class="screen">
+<div class="glass-card">
+<div class="card-title"><span>CLASSEUR DE CATALOGUES</span></div>
+
+<div class="binder-tabs">
+<div class="binder-tab active" onclick="switchCategory('tiktok', this)">📱 TikTok Trends</div>
+<div class="binder-tab" onclick="switchCategory('memes', this)">🎭 Pop Culture & Mèmes</div>
+<div class="binder-tab" onclick="switchCategory('gaming', this)">🎮 Gaming & Tech</div>
+<div class="binder-tab" onclick="switchCategory('football', this)">⚽ Football</div>
+<div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
+</div>
+
+<div class="grid-2" id="catalogGrid"></div>
+</div>
+</section>
+
+<!-- 3. MINI-JEUX -->
+<section id="scr-games" class="screen">
+<div class="glass-card">
+<div class="card-title"><span>ARCADE — GAIN DE CRÉDITS</span></div>
+<p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:12px;">Coût : 25 🪙 | Gain : 10 à 50 🪙</p>
+
+<div style="display:flex; flex-direction:column; gap:10px;">
+<div class="game-card"><div class="game-info"><h4>⚡ Réaction Extrême</h4><p>Stoppe le curseur hyper rapide !</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('reaction')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🔴 Puissance 4</h4><p>VS Robot Tactique</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('connect4')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🐍 Snake Néon</h4><p>Serpent tactile classique</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('snake')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🥞 Stack Néon</h4><p>Empilement de blocs précis</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('stack')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🎯 Tap Cible</h4><p>Touche les cibles en 10s</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('tap')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🧠 Mémoire Flash</h4><p>Répète la séquence néon</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('memory')">JOUER</button></div>
+</div>
+</div>
+</section>
+
+<!-- 4. BOUTIQUE -->
+<section id="scr-shop" class="screen">
+<div class="glass-card" style="text-align: center; padding: 30px 15px;">
+<div style="font-size: 3rem; margin-bottom: 10px;">🛠️</div>
+<h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; color: #fff; margin-bottom: 8px;">BOUTIQUE TEMPORAIREMENT FERMÉE</h3>
+<p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">La boutique d'achats de crédits est actuellement en maintenance. Elle sera de nouveau disponible très prochainement.</p>
+</div>
+</section>
+
+<!-- 5. COMPTE & AMIS -->
+<section id="scr-account" class="screen">
+<div id="authSection" class="glass-card">
+<div class="auth-tabs">
+<div class="auth-tab active" id="tabLogin" onclick="setAuthMode('login')">CONNEXION</div>
+<div class="auth-tab" id="tabRegister" onclick="setAuthMode('register')">INSCRIPTION</div>
+</div>
+
+<form id="authForm" onsubmit="handleAuth(event)">
+<div id="usernameBox" style="display:none;">
+<input type="text" id="authUsername" class="input-field" placeholder="Nom d'utilisateur">
+</div>
+<input type="email" id="authEmail" class="input-field" placeholder="Adresse e-mail" required>
+<input type="password" id="authPass" class="input-field" placeholder="Mot de passe" required>
+<button type="submit" class="btn" id="authSubmitBtn">SE CONNECTER</button>
+</form>
+</div>
+
+<div id="userProfileSection" class="glass-card" style="display:none; text-align:center;">
+<div style="font-size:3rem; margin-bottom:5px;">👤</div>
+<h3 style="font-family:'Space Grotesk';" id="profileName">Joueur</h3>
+<p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" id="userStatus">Joueur Standard</p>
+<p style="font-size:0.8rem; color:var(--glow-cyan); margin-top:8px;" id="userFriendId">ID Ami : Chargement...</p>
+<button class="btn btn-danger" style="margin-top:15px;" onclick="logoutUser()">SE DÉCONNECTER</button>
+</div>
+
+<!-- SECTION AMIS ET DEMANDES -->
+<div id="friendsSection" class="glass-card" style="display:none;">
+<div class="card-title"><span>🤝 CENTRE D'AMIS & DEMANDES</span></div>
+<div style="display:flex; gap:8px; margin-bottom:12px;">
+<input type="text" id="addFriendInput" class="input-field" placeholder="ID Ami (ex: #DROP-XXXX)" style="margin-bottom:0;">
+<button class="btn" style="width:auto; padding:0 15px;" onclick="sendFriendRequest()">AJOUTER</button>
+</div>
+
+<h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--glow-magenta);">📬 DEMANDES D'AMIS REÇUES</h4>
+<div id="friendRequestsList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i></div>
+
+<h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">👥 MES AMIS</h4>
+<div id="friendsList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucun ami ajouté.</i></div>
+<h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">🔄 ÉCHANGES DE CARTES</h4>
+<div id="tradesList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i></div>
+</div>
+
+<div class="glass-card">
+<div class="card-title"><span>CODE PROMO ADMINISTRATEUR</span></div>
+<input type="text" id="secretCodeInput" class="input-field" placeholder="Entrez le code..." style="text-transform:uppercase;">
+<button class="btn" onclick="redeemSecretCode()">VALIDER LE CODE</button>
+</div>
+</section>
+
+</main>
+
+<nav class="nav-dock">
+<button class="nav-item active" onclick="switchTab('scr-home', this)"><span class="nav-icon">🔮</span><span>DROP</span></button>
+<button class="nav-item" onclick="switchTab('scr-collection', this)"><span class="nav-icon">📁</span><span>CLASSEUR</span></button>
+<button class="nav-item" onclick="switchTab('scr-games', this)"><span class="nav-icon">🎮</span><span>JEUX</span></button>
+<button class="nav-item" onclick="switchTab('scr-shop', this)"><span class="nav-icon">💎</span><span>SHOP</span></button>
+<button class="nav-item" onclick="switchTab('scr-account', this)"><span class="nav-icon">👤</span><span>COMPTE</span></button>
+</nav>
+<!-- MODALS -->
+<div class="game-modal" id="gameArea">
+<div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<h3 style="font-family:'Space Grotesk';" id="gameTitle">Jeu</h3>
+<button class="btn btn-danger" style="width:auto; padding:6px 12px;" onclick="closeGame()">QUITTER</button>
+</div>
+<div id="gameCanvasContainer" style="width:100%; display:flex; justify-content:center; align-items:center; flex:1;"></div>
+</div>
+
+<div class="ad-modal" id="adModal">
+<div class="ad-box">
+<h3 style="font-family: 'Space Grotesk'; color: #fff; font-size: 1.1rem;">📺 Publicité Sponsorisée</h3>
+<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Regarde la vidéo pour obtenir tes crédits !</p>
+<div class="ad-screen">
+<div style="font-size: 2.5rem; margin-bottom: 8px;">🎬</div>
+<div style="font-family: 'Space Grotesk'; font-size: 1.4rem; font-weight: 800; color: var(--glow-cyan);" id="adTimer">30s</div>
+<p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">Visionnage en cours...</p>
+<div class="ad-progress" id="adProgressBar"></div>
+</div>
+<button class="btn" id="adClaimBtn" disabled onclick="claimAdReward()">PATIENTEZ (30s)...</button>
+</div>
+</div>
+
+</div>
+
+<script>
+// CONFIGURATION FIREBASE
+const firebaseConfig = {
+apiKey: "AIzaSyDulid3nF065pApgvoJ9DhFB7MSGc3uZJc",
+authDomain: "drop2027.firebaseapp.com",
+databaseURL: "https://drop2027-default-rtdb.firebaseio.com",
+projectId: "drop2027",
+storageBucket: "drop2027.firebasestorage.app",
+messagingSenderId: "776218104670",
+appId: "1:776218104670:web:9e52d49a350a4b485275cf",
+measurementId: "G-XHW37DN05J"
+};
+
+if (!firebase.apps.length) {
+firebase.initializeApp(firebaseConfig);
+}
+const auth = firebase.auth();
+const db = firebase.database();
+
+const CATALOGS = {
+tiktok: [
+{ id: 101, name: "Anneau Lumineux LED", emoji: "💡", price: 200, unlocked: false },
+{ id: 102, name: "Micro-Cravate Sans Fil", emoji: "🎙️", price: 250, unlocked: false },
+{ id: 103, name: "Trépied Suivi Automatique", emoji: "📐", price: 350, unlocked: false },
+{ id: 104, name: "Projecteur Galaxie TikTok", emoji: "🌌", price: 500, unlocked: false },
+{ id: 105, name: "Gourde Motivante 2L", emoji: "🥤", price: 150, unlocked: false },
+{ id: 106, name: "Tapis Néon RGB", emoji: "🟪", price: 300, unlocked: false },
+{ id: 107, name: "Mini Imprimante Thermique", emoji: "🖨️", price: 420, unlocked: false },
+{ id: 108, name: "Miroir Néon Vague", emoji: "🪞", price: 380, unlocked: false },
+{ id: 109, name: "Lampe Coucher de Soleil", emoji: "🌅", price: 220, unlocked: false },
+{ id: 110, name: "Micro Karaoke Bluetooth", emoji: "🎤", price: 310, unlocked: false },
+{ id: 111, name: "Sac Banane Holographique", emoji: "🎒", price: 280, unlocked: false },
+{ id: 112, name: "Veilleuse Pain de Mie", emoji: "🍞", price: 190, unlocked: false },
+{ id: 113, name: "Projecteur de poche 4K", emoji: "📹", price: 600, unlocked: false },
+{ id: 114, name: "Support Smartphone Flex", emoji: "📱", price: 170, unlocked: false },
+{ id: 115, name: "Lampe Plasma Cyber", emoji: "🔮", price: 340, unlocked: false },
+{ id: 116, name: "Enceinte Flottante LED", emoji: "🛸", price: 550, unlocked: false },
+{ id: 117, name: "Masque LED Personnalisable", emoji: "🎭", price: 480, unlocked: false },
+{ id: 118, name: "Bandeau Audio Sommeil", emoji: "🎧", price: 210, unlocked: false },
+{ id: 119, name: "Stylo d'Impression 3D", emoji: "🖊️", price: 390, unlocked: false },
+{ id: 120, name: "Distributeur de Bonbons Sensor", emoji: "🍬", price: 260, unlocked: false },
+{ id: 121, name: "Réveil Vague Rétro", emoji: "⏰", price: 310, unlocked: false },
+{ id: 122, name: "Cadre Photo Numérique HD", emoji: "🖼️", price: 620, unlocked: false },
+{ id: 123, name: "Kit Ring Light Pro Max", emoji: "📸", price: 700, unlocked: false },
+{ id: 124, name: "Mini Drone Follow-Me", emoji: "🚁", price: 850, unlocked: false },
+{ id: 125, name: "Tapis de Danse Lumineux", emoji: "🕺", price: 440, unlocked: false }
+],
+memes: [
+{ id: 201, name: "Lunettes Thug Life 8-Bit", emoji: "🕶️", price: 180, unlocked: false },
+{ id: 202, name: "Statue Moaï Moaï", emoji: "🗿", price: 400, unlocked: false },
+{ id: 203, name: "Peluches Pieuvre Reversible", emoji: "🐙", price: 220, unlocked: false },
+{ id: 204, name: "Casquette Cap No Cap", emoji: "🧢", price: 150, unlocked: false },
+{ id: 205, name: "Badge Meme Doge Gold", emoji: "🐕", price: 600, unlocked: false },
+{ id: 206, name: "Masque Shrek 3D", emoji: "👹", price: 320, unlocked: false },
+{ id: 207, name: "Carte Uno Reverse Silver", emoji: "🔄", price: 250, unlocked: false },
+{ id: 208, name: "Statue Pop Cat", emoji: "🐱", price: 480, unlocked: false },
+{ id: 209, name: "Coussin Geant Cheetos", emoji: "🛋️", price: 350, unlocked: false },
+{ id: 210, name: "Figurine Gigachad", emoji: "🗿", price: 750, unlocked: false },
+{ id: 211, name: "Tapis Froggy Peepo", emoji: "🐸", price: 290, unlocked: false },
+{ id: 212, name: "Mug 'Fine Dog' Fire", emoji: "☕", price: 210, unlocked: false },
+{ id: 213, name: "Trompette Doot Doot", emoji: "🎺", price: 330, unlocked: false },
+{ id: 214, name: "Costume Inflatable Alien", emoji: "👽", price: 520, unlocked: false },
+{ id: 215, name: "Bouton Noice Sound", emoji: "🔊", price: 170, unlocked: false },
+{ id: 216, name: "Canard en Caoutchouc Géant", emoji: "🦆", price: 280, unlocked: false },
+{ id: 217, name: "Affiche Nyan Cat Gold", emoji: "🌈", price: 450, unlocked: false },
+{ id: 218, name: "Horloge Meme 'It's Wednesday'", emoji: "🐸", price: 380, unlocked: false },
+{ id: 219, name: "Marteau de Juge 'Bonk'", emoji: "🔨", price: 230, unlocked: false },
+{ id: 220, name: "Figurine Stonks Up", emoji: "📈", price: 510, unlocked: false },
+{ id: 221, name: "Plaque d'Égout Pepe", emoji: "🛡️", price: 600, unlocked: false },
+{ id: 222, name: "Trophée NPC Officiel", emoji: "👤", price: 340, unlocked: false },
+{ id: 223, name: "Sifflet Emotional Damage", emoji: "💥", price: 290, unlocked: false },
+{ id: 224, name: "Panneau 'Bruh Moment'", emoji: "🚧", price: 310, unlocked: false },
+{ id: 225, name: "Costume T-Rex Gonflable", emoji: "🦖", price: 680, unlocked: false }
+],
+gaming: [
+{ id: 301, name: "Manette Pro Translucide", emoji: "🎮", price: 800, unlocked: false },
+{ id: 302, name: "Casque Audio Cyberpunk", emoji: "🎧", price: 1200, unlocked: false },
+{ id: 303, name: "Clavier Mécanique Custom", emoji: "⌨️", price: 1500, unlocked: false },
+{ id: 304, name: "Console Rétro Portable", emoji: "🕹️", price: 900, unlocked: false },
+{ id: 305, name: "Masque VR Next-Gen", emoji: "🥽", price: 2500, unlocked: false },
+{ id: 306, name: "Support Casque RGB", emoji: "🗼", price: 450, unlocked: false },
+{ id: 307, name: "Tapis de Souris XXL Neon", emoji: "🖥️", price: 380, unlocked: false },
+{ id: 308, name: "Carte Graphique Rétro", emoji: "📟", price: 1800, unlocked: false },
+{ id: 309, name: "Mini Borne Arcade", emoji: "👾", price: 1100, unlocked: false },
+{ id: 310, name: "Stream Deck Mini", emoji: "🎛️", price: 1350, unlocked: false },
+{ id: 311, name: "Câble Lumineux Fast Charge", emoji: "🔌", price: 210, unlocked: false },
+{ id: 312, name: "Finger Sleeves Pro", emoji: "🖐️", price: 120, unlocked: false },
+{ id: 313, name: "Chaise Gaming Quantum", emoji: "💺", price: 3200, unlocked: false },
+{ id: 314, name: "Microphone Studio Pro", emoji: "🎙️", price: 1400, unlocked: false },
+{ id: 315, name: "Souris de Jeu Ultra-Légère", emoji: "🖱️", price: 750, unlocked: false },
+{ id: 316, name: "Gants Retrogaming Tactiles", emoji: "🧤", price: 320, unlocked: false },
+{ id: 317, name: "Support Écran Triple Bras", emoji: "🖥️", price: 1600, unlocked: false },
+{ id: 318, name: "Coussin Ergonomique Gamer", emoji: "🛏️", price: 290, unlocked: false },
+{ id: 319, name: "Boîtier PC Verre Trempé RGB", emoji: "💻", price: 2100, unlocked: false },
+{ id: 320, name: "Carte d'Acquisition 4K60", emoji: "📹", price: 1750, unlocked: false },
+{ id: 321, name: "Eclairage Ambilight Écran", emoji: "🌈", price: 890, unlocked: false },
+{ id: 322, name: "Lunettes Anti-Lumière Bleue Pro", emoji: "👓", price: 410, unlocked: false },
+{ id: 323, name: "Volant Retour de Force GT", emoji: "🏎️", price: 2800, unlocked: false },
+{ id: 324, name: "Siège Simulation Dynamique", emoji: "🏎️", price: 4500, unlocked: false }
+],
+football: [
+{ id: 501, name: "Ballon Doré Vintage", emoji: "⚽", price: 300, unlocked: false },
+{ id: 502, name: "Crampons à Réacteurs", emoji: "👟", price: 650, unlocked: false },
+{ id: 503, name: "Sifflet d'Arbitre d'Or", emoji: "🎷", price: 250, unlocked: false },
+{ id: 504, name: "Maillot Retro Kylian Mbappou", emoji: "👕", price: 1200, unlocked: false },
+{ id: 505, name: "Figurine Lionel Messsi", emoji: "🐐", price: 2500, unlocked: false },
+{ id: 506, name: "Statue Cristiano Ronaldoo", emoji: "🗿", price: 2800, unlocked: false },
+{ id: 507, name: "Carte Legend Erling Braland", emoji: "🤖", price: 3500, unlocked: false },
+{ id: 508, name: "Gants de Zinedine Zidano", emoji: "🧤", price: 4000, unlocked: false },
+{ id: 509, name: "Casquette Karim Benzemouche", emoji: "🧢", price: 1800, unlocked: false },
+{ id: 510, name: "Gourde Tactique Neymar Jr", emoji: "🧪", price: 1500, unlocked: false },
+{ id: 511, name: "Carton Rouge Laser Inviolable", emoji: "🟥", price: 800, unlocked: false },
+{ id: 512, name: "Filet de Cage Infrissonnable", emoji: "🕸️", price: 1100, unlocked: false },
+{ id: 513, name: "Trophée Coupe du Monde (Officiel)", emoji: "🏆", price: 500000, unlocked: false }
+],
+secret: [
+{ id: 401, name: "Carte VIP Gold Access", emoji: "💳", price: 5000, unlocked: false },
+{ id: 402, name: "Trophée Créateur Diamant", emoji: "🏆", price: 10000, unlocked: false },
+{ id: 403, name: "Lingot Pur Métal DROP", emoji: "🧈", price: 15000, unlocked: false },
+{ id: 404, name: "Pass Backstage 2027", emoji: "🎟️", price: 8000, unlocked: false },
+{ id: 405, name: "Clé USB Holo-Cryptée", emoji: "🔑", price: 6500, unlocked: false },
+{ id: 406, name: "Bague Néon Collector", emoji: "💍", price: 12000, unlocked: false },
+{ id: 407, name: "Badge Fondateur Édition 1", emoji: "🎖️", price: 20000, unlocked: false },
+{ id: 408, name: "Disque d'Or Numérique", emoji: "📀", price: 30000, unlocked: false },
+{ id: 409, name: "Puce Cyber-Augmentée", emoji: "🦾", price: 45000, unlocked: false },
+{ id: 410, name: "Couronne Holographique", emoji: "👑", price: 75000, unlocked: false },
+{ id: 411, name: "Trophée Rubis Exclusif", emoji: "💎", price: 100000, unlocked: false },
+{ id: 412, name: "Orbe d'Énergie Quantique", emoji: "🔮", price: 150000, unlocked: false },
+{ id: 413, name: "Sceptre du Créateur", emoji: "🪄", price: 250000, unlocked: false },
+{ id: 414, name: "Carte de Crédit Obsidienne", emoji: "🖤", price: 400000, unlocked: false },
+{ id: 415, name: "Sceau Absolu de l'Infiniment Grand", emoji: "🌌", price: 600000, unlocked: false },
+{ id: 416, name: "Passeport Cosmique 2027", emoji: "🛸", price: 800000, unlocked: false },
+{ id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false }
+]
+};
+
+let activeCategory = 'tiktok';
+let appData = {
+credits: 0,
+redeemedCodes: [],
+currentUser: null,
+friendId: null,
+friends: [],
+isAdmin: false,
+catalogs: JSON.parse(JSON.stringify(CATALOGS))
+};
+
+let currentAuthMode = 'login';
+let isDropping = false;
+
+function showToast(message, type = 'success') {
+const toast = document.getElementById('appToast');
+const msgEl = document.getElementById('toastMsg');
+const iconEl = document.getElementById('toastIcon');
+
+toast.className = 'app-toast ' + type;
+msgEl.innerText = message;
+iconEl.innerText = type === 'success' ? '✅' : '❌';
+
+toast.classList.add('show');
+setTimeout(() => {
+toast.classList.remove('show');
+}, 3500);
+}
+
+// GESTION CORRIGÉE DE L'AUTHENTIFICATION ET PERSISTANCE
+auth.onAuthStateChanged((user) => {
+if (user) {
+const userRef = db.ref('users/' + user.uid);
+userRef.once('value').then((snapshot) => {
+let data = snapshot.val();
+const isAdminEmail = (user.email === 'carer.nathan11@gmail.com');
+
+if (!data) {
+const fId = generateFriendCode(user.uid);
+let freshCatalogs = JSON.parse(JSON.stringify(CATALOGS));
+if (isAdminEmail) {
+Object.keys(freshCatalogs).forEach(cat => freshCatalogs[cat].forEach(i => i.unlocked = true));
+}
+data = {
+username: user.email.split('@')[0],
+credits: isAdminEmail ? 999999999 : 0,
+friendId: fId,
+friends: [],
+isAdmin: isAdminEmail,
+catalogs: freshCatalogs,
+redeemedCodes: []
+};
+userRef.set(data);
+}
+
+appData.currentUser = { email: user.email, username: data.username || user.email.split('@')[0], uid: user.uid };
+appData.credits = data.credits !== undefined ? data.credits : 0;
+appData.friendId = data.friendId || generateFriendCode(user.uid);
+appData.friends = data.friends || [];
+appData.isAdmin = data.isAdmin || isAdminEmail;
+appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
+appData.redeemedCodes = data.redeemedCodes || [];
+
+db.ref('friend_codes/' + appData.friendId).set(user.uid);
+listenToTrades();
+listenToFriendRequests();
+updateUI();
+}).catch((error) => {
+console.error("Erreur de récupération :", error);
+appData.currentUser = { email: user.email, username: user.email.split('@')[0], uid: user.uid };
+updateUI();
+});
+} else {
+appData.currentUser = null;
+appData.credits = 0;
+appData.friendId = null;
+appData.friends = [];
+appData.isAdmin = false;
+appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
+updateUI();
+}
+});
+
+function generateFriendCode(uid) {
+return '#DROP-' + uid.substring(0, 8).toUpperCase();
+}
+
+function saveAppData() {
+if (appData.currentUser) {
+db.ref('users/' + appData.currentUser.uid).update({
+credits: appData.credits,
+catalogs: appData.catalogs,
+friends: appData.friends,
+friendId: appData.friendId,
+isAdmin: appData.isAdmin,
+redeemedCodes: appData.redeemedCodes
+});
+}
+updateUI();
+}
+
+function updateUI() {
+document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
+
+const authSec = document.getElementById('authSection');
+const profSec = document.getElementById('userProfileSection');
+const friendsSec = document.getElementById('friendsSection');
+
+if (appData.currentUser) {
+authSec.style.display = 'none';
+profSec.style.display = 'block';
+friendsSec.style.display = 'block';
+
+document.getElementById('profileName').innerText = appData.currentUser.username;
+document.getElementById('userFriendId').innerText = 'ID Ami : ' + appData.friendId;
+
+if (appData.isAdmin) {
+document.getElementById('userStatus').innerText = "👑 ADMINISTRATEUR SYSTEME";
+document.getElementById('userStatus').style.color = "var(--glow-magenta)";
+} else {
+document.getElementById('userStatus').innerText = "🎮 Joueur Standard";
+document.getElementById('userStatus').style.color = "var(--text-muted)";
+}
+renderFriendsUI();
+} else {
+authSec.style.display = 'block';
+profSec.style.display = 'none';
+friendsSec.style.display = 'none';
+}
+
+renderCatalogGrid();
+}
+function switchTab(id, btn) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+if (btn) btn.classList.add('active');
+}
+
+function switchCategory(catKey, tabBtn) {
+activeCategory = catKey;
+document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
+if(tabBtn) tabBtn.classList.add('active');
+renderCatalogGrid();
+}
+
+function renderCatalogGrid() {
+const grid = document.getElementById('catalogGrid');
+grid.innerHTML = '';
+
+if (activeCategory === 'football') {
+const bgPattern = document.createElement('div');
+bgPattern.className = 'football-bg-pattern';
+bgPattern.innerHTML = '⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽';
+grid.appendChild(bgPattern);
+}
+
+const currentItems = appData.catalogs[activeCategory] || [];
+
+currentItems.forEach(item => {
+const div = document.createElement('div');
+div.className = 'catalog-card' + (item.unlocked ? '' : ' locked');
+div.innerHTML = `<div class="emoji">${item.emoji}</div>
+<div class="item-name">${item.name}</div><div class="item-price">${item.price} 🪙</div>
+<button class="btn ${item.unlocked ? 'btn-secondary' : ''}" style="padding:6px; font-size:0.7rem; margin-top:8px;" ${item.unlocked ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">${item.unlocked ? 'Acquis' : 'Obtenir'}</button>`;
+grid.appendChild(div);
+});
+}
+
+function buyItemDirect(id) {
+let found = null;
+Object.keys(appData.catalogs).forEach(cat => {
+const item = appData.catalogs[cat].find(i => i.id === id);
+if(item) found = item;
+});
+
+if (!found) return;
+if (found.unlocked) return showToast('Article déjà débloqué !', 'error');
+
+if (!appData.isAdmin && appData.credits < found.price) {
+return showToast('Crédits insuffisants ! Il faut ' + found.price + ' 🪙', 'error');
+}
+
+if (!appData.isAdmin) appData.credits -= found.price;
+found.unlocked = true;
+
+if (found.id === 2000) triggerAnnihilation();
+else showToast('🎉 FÉLICITATIONS ! Objet obtenu : ' + found.emoji + ' ' + found.name, 'success');
+saveAppData();
+}
+
+function openRandomDrop() {
+if (isDropping) return;
+if (!appData.isAdmin && appData.credits < 150) return showToast('150 Crédits requis pour lancer un drop !', 'error');
+const roll = Math.random();
+let isUltraRare = roll < 0.1;
+
+let pool = [];
+if (isUltraRare) {
+appData.catalogs.secret.forEach(i => { if(!i.unlocked) pool.push(i); });
+} else {
+['tiktok', 'memes', 'gaming', 'football'].forEach(cat => {
+if(appData.catalogs[cat]) {
+appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+}
+});
+}
+
+if (pool.length === 0) {
+Object.keys(appData.catalogs).forEach(cat => {
+appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+});
+}
+
+if (pool.length === 0) return showToast('Félicitations, tout le classeur est déjà débloqué !', 'success');
+
+if (!appData.isAdmin) appData.credits -= 150;
+saveAppData();
+
+const picked = pool[Math.floor(Math.random() * pool.length)];
+picked.unlocked = true;
+
+isDropping = true;
+const card = document.getElementById('dropCard');
+const btn = document.getElementById('btnDrop');
+btn.disabled = true;
+
+card.classList.remove('revealed', 'exploding');
+
+document.getElementById('dropCardEmoji').innerText = picked.emoji;
+document.getElementById('dropCardName').innerText = picked.name;
+document.getElementById('dropCardRarity').innerText = isUltraRare ? "⚡ ULTRA RARE (1/10)" : "🌟 CLASSIQUE / RARE";
+document.getElementById('dropCardRarity').style.color = isUltraRare ? "var(--glow-magenta)" : "var(--glow-cyan)";
+
+setTimeout(() => card.classList.add('revealed'), 300);
+setTimeout(() => { card.classList.add('exploding'); createExplosionParticles(); }, 1400);
+
+setTimeout(() => {
+isDropping = false;
+btn.disabled = false;
+saveAppData();
+
+if (picked.id === 2000) triggerAnnihilation();
+else showToast('💥 UNBOXING EXPLOSIF ! Obtenu : ' + picked.emoji + ' ' + picked.name, 'success');
+}, 2200);
+}
+
+function createExplosionParticles() {
+const container = document.getElementById('particleBurst');
+container.innerHTML = '';
+for (let i = 0; i < 30; i++) {
+const p = document.createElement('div');
+p.className = 'particle active';
+const angle = Math.random() * Math.PI * 2;
+const dist = 80 + Math.random() * 120;
+p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+p.style.background = (i % 2 === 0) ? 'var(--glow-magenta)' : 'var(--glow-cyan)';
+container.appendChild(p);
+}
+}
+
+function triggerAnnihilation() {
+const vp = document.getElementById('viewport');
+vp.classList.add('annihilate');
+setTimeout(() => {
+vp.classList.remove('annihilate');
+appData.isAdmin = true;
+appData.credits = 999999999;
+Object.keys(appData.catalogs).forEach(cat => {
+appData.catalogs[cat].forEach(i => i.unlocked = true);
+});
+saveAppData();
+showToast('💥 ACCÈS ADMINISTRATEUR SUPRÊME DÉBLOQUÉ !', 'success');
+}, 2500);
+}
+
+function setAuthMode(mode) {
+currentAuthMode = mode;
+document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+document.getElementById('usernameBox').style.display = mode === 'register' ? 'block' : 'none';
+document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE";
+}
+
+function firebaseAuthErrorMessage(err) {
+const code = err && err.code ? err.code : '';
+const messages = {
+  'auth/invalid-email': 'Adresse e-mail invalide.',
+  'auth/user-not-found': 'Aucun compte ne correspond à cette adresse.',
+  'auth/wrong-password': 'Mot de passe incorrect.',
+  'auth/invalid-credential': 'E-mail ou mot de passe incorrect.',
+  'auth/email-already-in-use': 'Cette adresse e-mail est déjà utilisée.',
+  'auth/weak-password': 'Le mot de passe doit contenir au moins 6 caractères.',
+  'auth/operation-not-allowed': 'La connexion par e-mail/mot de passe n’est pas activée dans Firebase.'
+};
+return messages[code] || (err && err.message) || 'Une erreur inconnue est survenue.';
+}
+function handleAuth(e) {
+e.preventDefault();
+const submitBtn = document.getElementById('authSubmitBtn');
+const email = document.getElementById('authEmail').value.trim().toLowerCase();
+const pass = document.getElementById('authPass').value;
+const username = document.getElementById('authUsername').value.trim();
+if (!email || !pass) return showToast('❌ E-mail et mot de passe requis.', 'error');
+submitBtn.disabled = true;
+
+let isAdminAccount = (email === 'carer.nathan11@gmail.com');
+if (isAdminAccount && pass === 'dropadministrator20262027acces') {
+appData.isAdmin = true;
+appData.credits = 999999999;
+Object.keys(appData.catalogs).forEach(cat => appData.catalogs[cat].forEach(i => i.unlocked = true));
+}
+
+if (currentAuthMode === 'register') {
+auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
+const u = userCredential.user;
+const fId = generateFriendCode(u.uid);
+let initialCatalogs = JSON.parse(JSON.stringify(CATALOGS));
+if (appData.isAdmin) {
+Object.keys(initialCatalogs).forEach(cat => initialCatalogs[cat].forEach(i => i.unlocked = true));
+}
+const initialData = {
+username: username || email.split('@')[0],
+credits: appData.isAdmin ? 999999999 : 0,
+friendId: fId,
+friends: [],
+isAdmin: appData.isAdmin,
+catalogs: initialCatalogs,
+redeemedCodes: []
+};
+db.ref('users/' + u.uid).set(initialData).then(() => {
+db.ref('friend_codes/' + fId).set(u.uid);
+appData.currentUser = { email: u.email, username: initialData.username, uid: u.uid };
+showToast('✨ Compte créé avec succès ! Bienvenue.', 'success');
+updateUI();
+});
+}).catch(err => showToast("❌ Erreur d’inscription : " + firebaseAuthErrorMessage(err), "error"))
+.finally(() => { submitBtn.disabled = false; });
+} else {
+auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
+const u = userCredential.user;
+db.ref('users/' + u.uid).once('value').then(snapshot => {
+let data = snapshot.val() || {};
+if (!data.username) {
+data.username = u.email.split('@')[0];
+}
+db.ref('friend_codes/' + (data.friendId || generateFriendCode(u.uid))).set(u.uid);
+appData.currentUser = { email: u.email, username: data.username, uid: u.uid };
+appData.credits = data.credits !== undefined ? data.credits : 0;
+appData.friendId = data.friendId || generateFriendCode(u.uid);
+appData.friends = data.friends || [];
+appData.isAdmin = data.isAdmin || appData.isAdmin;
+appData.catalogs = data.catalogs || appData.catalogs;
+appData.redeemedCodes = data.redeemedCodes || [];
+showToast('👋 Connexion réussie ! Bon retour.', 'success');
+updateUI();
+});
+}).catch(err => showToast('❌ Erreur de connexion : ' + firebaseAuthErrorMessage(err), 'error'))
+.finally(() => { submitBtn.disabled = false; });
+}
+}
+
+function logoutUser() {
+auth.signOut().then(() => {
+appData.currentUser = null;
+showToast('Déconnexion effectuée.', 'success');
+updateUI();
+});
+}
+
+// GESTION CORRIGÉE DES AMIS ET DES DEMANDES
+function sendFriendRequest() {
+if (!appData.currentUser) return showToast('❌ Connectez-vous pour ajouter un ami.', 'error');
+const rawCode = document.getElementById('addFriendInput').value.trim().toUpperCase();
+const code = rawCode.startsWith('#') ? rawCode : '#' + rawCode;
+if (!code) return showToast("❌ Veuillez entrer un ID d'ami valide !", 'error');
+
+db.ref('friend_codes/' + code).once('value').then(snapshot => {
+const targetUid = snapshot.val();
+if (!targetUid) return showToast("❌ Cet ID Ami n'existe pas dans le système !", 'error');
+if (targetUid === appData.currentUser.uid) return showToast("❌ Vous ne pouvez pas vous ajouter vous-même !", 'error');
+
+if (appData.friends.some(f => f.uid === targetUid)) {
+return showToast("⚠️ Cet utilisateur est déjà dans votre liste d'amis.", 'error');
+}
+
+db.ref('friend_requests/' + targetUid).once('value').then(reqSnap => {
+const requests = reqSnap.val() || {};
+const alreadyRequested = Object.values(requests).some(r => r.senderUid === appData.currentUser.uid && r.status === 'pending');
+
+if (alreadyRequested) {
+return showToast("⚠️ Une demande a déjà été envoyée à cet utilisateur.", 'error');
+}
+
+const reqId = 'req_' + Date.now();
+db.ref('friend_requests/' + targetUid + '/' + reqId).set({
+senderUid: appData.currentUser.uid,
+senderName: appData.currentUser.username,
+senderFriendId: appData.friendId,
+status: 'pending'
+}).then(() => {
+document.getElementById('addFriendInput').value = '';
+showToast("✅ Demande d'ami envoyée avec succès !", 'success');
+});
+});
+}).catch(err => {
+showToast("❌ Erreur : " + err.message, 'error');
+});
+}
+
+function listenToFriendRequests() {
+if (!appData.currentUser) return;
+db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
+const requests = snapshot.val();
+const listEl = document.getElementById('friendRequestsList');
+if (!listEl) return;
+listEl.innerHTML = '';
+
+if (!requests) {
+listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
+return;
+}
+let count = 0;
+Object.keys(requests).forEach(reqId => {
+const req = requests[reqId];
+if (req && req.status === 'pending') {
+count++;
+const div = document.createElement('div');
+div.className = 'request-card-box';
+div.innerHTML = `<div style="font-size:0.8rem;"><b>${req.senderName}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${req.senderFriendId || ''})</span></div>
+<div style="display:flex; gap:6px; margin-top:8px;">
+<button class="btn btn-success" style="padding:6px; font-size:0.7rem;" onclick="acceptFriendRequest('${reqId}', '${req.senderUid}', '${String(req.senderName || '').replace(/'/g, "\'")}', '${req.senderFriendId || ''}')">ACCEPTER</button>
+<button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="refuseFriendRequest('${reqId}')">REFUSER</button>
+</div>`;
+listEl.appendChild(div);
+}
+});
+
+if (count === 0) {
+listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
+}
+});
+}
+
+function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
+if (!appData.friends.some(f => f.uid === senderUid)) {
+appData.friends.push({ uid: senderUid, username: senderName, friendId: senderFriendId });
+}
+
+db.ref('users/' + senderUid + '/friends').once('value').then(snap => {
+let friendList = snap.val() || [];
+if (!friendList.some(f => f.uid === appData.currentUser.uid)) {
+friendList.push({ uid: appData.currentUser.uid, username: appData.currentUser.username, friendId: appData.friendId });
+db.ref('users/' + senderUid + '/friends').set(friendList);
+}
+});
+
+db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove();
+saveAppData();
+showToast('🎉 Vous êtes désormais ami avec ' + senderName + ' !', 'success');
+}
+
+function refuseFriendRequest(reqId) {
+db.ref('friend_requests/' + appData.currentUser.uid + '/' + reqId).remove();
+showToast("Demande refusée.", 'success');
+}
+
+function renderFriendsUI() {
+const fl = document.getElementById('friendsList');
+if (!appData.friends || appData.friends.length === 0) {
+fl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucun ami ajouté.</i>';
+return;
+}
+
+fl.innerHTML = '';
+appData.friends.forEach(f => {
+const div = document.createElement('div');
+div.className = 'friend-badge';
+div.innerHTML = `<div><b>${f.username}</b> <span style="font-size:0.7rem; color:var(--text-muted);">(${f.friendId})</span></div>
+<button class="btn" style="width:auto; padding:6px 12px; font-size:0.7rem;" onclick="openTradePrompt('${f.uid}', '${String(f.username || '').replace(/'/g, "\'")}')">ÉCHANGER</button>`;
+fl.appendChild(div);
+});
+}
+
+function openTradePrompt(targetUid, targetName) {
+let myUnlocked = [];
+Object.keys(appData.catalogs).forEach(cat => {
+appData.catalogs[cat].forEach(i => { if(i.unlocked) myUnlocked.push(i); });
+});
+
+if (myUnlocked.length === 0) return showToast("Vous n'avez aucune carte débloquée à proposer !", 'error');
+
+let msg = "Proposer un échange à " + targetName + " :\nEntrez l'ID de la carte que vous DONNEZ :\n" + myUnlocked.map(i => '#' + i.id + ' - ' + i.name).join('\n');
+let myCardId = prompt(msg);
+if (!myCardId) return;
+
+let wantedCardInput = prompt("Entrez l'ID de la carte que vous DEMANDEZ en échange :");
+if (!wantedCardInput) return;
+
+const offeredCardId = Number(String(myCardId).replace('#', '').trim());
+const wantedCardId = Number(String(wantedCardInput).replace('#', '').trim());
+if (!Number.isInteger(offeredCardId) || !Number.isInteger(wantedCardId)) {
+  return showToast('❌ ID de carte invalide.', 'error');
+}
+const offeredCard = findCardById(offeredCardId);
+if (!offeredCard || !offeredCard.unlocked) {
+  return showToast('❌ Cette carte n’est pas débloquée dans votre classeur.', 'error');
+}
+const tradeId = 'trade_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+db.ref('trades/' + tradeId).set({
+senderUid: appData.currentUser.uid,
+senderName: appData.currentUser.username,
+receiverUid: targetUid,
+offeredCardId,
+wantedCardId,
+status: 'pending'
+}).catch(err => showToast('❌ Erreur d’envoi : ' + err.message, 'error'));
+
+showToast("📩 Offre d'échange envoyée avec succès !", 'success');
+}
+
+function listenToTrades() {
+db.ref('trades').on('value', snapshot => {
+const trades = snapshot.val();
+const tl = document.getElementById('tradesList');
+if(!tl) return;
+tl.innerHTML = '';
+
+if (!trades) { tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>'; return; }
+
+let count = 0;
+Object.keys(trades).forEach(tid => {
+const t = trades[tid];
+if (appData.currentUser && (t.receiverUid === appData.currentUser.uid || t.senderUid === appData.currentUser.uid) && t.status === 'pending') {
+count++;
+const div = document.createElement('div');
+div.className = 'trade-card-box';
+
+if (t.receiverUid === appData.currentUser.uid) {
+div.innerHTML = `<p style="font-size:0.75rem;">📩 <b>${t.senderName}</b> souhaite faire un échange !</p>
+<p style="font-size:0.7rem; color:var(--glow-cyan);">Propose #${t.offeredCardId} | Demande #${t.wantedCardId}</p>
+<div style="display:flex; gap:6px; margin-top:8px;">
+<button class="btn btn-success" style="padding:6px; font-size:0.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button>
+<button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button>
+</div>`;
+} else {
+div.innerHTML = `<p style="font-size:0.75rem; color:var(--text-muted);">⏳ Offre envoyée à votre ami (En attente...)</p>`;
+}
+tl.appendChild(div);
+}
+});
+
+if (count === 0) tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>';
+});
+}
+
+function acceptTrade(tradeId) {
+db.ref('trades/' + tradeId).once('value').then(snapshot => {
+const t = snapshot.val();
+if (!t || t.status !== 'pending') return;
+if (!appData.currentUser || t.receiverUid !== appData.currentUser.uid) return;
+
+const offeredCard = findCardById(t.offeredCardId);
+const wantedCard = findCardById(t.wantedCardId);
+if (!offeredCard || !wantedCard || !wantedCard.unlocked) {
+  return showToast('❌ Échange impossible : la carte demandée n’est plus disponible.', 'error');
+}
+
+db.ref('users/' + t.senderUid + '/catalogs').once('value').then(snap => {
+const senderCats = snap.val();
+if (!senderCats) throw new Error('Données du joueur introuvables.');
+
+let senderOffered = false;
+let senderWanted = false;
+Object.keys(senderCats).forEach(cat => {
+  senderCats[cat].forEach(i => {
+    if (i.id === Number(t.offeredCardId) && i.unlocked) senderOffered = true;
+    if (i.id === Number(t.wantedCardId)) i.unlocked = true;
+  });
+});
+if (!senderOffered) throw new Error('La carte proposée n’est plus disponible.');
+
+Object.keys(senderCats).forEach(cat => {
+  senderCats[cat].forEach(i => {
+    if (i.id === Number(t.offeredCardId)) i.unlocked = false;
+    if (i.id === Number(t.wantedCardId)) i.unlocked = true;
+  });
+});
+
+return db.ref('users/' + t.senderUid + '/catalogs').set(senderCats);
+}).then(() => {
+wantedCard.unlocked = false;
+offeredCard.unlocked = true;
+return db.ref('trades/' + tradeId).update({ status: 'accepted' });
+}).then(() => {
+saveAppData();
+showToast('🎉 Échange réussi ! Les cartes ont été synchronisées.', 'success');
+}).catch(err => {
+console.error(err);
+showToast('❌ Impossible de finaliser l’échange : ' + err.message, 'error');
+});
+});
+}
+
+function findCardById(id) {
+let result = null;
+Object.keys(appData.catalogs).forEach(cat => {
+const item = appData.catalogs[cat].find(i => i.id === Number(id));
+if (item) result = item;
+});
+return result;
+}
+
+function refuseTrade(tradeId) {
+db.ref('trades/' + tradeId).update({ status: 'refused' });
+showToast("Offre d'échange refusée.", 'success');
+}
+
+function unlockCardById(id) {
+Object.keys(appData.catalogs).forEach(cat => {
+appData.catalogs[cat].forEach(i => { if(i.id === id) i.unlocked = true; });
+});
+}
+
+function redeemSecretCode() {
+const code = document.getElementById('secretCodeInput').value.trim().toUpperCase();
+if (!code) return;
+
+if (appData.redeemedCodes.includes(code)) return showToast('❌ Ce code a déjà été utilisé.', 'error');
+
+if (code === 'DROPDROP2627GIVEFREE10000') {
+appData.credits += 10000;
+appData.redeemedCodes.push(code);
+saveAppData();
+document.getElementById('secretCodeInput').value = '';
+showToast('🎉 CODE VALIDE ! +10 000 Crédits ajoutés.', 'success');
+} else {
+showToast('❌ Code promotionnel invalide ou expiré.', 'error');
+}
+}
+
+/* PUBLICITÉ 30S */
+let adInterval = null, adTimeRemaining = 30;
+function startAdModal() {
+adTimeRemaining = 30;
+const modal = document.getElementById('adModal'), timerEl = document.getElementById('adTimer'), btn = document.getElementById('adClaimBtn'), progressBar = document.getElementById('adProgressBar');
+modal.classList.add('active'); btn.disabled = true; btn.innerText = 'PATIENTEZ (' + adTimeRemaining + 's)...'; timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = '0%';
+
+adInterval = setInterval(() => {
+adTimeRemaining--;
+timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = ((30 - adTimeRemaining) / 30) * 100 + '%';
+if (adTimeRemaining <= 0) {
+clearInterval(adInterval); btn.disabled = false; btn.innerText = 'RÉCUPÉRER 15 🪙';
+}
+}, 1000);
+}
+
+function claimAdReward() {
+appData.credits += 15;
+saveAppData();
+document.getElementById('adModal').classList.remove('active');
+showToast('Pub visionnée avec succès ! +15 Crédits 🪙', 'success');
+}
+
+/* MINI-JEUX ARCADE */
+let currentGameInterval = null;
+function startGame(gameType) {
+if (!appData.isAdmin && appData.credits < 25) return showToast('25 Crédits nécessaires pour jouer !', 'error');
+if (!appData.isAdmin) appData.credits -= 25;
+saveAppData();
+
+document.getElementById('gameArea').classList.add('active');
+const container = document.getElementById('gameCanvasContainer');
+container.innerHTML = '';
+
+if (gameType === 'reaction') runReactionGame(container);
+else if (gameType === 'connect4') runConnect4Game(container);
+else if (gameType === 'snake') runSnakeGame(container);
+else if (gameType === 'tap') runTapGame(container);
+else if (gameType === 'memory') runMemoryGame(container);
+else if (gameType === 'stack') runStackGame(container);
+}
+
+function closeGame() {
+if(currentGameInterval) clearInterval(currentGameInterval);
+document.getElementById('gameArea').classList.remove('active');
+}
+
+function rewardPlayer(amount) {
+showToast('🎮 Fin de partie ! Gains : +' + amount + ' Crédits 🪙', 'success');
+appData.credits += amount;
+saveAppData();
+closeGame();
+}
+function runReactionGame(c) {
+document.getElementById('gameTitle').innerText = "Réaction Extrême";
+c.innerHTML = '<div style="text-align:center;"><div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);"><div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div><div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div></div><button class="btn" onclick="stopReaction()">STOP !</button></div>';
+let pos = 0, dir = 12;
+currentGameInterval = setInterval(() => {
+pos += dir; if(pos > 244 || pos < 0) dir *= -1;
+const cur = document.getElementById('cursor');
+if(cur) cur.style.left = pos + 'px';
+}, 4);
+window.stopReaction = () => {
+clearInterval(currentGameInterval);
+rewardPlayer((pos >= 100 && pos <= 150) ? 50 : 10);
+};
+}
+
+function runConnect4Game(c) {
+document.getElementById('gameTitle').innerText = "Puissance 4 Tactique";
+c.innerHTML = '<div id="c4board" style="display:grid; grid-template-columns:repeat(7, 35px); gap:5px; background:rgba(139,92,246,0.2); padding:8px; border-radius:14px; border:1px solid var(--card-border);"></div>';
+let board = Array(6).fill().map(() => Array(7).fill(0));
+function draw() {
+const b = document.getElementById('c4board'); if(!b) return; b.innerHTML = '';
+for(let r=0; r<6; r++) {
+for(let col=0; col<7; col++) {
+let cell = document.createElement('div');
+cell.style.cssText = 'width:35px; height:35px; border-radius:50%; background:' + (board[r][col]===1?'var(--glow-magenta)':board[r][col]===2?'var(--glow-cyan)':'#050508');
+cell.onclick = (function(cl) { return function() { play(cl); }; })(col);
+b.appendChild(cell);
+}
+}
+}
+function play(col) {
+for(let r=5; r>=0; r--) {
+if(board[r][col] === 0) {
+board[r][col] = 1; if(checkWin(1)) return rewardPlayer(50);
+aiPlay(); draw(); return;
+}
+}
+}
+function aiPlay() {
+let valid = []; for(let c=0; c<7; c++) if(board[0][c] === 0) valid.push(c);
+if(valid.length === 0) return rewardPlayer(20);
+let choice = valid[Math.floor(Math.random() * valid.length)];
+for(let r=5; r>=0; r--) { if(board[r][choice] === 0) { board[r][choice] = 2; break; } }
+if(checkWin(2)) rewardPlayer(10);
+}
+function checkWin(p) {
+for(let r=0; r<6; r++) for(let c=0; c<4; c++) if(board[r][c]==p && board[r][c+1]==p && board[r][c+2]==p && board[r][c+3]==p) return true;
+for(let r=0; r<3; r++) for(let c=0; c<7; c++) if(board[r][c]==p && board[r+1][c]==p && board[r+2][c]==p && board[r+3][c]==p) return true;
+return false;
+}
+draw();
+}
+
+function runSnakeGame(c) {
+document.getElementById('gameTitle').innerText = "Snake Néon 2027";
+c.innerHTML = '<canvas id="sc" width="240" height="240" style="background:#0a0814; border-radius:14px; border:1px solid var(--card-border);"></canvas>';
+const cvs = document.getElementById('sc'), ctx = cvs.getContext('2d');
+let snake = [{x:10, y:10}], food = {x:15, y:15}, dx = 1, dy = 0, score = 0;
+cvs.ontouchstart = (e) => {
+let t = e.touches[0], rect = cvs.getBoundingClientRect();
+let x = t.clientX - rect.left - 120, y = t.clientY - rect.top - 120;
+if(Math.abs(x) > Math.abs(y)) { dx = x > 0 ? 1 : -1; dy = 0; }
+else { dy = y > 0 ? 1 : -1; dx = 0; }
+};
+currentGameInterval = setInterval(() => {
+let head = {x: snake[0].x + dx, y: snake[0].y + dy};
+if(head.x<0||head.x>=24||head.y<0||head.y>=24) return rewardPlayer(Math.min(10 + score * 5, 50));
+snake.unshift(head);
+if(head.x === food.x && head.y === food.y) { score++; food = {x:Math.floor(Math.random()*24), y:Math.floor(Math.random()*24)}; }
+else snake.pop();
+ctx.fillStyle = "#0a0814"; ctx.fillRect(0,0,240,240);
+ctx.fillStyle = "#d946ef"; snake.forEach(s => ctx.fillRect(s.x*10, s.y*10, 9, 9));
+ctx.fillStyle = "#06b6d4"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
+}, 100);
+}
+
+function runTapGame(c) {
+document.getElementById('gameTitle').innerText = "Tap Cible (10s)";
+let score = 0, timeLeft = 10;
+c.innerHTML = '<div style="text-align:center;"><h2 id="timer">10s</h2><div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div><h3>Score : <span id="tapScore">0</span></h3></div>';
+const targetEl = document.getElementById('target');
+if(targetEl) {
+targetEl.onclick = () => {
+score++; document.getElementById('tapScore').innerText = score;
+targetEl.style.transform = 'translate(' + ((Math.random()-0.5)*120) + 'px, ' + ((Math.random()-0.5)*120) + 'px)';
+};
+}
+currentGameInterval = setInterval(() => {
+timeLeft--;
+const timerEl = document.getElementById('timer');
+if(timerEl) timerEl.innerText = timeLeft + 's';
+if(timeLeft <= 0) rewardPlayer(Math.min(10 + score * 2, 50));
+}, 1000);
+}
+
+function runMemoryGame(c) {
+document.getElementById('gameTitle').innerText = "Mémoire Flash";
+c.innerHTML = '<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;"><div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div><div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div><div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div><div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div></div>';
+let seq = [Math.floor(Math.random()*4), Math.floor(Math.random()*4)], step = 0;
+function playSeq() {
+let i = 0;
+let interval = setInterval(() => {
+let el = document.getElementById('m' + seq[i]);
+if(el) { el.style.opacity = '0.2'; setTimeout(() => el.style.opacity = '1', 300); }
+i++; if(i >= seq.length) clearInterval(interval);
+}, 600);
+}
+setTimeout(playSeq, 500);
+window.userTap = (id) => {
+if(id === seq[step]) { step++; if(step >= seq.length) rewardPlayer(50); }
+else rewardPlayer(10);
+};
+}
+
+function runStackGame(c) {
+document.getElementById('gameTitle').innerText = "Stack Néon";
+c.innerHTML = '<div style="text-align:center;"><div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div><p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p><button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button></div>';
+const board = document.getElementById('sboard'), BOARD_WIDTH = 200, BLOCK_HEIGHT = 20;
+let stack = [], currentWidth = 100, currentPos = 0, currentDir = 2, currentLevel = 0;
+if(board) {
+stack.push({ left: 50, width: 100 }); renderBlock(50, 100, 0, false); currentLevel = 1; createMovingBlock();
+}
+
+function createMovingBlock() {
+currentPos = 0;
+const movingEl = document.createElement('div'); movingEl.id = 'movingBlock';
+movingEl.style.cssText = 'width:' + currentWidth + 'px; height:' + BLOCK_HEIGHT + 'px; position:absolute; background:var(--glow-violet); box-shadow:0 0 10px var(--glow-violet); border-radius:4px;';
+if(board) board.appendChild(movingEl);
+}
+currentGameInterval = setInterval(() => {
+currentPos += currentDir;
+if (currentPos > (BOARD_WIDTH - currentWidth) || currentPos < 0) currentDir *= -1;
+const m = document.getElementById('movingBlock'); if (m) m.style.left = currentPos + 'px';
+}, 16);
+
+function renderBlock(left, width, level, isMoving = false) {
+const b = document.createElement('div');
+b.style.cssText = 'width:' + width + 'px; height:' + BLOCK_HEIGHT + 'px; left:' + left + 'px; bottom:' + (level * BLOCK_HEIGHT) + 'px; position:absolute; background:' + (isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)') + '; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;';
+if(board) board.appendChild(b);
+}
+
+window.stackDrop = () => {
+const prevBlock = stack[stack.length - 1];
+const diff = currentPos - prevBlock.left;
+if (Math.abs(diff) >= currentWidth) { clearInterval(currentGameInterval); rewardPlayer(Math.max(10, stack.length * 5)); return; }
+let newWidth = currentWidth - Math.abs(diff), newLeft = diff > 0 ? currentPos : prevBlock.left;
+const m = document.getElementById('movingBlock'); if (m) m.remove();
+stack.push({ left: newLeft, width: newWidth }); renderBlock(newLeft, newWidth, currentLevel, false);
+currentWidth = newWidth; currentLevel++;
+const sCount = document.getElementById('stackCount');
+if(sCount) sCount.innerText = stack.length - 1;
+if (currentLevel >= 8) { clearInterval(currentGameInterval); rewardPlayer(50); } else createMovingBlock();
+};
+}
+</script>
+</body>
+  </html>
