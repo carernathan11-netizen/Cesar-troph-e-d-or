@@ -49,7 +49,7 @@
       overflow: hidden;
     }
 
-    /* App Shell Mobile First (390x844 ratio) */
+    /* App Shell Mobile First */
     .app-viewport {
       width: 100%;
       max-width: 420px;
@@ -299,15 +299,10 @@
       border-color: var(--cyan);
       transform: translateY(-2px);
     }
-    .collection-item.locked {
-      opacity: 0.35;
-      filter: grayscale(1);
-    }
     .collection-item .emoji { font-size: 2.2rem; margin-bottom: 6px; }
     .collection-item .name { font-size: 0.75rem; font-weight: 800; }
     .collection-item .num { font-size: 0.65rem; color: var(--text-muted); font-family: 'Space Grotesk'; }
 
-    /* Badge Rareté */
     .rarity-dot {
       width: 6px;
       height: 6px;
@@ -334,17 +329,15 @@
       justify-content: center;
       font-size: 1.8rem;
       cursor: pointer;
-      transition: transform 0.3s, background 0.3s;
+      transition: transform 0.2s, background 0.2s;
     }
     .memory-card.flipped {
       background: rgba(0, 240, 255, 0.15);
       border-color: var(--cyan);
-      transform: rotateY(180deg);
     }
     .memory-card.matched {
       background: rgba(5, 255, 161, 0.15);
       border-color: var(--lime);
-      visibility: visible;
     }
 
     /* Musée Personal Room View */
@@ -624,9 +617,7 @@
   </div>
 
   <script>
-    /* ===================================================
-       1. SYNTHÉTISEUR AUDIO AVANCÉ (Web Audio API)
-       =================================================== */
+    /* 1. MOTEUR AUDIO (Web Audio API) */
     let audioCtx = null;
 
     function initAudio() {
@@ -636,41 +627,43 @@
     }
 
     function playSound(type) {
-      initAudio();
-      if (!audioCtx) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
 
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
 
-      if (type === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-      } else if (type === 'drop') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-      } else if (type === 'win') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(523, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
-        osc.frequency.setValueAtTime(783, audioCtx.currentTime + 0.2);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+        if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+        } else if (type === 'drop') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'win') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
+          osc.frequency.setValueAtTime(783, audioCtx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+        }
+      } catch (e) {
+        console.log('Audio pas encore activé par geste utilisateur');
       }
     }
 
-    /* ===================================================
-       2. DONNÉES DU CATALOGUE
-       =================================================== */
+    /* 2. CATALOGUE DONNÉES */
     const itemsData = [
       { num: '#001', name: 'Canette Rétro', cat: 'FOOD', emoji: '🥤', rarity: 'var(--rarity-common)', story: 'Encore pétillante après 30 ans passés dans un grenier.' },
       { num: '#012', name: 'Cassette VHS', cat: 'RETRO', emoji: '📼', rarity: 'var(--rarity-rare)', story: 'Bande magnétique usée. Contient un anniversaire de 1998.' },
@@ -678,20 +671,28 @@
       { num: '#099', name: 'Donut Absurde', cat: 'FOOD', emoji: '🍩', rarity: 'var(--rarity-common)', story: 'Glaçage bleu néon. Goût totalement indéterminé.' },
       { num: '#104', name: 'Console Portable', cat: 'TECH', emoji: '🎮', rarity: 'var(--rarity-legendary)', story: 'Écran monochrome. Le bouton B doit être pressé très fort.' },
       { num: '#202', name: 'Glaçon Éternel', cat: 'ABSURD', emoji: '🧊', rarity: 'var(--rarity-iconic)', story: 'Ne fond jamais, même au centre du soleil.' },
-      { num: '#310', name: 'Canard en Plastique', cat: 'ABSURD', emoji: '🦆', rarity: 'var(--rarity-common)', story: 'Semble vous fixer avec une sagesse ancestrale.' },
+      { num: '#310', name: 'Canard Plastique', cat: 'ABSURD', emoji: '🦆', rarity: 'var(--rarity-common)', story: 'Semble vous fixer avec une sagesse ancestrale.' },
       { num: '#412', name: 'Casque Studio', cat: 'TECH', emoji: '🎧', rarity: 'var(--rarity-rare)', story: 'Isole à 100% du bruit du monde extérieur.' }
     ];
 
-    /* ===================================================
-       3. ROUTEUR ET FILTRES
-       =================================================== */
+    /* 3. NAVIGATION ET RENDU */
     function switchTab(screenId, btnEl) {
       playSound('click');
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       
       document.getElementById(screenId).classList.add('active');
-      if (btnEl) btnEl.classList.add('active');
+      if (btnEl) {
+        btnEl.classList.add('active');
+      } else {
+        // Sélectionne le bouton correspondant si appelé depuis le code
+        const navBtns = document.querySelectorAll('.nav-item');
+        if (screenId === 'scr-home') navBtns[0].classList.add('active');
+        if (screenId === 'scr-games') navBtns[1].classList.add('active');
+        if (screenId === 'scr-collection') navBtns[2].classList.add('active');
+        if (screenId === 'scr-mydrop') navBtns[3].classList.add('active');
+        if (screenId === 'scr-profile') navBtns[4].classList.add('active');
+      }
     }
 
     function renderCollection(filter = 'ALL') {
@@ -713,7 +714,6 @@
         grid.appendChild(div);
       });
     }
-    renderCollection();
 
     function filterCollection(cat, chip) {
       playSound('click');
@@ -722,9 +722,7 @@
       renderCollection(cat);
     }
 
-    /* ===================================================
-       4. ANIMATION RÉVÉLATION LE DROP DU JOUR
-       =================================================== */
+    /* 4. RECOMPENSE "DROP DU JOUR" */
     let dropDiscovered = false;
 
     function triggerDropDiscovery() {
@@ -740,21 +738,18 @@
         dropDiscovered = true;
         document.getElementById('heroEmoji').innerText = '🪩';
         document.getElementById('heroName').innerText = 'Boule Disco 1979';
-        document.getElementById('heroQuote').innerText = '«« Épicentre d'une nuit sans fin. »»';
-        btn.innerText = 'DÉCOUVRE DANS TA COLLECTION';
+        document.getElementById('heroQuote').innerText = '«« Épicentre d\'une nuit sans fin. »»';
+        btn.innerText = 'VOIR DANS LA COLLECTION';
         btn.className = 'btn btn-secondary';
         btn.style.opacity = '1';
         btn.onclick = () => switchTab('scr-collection');
 
-        // Mettre à jour les crédits (+250)
-        let c = parseInt(document.getElementById('creditVal').innerText.replace(' ', '')) + 250;
-        document.getElementById('creditVal').innerText = c.toLocaleString();
+        let c = parseInt(document.getElementById('creditVal').innerText.replace(/\s/g, '')) + 250;
+        document.getElementById('creditVal').innerText = c.toLocaleString('fr-FR');
       }, 1000);
     }
 
-    /* ===================================================
-       5. MINI-JEU MEMORY FONCTIONNEL
-       =================================================== */
+    /* 5. MINI-JEU MEMORY */
     const memoryEmojis = ['🥤', '📼', '🍩', '🎮', '🥤', '📼', '🍩', '🎮'];
     let flippedCards = [];
     let matchedPairs = 0;
@@ -768,14 +763,12 @@
       flippedCards = [];
       matchedPairs = 0;
 
-      // Shuffle
       const shuffled = [...memoryEmojis].sort(() => Math.random() - 0.5);
 
       shuffled.forEach((emoji, index) => {
         const card = document.createElement('div');
         card.className = 'memory-card';
         card.dataset.emoji = emoji;
-        card.dataset.index = index;
         card.onclick = () => flipMemoryCard(card);
         board.appendChild(card);
       });
@@ -800,8 +793,8 @@
 
             if (matchedPairs === 4) {
               alert('VICTOIRE ! +100 DROP Credits gagnés !');
-              let c = parseInt(document.getElementById('creditVal').innerText.replace(' ', '')) + 100;
-              document.getElementById('creditVal').innerText = c.toLocaleString();
+              let c = parseInt(document.getElementById('creditVal').innerText.replace(/\s/g, '')) + 100;
+              document.getElementById('creditVal').innerText = c.toLocaleString('fr-FR');
               document.getElementById('gameOverlay').style.display = 'block';
               document.getElementById('memoryBoard').style.display = 'none';
             }
@@ -818,9 +811,7 @@
       }
     }
 
-    /* ===================================================
-       6. MODAL FICHE OBJET
-       =================================================== */
+    /* 6. MODAL OBJET */
     function openModal(item) {
       playSound('click');
       document.getElementById('mEmoji').innerText = item.emoji;
@@ -834,6 +825,9 @@
       playSound('click');
       document.getElementById('itemModal').classList.remove('active');
     }
+
+    // Rendu initial de la collection au chargement
+    renderCollection();
   </script>
 </body>
 </html>
