@@ -1010,19 +1010,15 @@ if (!targetUid) throw new Error("Cet ID Ami n'existe pas.");
 if (targetUid === appData.currentUser.uid) throw new Error('Vous ne pouvez pas vous ajouter vous-même.');
 if ((appData.friends || []).some(f => f.uid === targetUid)) throw new Error('Cet utilisateur est déjà dans vos amis.');
 
-return db.ref('friend_requests/' + targetUid).once('value').then(reqSnap => {
-const requests = reqSnap.val() || {};
-const duplicate = Object.values(requests).some(r => r && r.senderUid === appData.currentUser.uid && r.status === 'pending');
-if (duplicate) throw new Error('Une demande a déjà été envoyée à cet utilisateur.');
-
-const reqId = 'req_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+// Ne jamais lire le dossier friend_requests d'un autre joueur ici :
+// cela provoque un PERMISSION_DENIED avec des règles Firebase sécurisées.
+const reqId = 'req_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
 return db.ref('friend_requests/' + targetUid + '/' + reqId).set({
 senderUid: appData.currentUser.uid,
 senderName: appData.currentUser.username,
 senderFriendId: appData.friendId,
 status: 'pending',
 createdAt: firebase.database.ServerValue.TIMESTAMP
-});
 });
 })
 .then(() => {
@@ -1042,6 +1038,7 @@ const requests = snapshot.val();
 const listEl = document.getElementById('friendRequestsList');
 if (!listEl) return;
 listEl.innerHTML = '';
+
 if (!requests) {
 listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
 return;
@@ -1062,9 +1059,14 @@ div.innerHTML = `<div style="font-size:0.8rem;"><b>${req.senderName}</b> <span s
 listEl.appendChild(div);
 }
 });
+
 if (count === 0) {
 listEl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i>';
 }
+}, error => {
+console.error('listenToFriendRequests:', error);
+const listEl = document.getElementById('friendRequestsList');
+if (listEl) listEl.innerHTML = '<i style="color:var(--danger); font-size:0.75rem;">Firebase refuse l’accès aux demandes d’amis.</i>';
 });
 }
 
