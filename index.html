@@ -193,7 +193,7 @@ flex-shrink: 0;
 background: rgba(10, 8, 20, 0.8);
 backdrop-filter: blur(25px);
 border-top: 1px solid var(--card-border);
-display: flex; justify-content: space-around; align-items: center;
+display: flex; justify-around: space-around; align-items: center;
 z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 20%; cursor: pointer; }
@@ -372,41 +372,12 @@ animation: particleFly 0.8s ease-out forwards;
 </div>
 </section>
 
-<!-- 4. BOUTIQUE (SYSTEME PAR EMAIL & CODE) -->
+<!-- 4. BOUTIQUE (TEMPORAIREMENT DÉSACTIVÉE) -->
 <section id="scr-shop" class="screen">
-<div class="glass-card">
-<div class="card-title"><span>ACHAT DE CRÉDITS (PAR DÉBLOCAGE EMAIL)</span></div>
-<p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:14px;">Commandez vos crédits directement auprès de notre support pour obtenir un code unique de déblocage instantané.</p>
-
-<div class="shop-item">
-<div class="shop-info">
-<h4>Pack Starter</h4>
-<p>+1 000 🪙</p>
-</div>
-<button class="btn" style="width:auto; padding:8px 16px;" onclick="openMailShopModal(1000, '0,99 €')">0,99 €</button>
-</div>
-
-<div class="shop-item">
-<div class="shop-info">
-<h4>Pack Pro</h4>
-<p>+6 000 🪙 (+20% offert)</p>
-</div>
-<button class="btn" style="width:auto; padding:8px 16px;" onclick="openMailShopModal(6000, '4,99 €')">4,99 €</button>
-</div>
-
-<div class="shop-item">
-<div class="shop-info">
-<h4>Pack Ultime</h4>
-<p>+15 000 🪙 (+50% offert)</p>
-</div>
-<button class="btn" style="width:auto; padding:8px 16px;" onclick="openMailShopModal(15000, '9,99 €')">9,99 €</button>
-</div>
-</div>
-
-<div class="glass-card">
-<div class="card-title"><span>ACTIVER VOTRE CODE REÇU</span></div>
-<input type="text" id="shopCodeInput" class="input-field" placeholder="Ex: DROP-XXXX-XXXX-DROP..." style="text-transform:uppercase;">
-<button class="btn" onclick="redeemShopCode()">VALIDER MON CODE</button>
+<div class="glass-card" style="text-align: center; padding: 30px 15px;">
+<div style="font-size: 3rem; margin-bottom: 10px;">🛠️</div>
+<h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; color: #fff; margin-bottom: 8px;">BOUTIQUE TEMPORAIREMENT FERMÉE</h3>
+<p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">La boutique d'achats de crédits est actuellement en maintenance. Elle sera de nouveau disponible très prochainement.</p>
 </div>
 </section>
 
@@ -461,27 +432,6 @@ animation: particleFly 0.8s ease-out forwards;
 <div id="gameCanvasContainer" style="width:100%; display:flex; justify-content:center; align-items:center; flex:1;"></div>
 </div>
 
-<!-- MODAL D'INSTRUCTION DE PAIEMENT VIA EMAIL -->
-<div class="game-modal" id="payModal">
-<div style="width:100%; max-width:350px; background:var(--card-bg); border:1px solid var(--card-border-glow); border-radius:22px; padding:20px; backdrop-filter:blur(25px); text-align:center;">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-<h3 style="font-family:'Space Grotesk'; font-size:1rem; color:#fff;">📧 ACHAT DE CRÉDITS</h3>
-<button onclick="closePaymentModal()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✕</button>
-</div>
-<p style="font-size:0.9rem; color:var(--glow-cyan); margin-bottom:12px; font-weight:700;" id="payPackTitle">Pack +1000 🪙 (0,99 €)</p>
-
-<div style="background:rgba(0,0,0,0.4); padding:14px; border-radius:14px; border:1px dashed var(--glow-magenta); margin-bottom:15px; font-size:0.8rem; text-align:left; line-height:1.4;">
-Pour obtenir ce pack, veuillez :<br><br>
-1. Envoyer le montant demandé par e-mail à :<br>
-<b style="color:var(--glow-magenta); word-break:break-all;">anonymemaildesktop@gmail.com</b><br><br>
-2. Indiquez votre e-mail de compte.<br>
-3. Vous recevrez en retour votre code secret à 16 caractères à entrer dans l'onglet Shop !
-</div>
-
-<button class="btn" onclick="closePaymentModal()">J'AI COMPRIS</button>
-</div>
-</div>
-
 </div>
 
 <script>
@@ -500,12 +450,10 @@ return res;
 
 (function generate5000RandomCodes() {
 for (let i = 1; i <= 5000; i++) {
-// Génération d'un code unique sous le format DROP-XXXX-XXXX-DROP
 let uniqueCode = `DROP-${getRandomChunk(4)}-${getRandomChunk(4)}-DROP`;
 while (GENERATED_5000_CODES[uniqueCode]) {
 uniqueCode = `DROP-${getRandomChunk(4)}-${getRandomChunk(4)}-DROP`;
 }
-// Montants variés attribués aux codes
 const creditAmount = (i % 10 === 0) ? 20000 : (i % 5 === 0) ? 10000 : (i % 2 === 0) ? 2000 : 1000;
 GENERATED_5000_CODES[uniqueCode] = creditAmount;
 }
@@ -528,7 +476,6 @@ tiktok: [
 { id: 112, name: "Veilleuse Pain de Mie", emoji: "🍞", price: 190, unlocked: false },
 { id: 113, name: "Projecteur de poche 4K", emoji: "📹", price: 600, unlocked: false },
 { id: 114, name: "Support Smartphone Flex", emoji: "📱", price: 170, unlocked: false },
-// NOUVELLES CARTES TIKTOK
 { id: 115, name: "Lampe Plasma Cyber", emoji: "🔮", price: 340, unlocked: false },
 { id: 116, name: "Enceinte Flottante LED", emoji: "🛸", price: 550, unlocked: false },
 { id: 117, name: "Masque LED Personnalisable", emoji: "🎭", price: 480, unlocked: false },
@@ -553,7 +500,6 @@ memes: [
 { id: 212, name: "Mug 'Fine Dog' Fire", emoji: "☕", price: 210, unlocked: false },
 { id: 213, name: "Trompette Doot Doot", emoji: "🎺", price: 330, unlocked: false },
 { id: 214, name: "Costume Inflatable Alien", emoji: "👽", price: 520, unlocked: false },
-// NOUVELLES CARTES MEMES
 { id: 215, name: "Bouton Noice Sound", emoji: "🔊", price: 170, unlocked: false },
 { id: 216, name: "Canard en Caoutchouc Géant", emoji: "🦆", price: 280, unlocked: false },
 { id: 217, name: "Affiche Nyan Cat Gold", emoji: "🌈", price: 450, unlocked: false },
@@ -578,7 +524,6 @@ gaming: [
 { id: 312, name: "Finger Sleeves Pro", emoji: "🖐️", price: 120, unlocked: false },
 { id: 313, name: "Chaise Gaming Quantum", emoji: "💺", price: 3200, unlocked: false },
 { id: 314, name: "Microphone Studio Pro", emoji: "🎙️", price: 1400, unlocked: false },
-// NOUVELLES CARTES GAMING
 { id: 315, name: "Souris de Jeu Ultra-Légère", emoji: "🖱️", price: 750, unlocked: false },
 { id: 316, name: "Gants Retrogaming Tactiles", emoji: "🧤", price: 320, unlocked: false },
 { id: 317, name: "Support Écran Triple Bras", emoji: "🖥️", price: 1600, unlocked: false },
@@ -600,7 +545,6 @@ secret: [
 { id: 409, name: "Puce Cyber-Augmentée", emoji: "🦾", price: 45000, unlocked: false },
 { id: 410, name: "Couronne Holographique", emoji: "👑", price: 75000, unlocked: false },
 { id: 411, name: "Trophée Rubis Exclusif", emoji: "💎", price: 100000, unlocked: false },
-// NOUVELLES CARTES ULTRA RARES
 { id: 412, name: "Orbe d'Énergie Quantique", emoji: "🔮", price: 150000, unlocked: false },
 { id: 413, name: "Sceptre du Créateur", emoji: "🪄", price: 250000, unlocked: false },
 { id: 414, name: "Carte de Crédit Obsidienne", emoji: "🖤", price: 400000, unlocked: false },
@@ -612,8 +556,10 @@ secret: [
 
 let activeCategory = 'tiktok';
 
+let registeredUsers = {};
+
 let appData = {
-credits: 0, // RESET STRICT A 0 CREDITS POUR TOUT LE MONDE
+credits: 0,
 redeemedCodes: [],
 currentUser: null,
 isAdmin: false,
@@ -624,30 +570,32 @@ let currentAuthMode = 'login';
 let isDropping = false;
 
 function loadAppData() {
+const savedUsers = localStorage.getItem('drop_registered_users_2027');
+if (savedUsers) {
+registeredUsers = JSON.parse(savedUsers);
+}
+
 const saved = localStorage.getItem('drop_app_mobile_2027');
 if (saved) {
 const parsed = JSON.parse(saved);
-appData.credits = 0; // Remise à zéro stricte
+appData.credits = parsed.credits || 0;
 appData.redeemedCodes = parsed.redeemedCodes || [];
 appData.currentUser = parsed.currentUser || null;
 appData.isAdmin = parsed.isAdmin || false;
 if (parsed.catalogs) {
-Object.keys(CATALOGS).forEach(cat => {
-if (parsed.catalogs[cat]) {
-CATALOGS[cat].forEach(newItem => {
-const old = parsed.catalogs[cat].find(o => o.id === newItem.id);
-if (old) newItem.unlocked = old.unlocked;
-});
+appData.catalogs = parsed.catalogs;
+} else {
+appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 }
-});
-}
-appData.catalogs = CATALOGS;
+} else {
+appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 }
 updateUI();
 }
 
 function saveAppData() {
 localStorage.setItem('drop_app_mobile_2027', JSON.stringify(appData));
+localStorage.setItem('drop_registered_users_2027', JSON.stringify(registeredUsers));
 updateUI();
 }
 
@@ -741,9 +689,8 @@ function openRandomDrop() {
 if (isDropping) return;
 if (!appData.isAdmin && appData.credits < 150) return alert('150 Crédits requis !');
 
-// Sélection selon la probabilité 1/10 Ultra Rare et 9/10 Normales/Rares
-const roll = Math.random(); // 0 à 1
-let isUltraRare = roll < 0.1; // 10% de chance (1/10)
+const roll = Math.random();
+let isUltraRare = roll < 0.1;
 
 let pool = [];
 if (isUltraRare) {
@@ -754,7 +701,6 @@ appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
 });
 }
 
-// Fallback si la catégorie est vide
 if (pool.length === 0) {
 Object.keys(appData.catalogs).forEach(cat => {
 appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
@@ -769,33 +715,27 @@ saveAppData();
 const picked = pool[Math.floor(Math.random() * pool.length)];
 picked.unlocked = true;
 
-// Démarrage de l'animation
 isDropping = true;
 const card = document.getElementById('dropCard');
 const btn = document.getElementById('btnDrop');
 btn.disabled = true;
 
-// Remettre la carte de dos
 card.classList.remove('revealed', 'exploding');
 
-// Remplir la face avant
 document.getElementById('dropCardEmoji').innerText = picked.emoji;
 document.getElementById('dropCardName').innerText = picked.name;
 document.getElementById('dropCardRarity').innerText = isUltraRare ? "⚡ ULTRA RARE (1/10)" : "🌟 CLASSIQUE / RARE";
 document.getElementById('dropCardRarity').style.color = isUltraRare ? "var(--glow-magenta)" : "var(--glow-cyan)";
 
-// Étape 1 : Rotation lente
 setTimeout(() => {
 card.classList.add('revealed');
 }, 300);
 
-// Étape 2 : Explosion et particules
 setTimeout(() => {
 card.classList.add('exploding');
 createExplosionParticles();
 }, 1400);
 
-// Étape 3 : Révélation finale et sauvegarde
 setTimeout(() => {
 isDropping = false;
 btn.disabled = false;
@@ -841,39 +781,7 @@ alert('💥 SYSTEM OVERRIDE 2027... ACCÈS ADMINISTRATEUR SUPRÊME DÉBLOQUÉ !'
 }, 2500);
 }
 
-/* MODAL DE CONSIGNES EMAIL SHOP */
-function openMailShopModal(credits, priceText) {
-document.getElementById('payPackTitle').innerText = `Pack +${credits.toLocaleString()} 🪙 (${priceText})`;
-document.getElementById('payModal').classList.add('active');
-}
-
-function closePaymentModal() {
-document.getElementById('payModal').classList.remove('active');
-}
-
-/* VALIDATION STRICTE DES CODES DE BOUTIQUE A USAGE UNIQUE */
-function redeemShopCode() {
-const code = document.getElementById('shopCodeInput').value.trim().toUpperCase();
-if (!code) return;
-
-// Vérification de la validité et de l'état d'utilisation
-if (appData.redeemedCodes.includes(code)) {
-return alert('❌ Code déjà utilisé ou invalide.');
-}
-
-if (GENERATED_5000_CODES[code]) {
-const amount = GENERATED_5000_CODES[code];
-appData.credits += amount;
-appData.redeemedCodes.push(code); // Marque le code comme utilisé définitivement
-saveAppData();
-document.getElementById('shopCodeInput').value = '';
-alert(`🎉 CODE DE BOUTIQUE CONFIRMÉ ! +${amount.toLocaleString()} Crédits ajoutés à votre compte !`);
-} else {
-alert('❌ Code déjà utilisé ou invalide.');
-}
-}
-
-/* AUTHENTIFICATION */
+/* AUTHENTIFICATION STRICTE FIXÉE */
 function setAuthMode(mode) {
 currentAuthMode = mode;
 document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
@@ -884,10 +792,11 @@ document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'SE CONN
 
 function handleAuth(e) {
 e.preventDefault();
-const email = document.getElementById('authEmail').value.trim();
+const email = document.getElementById('authEmail').value.trim().toLowerCase();
 const pass = document.getElementById('authPass').value.trim();
-const username = document.getElementById('authUsername').value.trim() || email.split('@')[0];
+const username = document.getElementById('authUsername').value.trim();
 
+// Accès administrateur
 if (email === 'carer.nathan11@gmail.com' && pass === 'dropadministrator20262027acces') {
 appData.isAdmin = true;
 appData.credits = 999999999;
@@ -897,17 +806,52 @@ appData.catalogs[cat].forEach(i => i.unlocked = true);
 appData.currentUser = { email, username: username || 'Gérant System' };
 saveAppData();
 alert('⚡ ACCÈS ADMINISTRATEUR CONFIRMÉ !');
-} else {
+return;
+}
+
+if (currentAuthMode === 'register') {
+if (registeredUsers[email]) {
+return alert('❌ Cet e-mail est déjà utilisé. Veuillez vous connecter.');
+}
+registeredUsers[email] = {
+username: username || email.split('@')[0],
+password: pass,
+credits: 0,
+catalogs: JSON.parse(JSON.stringify(CATALOGS)) // Collection vierge
+};
+
+appData.currentUser = { email, username: registeredUsers[email].username };
+appData.credits = 0;
+appData.catalogs = registeredUsers[email].catalogs;
 appData.isAdmin = false;
-appData.currentUser = { email, username };
+
 saveAppData();
-alert(currentAuthMode === 'login' ? '✅ Connexion réussie !' : '🎉 Compte créé !');
+alert('🎉 Compte créé avec succès !');
+} else {
+// Connexion stricte
+if (!registeredUsers[email] || registeredUsers[email].password !== pass) {
+return alert('❌ Connexion échouée : E-mail ou mot de passe incorrect, ou compte inexistant.');
+}
+
+appData.currentUser = { email, username: registeredUsers[email].username };
+appData.credits = registeredUsers[email].credits || 0;
+appData.catalogs = registeredUsers[email].catalogs || JSON.parse(JSON.stringify(CATALOGS));
+appData.isAdmin = false;
+
+saveAppData();
+alert('✅ Connexion réussie !');
 }
 }
 
 function logoutUser() {
+if (appData.currentUser && registeredUsers[appData.currentUser.email]) {
+registeredUsers[appData.currentUser.email].credits = appData.credits;
+registeredUsers[appData.currentUser.email].catalogs = appData.catalogs;
+}
 appData.currentUser = null;
 appData.isAdmin = false;
+appData.credits = 0;
+appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 saveAppData();
 alert('Déconnexion effectuée.');
 }
