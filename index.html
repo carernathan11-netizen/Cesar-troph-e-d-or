@@ -344,12 +344,12 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <div class="ad-modal" id="adModal">
 <div class="ad-box">
-<h3 style="font-family:'Space Grotesk'; color:#fff; font-size:1.1rem;">📺 Publicité Sponsorisée</h3>
-<p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Regarde la vidéo pour obtenir tes crédits !</p>
+<h3 style="font-family: 'Space Grotesk'; color: #fff; font-size: 1.1rem;">📺 Publicité Sponsorisée</h3>
+<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Regarde la vidéo pour obtenir tes crédits !</p>
 <div class="ad-screen">
-<div style="font-size:2.5rem; margin-bottom:8px;">🎬</div>
-<div style="font-family:'Space Grotesk'; font-size:1.4rem; font-weight:800; color:var(--glow-cyan);" id="adTimer">30s</div>
-<p style="font-size:0.65rem; color:var(--text-muted); margin-top:4px;">Visionnage en cours...</p>
+<div style="font-size: 2.5rem; margin-bottom: 8px;">🎬</div>
+<div style="font-family: 'Space Grotesk'; font-size: 1.4rem; font-weight: 800; color: var(--glow-cyan);" id="adTimer">30s</div>
+<p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">Visionnage en cours...</p>
 <div class="ad-progress" id="adProgressBar"></div>
 </div>
 <button class="btn" id="adClaimBtn" disabled onclick="claimAdReward()">PATIENTEZ (30s)...</button>
@@ -508,7 +508,7 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS))
 let currentAuthMode = 'login';
 let isDropping = false;
 
-// ÉCOUTEUR DE CONNEXION FIREBASE
+// ÉCOUTEUR DE CONNEXION FIREBASE CORRIGÉ & ROBUSTE
 auth.onAuthStateChanged((user) => {
 if (user) {
 const userRef = db.ref('users/' + user.uid);
@@ -641,8 +641,8 @@ div.innerHTML = `
 <div class="emoji">${item.emoji}</div>
 <div class="item-name">${item.name}</div>
 <div class="item-price">${item.unlocked ? 'ACQUIS' : item.price + ' 🪙'}</div>
-<button class="btn btn-secondary" style="margin-top:8px; padding:6px; font-size:0.7rem;" ${item.unlocked ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">
-${item.unlocked ? 'Débloqué' : 'Obtenir'}
+<button class="btn" style="padding:6px; font-size:0.7rem; margin-top:6px;" ${item.unlocked ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">
+${item.unlocked ? 'Déjà acquis' : 'Obtenir'}
 </button>`;
 grid.appendChild(div);
 });
@@ -796,6 +796,7 @@ catalogs: initialCatalogs,
 redeemedCodes: []
 };
 db.ref('users/' + u.uid).set(initialData).then(() => {
+db.ref('friend_codes/' + fId).set(u.uid);
 appData.currentUser = { email: u.email, username: initialData.username, uid: u.uid };
 updateUI();
 });
@@ -817,6 +818,7 @@ redeemedCodes: []
 };
 db.ref('users/' + u.uid).set(data);
 }
+db.ref('friend_codes/' + (data.friendId || generateFriendCode(u.uid))).set(u.uid);
 appData.currentUser = { email: u.email, username: data.username || u.email.split('@')[0], uid: u.uid };
 appData.credits = data.credits !== undefined ? data.credits : 0;
 appData.friendId = data.friendId || generateFriendCode(u.uid);
@@ -838,40 +840,31 @@ alert('Déconnexion effectuée.');
 });
 }
 
-/* SYSTÈME AMIS & ÉCHANGES (MIS À JOUR) */
+/* SYSTÈMES AMIS & ÉCHANGES CORRIGÉS */
 function addFriend() {
 const code = document.getElementById('addFriendInput').value.trim().toUpperCase();
-if (!code) return;
+if (!code) return alert("❌ Veuillez entrer un identifiant d'ami valide !");
 
 db.ref('friend_codes/' + code).once('value').then(snapshot => {
 const friendUid = snapshot.val();
-if (!friendUid) {
-alert("❌ Compte introuvable");
-return;
-}
-if (friendUid === appData.currentUser.uid) {
-alert("❌ Tu ne peux pas t'ajouter toi-même !");
-return;
-}
+if (!friendUid) return alert("❌ Cet ID Ami n'existe pas !");
+if (friendUid === appData.currentUser.uid) return alert("❌ Tu ne peux pas t'ajouter toi-même !");
 
 db.ref('users/' + friendUid).once('value').then(fSnap => {
 const fData = fSnap.val();
-if (!fData) {
-alert("❌ Compte introuvable");
-return;
-}
+const friendName = fData ? (fData.username || 'Ami') : 'Ami';
 
 if (!appData.friends.some(f => f.uid === friendUid)) {
-appData.friends.push({ uid: friendUid, username: fData.username, friendId: code });
+appData.friends.push({ uid: friendUid, username: friendName, friendId: code });
 saveAppData();
 document.getElementById('addFriendInput').value = '';
-alert(`✅ Compte trouvé avec succès ! ${fData.username} a été ajouté à tes amis.`);
+alert(`✅ Ajouté avec succès ! ${friendName} a été ajouté à tes amis.`);
 } else {
-alert("Cet ami est déjà dans ta liste !");
+alert("⚠️ Cet ami est déjà dans ta liste !");
 }
 });
 }).catch(err => {
-alert("❌ Compte introuvable");
+alert("❌ Erreur lors de la recherche de l'ami : " + err.message);
 });
 }
 
@@ -937,10 +930,11 @@ const div = document.createElement('div');
 div.className = 'trade-card-box';
 
 if (t.receiverUid === appData.currentUser.uid) {
-div.innerHTML = `<p style="font-size:0.75rem;">📩 <b>${t.senderName}</b> veut échanger avec toi !</p>
+div.innerHTML = `
+<p style="font-size:0.75rem;">📩 <b>${t.senderName}</b> veut échanger avec toi !</p>
 <p style="font-size:0.7rem; color:var(--glow-cyan);">Il donne : ID #${t.offeredCardId} | Il demande : ID #${t.wantedCardId}</p>
 <div style="display:flex; gap:6px; margin-top:8px;">
-<button class="btn" style="padding:6px; font-size:0.7rem; background:var(--glow-violet);" onclick="acceptTrade('${tid}')">ACCEPTER</button>
+<button class="btn" style="padding:6px; font-size:0.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button>
 <button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button>
 </div>`;
 } else {
