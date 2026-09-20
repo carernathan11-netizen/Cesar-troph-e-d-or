@@ -155,16 +155,26 @@ background: rgba(139, 92, 246, 0.25); border-color: var(--glow-magenta);
 color: #fff; box-shadow: 0 0 12px rgba(217, 70, 239, 0.3);
 }
 
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; position: relative; }
 .catalog-card {
 background: rgba(20, 16, 38, 0.6); border: 1px solid var(--card-border);
 border-radius: 16px; padding: 12px; text-align: center; position: relative;
 display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+z-index: 2;
 }
 .catalog-card .emoji { font-size: 2.2rem; margin: 6px 0; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
 .catalog-card .item-name { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; min-height: 2.2em; display: flex; align-items: center; justify-content: center; }
 .catalog-card .item-price { font-size: 0.7rem; color: var(--glow-cyan); font-weight: 800; font-family: 'Space Grotesk'; }
 .catalog-card.locked { opacity: 0.6; filter: grayscale(0.6); }
+
+/* ARRIÈRE-PLAN BALLONS DE FOOT */
+.football-bg-pattern {
+position: absolute; inset: 0; pointer-events: none; opacity: 0.08; z-index: 1;
+background-image: radial-gradient(#fff 2px, transparent 2px), radial-gradient(#fff 2px, transparent 2px);
+background-size: 40px 40px; background-position: 0 0, 20px 20px;
+display: flex; flex-wrap: wrap; justify-content: space-around; align-content: space-around;
+font-size: 2.5rem; overflow: hidden;
+}
 
 .game-card {
 background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border);
@@ -186,7 +196,7 @@ flex-shrink: 0;
 background: rgba(10, 8, 20, 0.8);
 backdrop-filter: blur(25px);
 border-top: 1px solid var(--card-border);
-display: flex; justify-around: space-around; align-items: center;
+display: flex; justify-content: space-around; align-items: center;
 z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 20%; cursor: pointer; }
@@ -338,6 +348,7 @@ width: 0%; transition: width 1s linear;
 <div class="binder-tab active" onclick="switchCategory('tiktok', this)">📱 TikTok Trends</div>
 <div class="binder-tab" onclick="switchCategory('memes', this)">🎭 Pop Culture & Mèmes</div>
 <div class="binder-tab" onclick="switchCategory('gaming', this)">🎮 Gaming & Tech</div>
+<div class="binder-tab" onclick="switchCategory('football', this)">⚽ Football</div>
 <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
 </div>
 
@@ -353,7 +364,7 @@ width: 0%; transition: width 1s linear;
 
 <div style="display:flex; flex-direction:column; gap:10px;">
 <div class="game-card">
-<div class="game-info"><h4>⚡ Réaction</h4><p>Stoppe le curseur dans le néon</p></div>
+<div class="game-info"><h4>⚡ Réaction Extrême</h4><p>Stoppe le curseur hyper rapide !</p></div>
 <button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('reaction')">JOUER</button>
 </div>
 <div class="game-card">
@@ -505,7 +516,10 @@ tiktok: [
 { id: 119, name: "Stylo d'Impression 3D", emoji: "🖊️", price: 390, unlocked: false },
 { id: 120, name: "Distributeur de Bonbons Sensor", emoji: "🍬", price: 260, unlocked: false },
 { id: 121, name: "Réveil Vague Rétro", emoji: "⏰", price: 310, unlocked: false },
-{ id: 122, name: "Cadre Photo Numérique HD", emoji: "🖼️", price: 620, unlocked: false }
+{ id: 122, name: "Cadre Photo Numérique HD", emoji: "🖼️", price: 620, unlocked: false },
+{ id: 123, name: "Kit Ring Light Pro Max", emoji: "📸", price: 700, unlocked: false },
+{ id: 124, name: "Mini Drone Follow-Me", emoji: "🚁", price: 850, unlocked: false },
+{ id: 125, name: "Tapis de Danse Lumineux", emoji: "🕺", price: 440, unlocked: false }
 ],
 memes: [
 { id: 201, name: "Lunettes Thug Life 8-Bit", emoji: "🕶️", price: 180, unlocked: false },
@@ -529,7 +543,10 @@ memes: [
 { id: 219, name: "Marteau de Juge 'Bonk'", emoji: "🔨", price: 230, unlocked: false },
 { id: 220, name: "Figurine Stonks Up", emoji: "📈", price: 510, unlocked: false },
 { id: 221, name: "Plaque d'Égout Pepe", emoji: "🛡️", price: 600, unlocked: false },
-{ id: 222, name: "Trophée NPC Officiel", emoji: "👤", price: 340, unlocked: false }
+{ id: 222, name: "Trophée NPC Officiel", emoji: "👤", price: 340, unlocked: false },
+{ id: 223, name: "Sifflet Emotional Damage", emoji: "💥", price: 290, unlocked: false },
+{ id: 224, name: "Panneau 'Bruh Moment'", emoji: "🚧", price: 310, unlocked: false },
+{ id: 225, name: "Costume T-Rex Gonflable", emoji: "🦖", price: 680, unlocked: false }
 ],
 gaming: [
 { id: 301, name: "Manette Pro Translucide", emoji: "🎮", price: 800, unlocked: false },
@@ -553,7 +570,24 @@ gaming: [
 { id: 319, name: "Boîtier PC Verre Trempé RGB", emoji: "💻", price: 2100, unlocked: false },
 { id: 320, name: "Carte d'Acquisition 4K60", emoji: "📹", price: 1750, unlocked: false },
 { id: 321, name: "Eclairage Ambilight Écran", emoji: "🌈", price: 890, unlocked: false },
-{ id: 322, name: "Lunettes Anti-Lumière Bleue Pro", emoji: "👓", price: 410, unlocked: false }
+{ id: 322, name: "Lunettes Anti-Lumière Bleue Pro", emoji: "👓", price: 410, unlocked: false },
+{ id: 323, name: "Volant Retour de Force GT", emoji: "🏎️", price: 2800, unlocked: false },
+{ id: 324, name: "Siège Simulation Dynamique", emoji: "🏎️", price: 4500, unlocked: false }
+],
+football: [
+{ id: 501, name: "Ballon Doré Vintage", emoji: "⚽", price: 300, unlocked: false },
+{ id: 502, name: "Crampons à Réacteurs", emoji: "👟", price: 650, unlocked: false },
+{ id: 503, name: "Sifflet d'Arbitre d'Or", emoji: "🎷", price: 250, unlocked: false },
+{ id: 504, name: "Maillot Retro Kylian Mbappou", emoji: "👕", price: 1200, unlocked: false },
+{ id: 505, name: "Figurine Lionel Messsi", emoji: "🐐", price: 2500, unlocked: false },
+{ id: 506, name: "Statue Cristiano Ronaldoo", emoji: "🗿", price: 2800, unlocked: false },
+{ id: 507, name: "Carte Legend Erling Braland", emoji: "🤖", price: 3500, unlocked: false },
+{ id: 508, name: "Gants de Zinedine Zidano", emoji: "🧤", price: 4000, unlocked: false },
+{ id: 509, name: "Casquette Karim Benzemouche", emoji: "🧢", price: 1800, unlocked: false },
+{ id: 510, name: "Gourde Tactique Neymar Jr", emoji: "🧪", price: 1500, unlocked: false },
+{ id: 511, name: "Carton Rouge Laser Inviolable", emoji: "🟥", price: 800, unlocked: false },
+{ id: 512, name: "Filet de Cage Infrissonnable", emoji: "🕸️", price: 1100, unlocked: false },
+{ id: 513, name: "Trophée Coupe du Monde (Officiel)", emoji: "🏆", price: 500000, unlocked: false }
 ],
 secret: [
 { id: 401, name: "Carte VIP Gold Access", emoji: "💳", price: 5000, unlocked: false },
@@ -605,6 +639,10 @@ appData.currentUser = parsed.currentUser || null;
 appData.isAdmin = parsed.isAdmin || false;
 if (parsed.catalogs) {
 appData.catalogs = parsed.catalogs;
+// Garantir la présence des nouveaux articles si non chargés
+if (!appData.catalogs.football) {
+appData.catalogs.football = JSON.parse(JSON.stringify(CATALOGS.football));
+}
 } else {
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 }
@@ -663,6 +701,15 @@ renderCatalogGrid();
 function renderCatalogGrid() {
 const grid = document.getElementById('catalogGrid');
 grid.innerHTML = '';
+
+// Arrière-plan ballons pour la catégorie foot
+if (activeCategory === 'football') {
+const bgPattern = document.createElement('div');
+bgPattern.className = 'football-bg-pattern';
+bgPattern.innerHTML = '⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽';
+grid.appendChild(bgPattern);
+}
+
 const currentItems = appData.catalogs[activeCategory] || [];
 
 currentItems.forEach(item => {
@@ -715,8 +762,10 @@ let pool = [];
 if (isUltraRare) {
 appData.catalogs.secret.forEach(i => { if(!i.unlocked) pool.push(i); });
 } else {
-['tiktok', 'memes', 'gaming'].forEach(cat => {
+['tiktok', 'memes', 'gaming', 'football'].forEach(cat => {
+if(appData.catalogs[cat]) {
 appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+}
 });
 }
 
@@ -959,21 +1008,25 @@ saveAppData();
 closeGame();
 }
 
+/* JEU RÉACTION ACCÉLÉRÉ (ULTRA RAPIDE) */
 function runReactionGame(c) {
-document.getElementById('gameTitle').innerText = "Réaction Néon";
-c.innerHTML = `<div style="text-align:center;">
+document.getElementById('gameTitle').innerText = "Réaction Extrême";
+c.innerHTML = `
+<div style="text-align:center;">
 <div id="bar" style="width:250px; height:30px; background:#100d20; position:relative; overflow:hidden; border-radius:15px; margin-bottom:20px; border:1px solid var(--card-border);">
 <div style="position:absolute; left:100px; width:50px; height:100%; background:var(--glow-magenta);"></div>
 <div id="cursor" style="position:absolute; left:0; width:6px; height:100%; background:#fff; box-shadow:0 0 10px #fff;"></div>
 </div>
 <button class="btn" onclick="stopReaction()">STOP !</button>
 </div>`;
-let pos = 0, dir = 3;
+
+let pos = 0, dir = 12; // Vitesse décuplée pour grande difficulté
 currentGameInterval = setInterval(() => {
 pos += dir;
 if(pos > 244 || pos < 0) dir *= -1;
 document.getElementById('cursor').style.left = pos + 'px';
-}, 20);
+}, 4); // Rafraîchissement ultra-rapide 4ms
+
 window.stopReaction = () => {
 clearInterval(currentGameInterval);
 rewardPlayer((pos >= 100 && pos <= 150) ? 50 : 10);
@@ -1052,7 +1105,8 @@ ctx.fillStyle = "#06b6d4"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
 function runTapGame(c) {
 document.getElementById('gameTitle').innerText = "Tap Cible (10s)";
 let score = 0, timeLeft = 10;
-c.innerHTML = `<div style="text-align:center;">
+c.innerHTML = `
+<div style="text-align:center;">
 <h2 id="timer">10s</h2>
 <div id="target" style="width:65px; height:65px; background:var(--glow-magenta); border-radius:50%; margin:30px auto; cursor:pointer; box-shadow:0 0 20px var(--glow-magenta);"></div>
 <h3>Score : <span id="tapScore">0</span></h3>
@@ -1073,7 +1127,8 @@ if(timeLeft <= 0) rewardPlayer(Math.min(10 + score*2, 50));
 
 function runMemoryGame(c) {
 document.getElementById('gameTitle').innerText = "Mémoire Flash";
-c.innerHTML = `<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;">
+c.innerHTML = `
+<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;">
 <div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div>
 <div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div>
 <div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div>
@@ -1102,7 +1157,6 @@ rewardPlayer(10);
 };
 }
 
-/* JEU DU STACK CORRIGÉ ET FONCTIONNEL */
 function runStackGame(c) {
 document.getElementById('gameTitle').innerText = "Stack Néon";
 c.innerHTML = `
@@ -1122,11 +1176,9 @@ let currentPos = 0;
 let currentDir = 2;
 let currentLevel = 0;
 
-// Premier bloc immobile en bas
 stack.push({ left: 50, width: 100 });
 renderBlock(50, 100, 0, false);
 
-// Création du bloc mobile du premier niveau
 currentLevel = 1;
 createMovingBlock();
 
@@ -1134,7 +1186,7 @@ function createMovingBlock() {
 currentPos = 0;
 const movingEl = document.createElement('div');
 movingEl.id = 'movingBlock';
-movingEl.style.cssText = `width:${currentWidth}px; height:${BLOCK_HEIGHT - 2}px; background:var(--glow-violet); position:absolute; bottom:${currentLevel * BLOCK_HEIGHT}px; left:0px; box-shadow:0 0 10px var(--glow-violet); border-radius:4px;`;
+movingEl.style.cssText = `width:${currentWidth}px; height:${BLOCK_HEIGHT - 2}px; position:absolute; bottom:${currentLevel * BLOCK_HEIGHT}px; background:var(--glow-violet); left:0px; box-shadow:0 0 10px var(--glow-violet); border-radius:4px;`;
 board.appendChild(movingEl);
 }
 
@@ -1158,21 +1210,17 @@ const prevBlock = stack[stack.length - 1];
 const diff = currentPos - prevBlock.left;
 
 if (Math.abs(diff) >= currentWidth) {
-// Bloc raté à côté -> Défaite
 clearInterval(currentGameInterval);
 rewardPlayer(Math.max(10, stack.length * 5));
 return;
 }
 
-// Recouvrement
 let newWidth = currentWidth - Math.abs(diff);
 let newLeft = diff > 0 ? currentPos : prevBlock.left;
 
-// Retirer le bloc animé mobile
 const m = document.getElementById('movingBlock');
 if (m) m.remove();
 
-// Ajouter le bloc posé
 stack.push({ left: newLeft, width: newWidth });
 renderBlock(newLeft, newWidth, currentLevel, false);
 
