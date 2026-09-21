@@ -228,6 +228,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 .trade-box { width:min(96vw,560px); max-height:90vh; overflow:auto; background:linear-gradient(145deg,rgba(20,13,39,.98),rgba(7,6,15,.98)); border:1px solid var(--card-border-glow); border-radius:24px; padding:18px; box-shadow:0 0 55px rgba(217,70,239,.25); }
 .trade-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
 .trade-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.ambient-sparkles{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}.ambient-sparkles span{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--glow-cyan);box-shadow:0 0 10px var(--glow-cyan);opacity:.25;animation:ambientFloat linear infinite}.ambient-sparkles span:nth-child(1){left:8%;top:82%;animation-duration:9s}.ambient-sparkles span:nth-child(2){left:24%;top:62%;animation-duration:12s}.ambient-sparkles span:nth-child(3){left:47%;top:90%;animation-duration:10s}.ambient-sparkles span:nth-child(4){left:71%;top:70%;animation-duration:13s}.ambient-sparkles span:nth-child(5){left:90%;top:84%;animation-duration:11s}@keyframes ambientFloat{0%{transform:translateY(30px) scale(.7);opacity:0}20%{opacity:.35}100%{transform:translateY(-180px) scale(1.5);opacity:0}}.hud-header{animation:hudIn .6s ease-out}@keyframes hudIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}.screen.active .glass-card{animation:cardIn .45s ease-out both}.screen.active .glass-card:nth-child(2){animation-delay:.04s}.screen.active .glass-card:nth-child(3){animation-delay:.08s}@keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}.nav-item.active .nav-icon{animation:navPulse 1.8s ease-in-out infinite}@keyframes navPulse{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.08)}}
 .music-toggle { width:38px;height:38px;border-radius:50%;border:1px solid var(--card-border-glow);background:rgba(139,92,246,.12);color:#fff;font-size:1.05rem;cursor:pointer;box-shadow:0 0 16px rgba(217,70,239,.18);transition:transform .2s,box-shadow .2s; }
 .music-toggle:active{transform:scale(.9)}
 .ad-big-icon{font-size:3rem;filter:drop-shadow(0 0 18px rgba(217,70,239,.5));animation:adFloat 1.4s ease-in-out infinite alternate;}
@@ -479,7 +480,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <p style="font-size:0.8rem; color:var(--glow-cyan); margin-top:8px;" id="userFriendId">ID Ami : Chargement...</p>
 <button class="btn btn-danger" style="margin-top:15px;" onclick="logoutUser()">SE DÉCONNECTER</button>
 </div>
-
 <!-- SECTION AMIS ET DEMANDES -->
 <div id="friendsSection" class="glass-card" style="display:none;">
 <div class="card-title"><span>🤝 CENTRE D'AMIS & DEMANDES</span></div>
@@ -542,7 +542,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </div>
 
 </div>
-
 <script>
 // CONFIGURATION FIREBASE
 const firebaseConfig = {
@@ -941,7 +940,6 @@ const iconEl = document.getElementById('toastIcon');
 toast.className = 'app-toast ' + type;
 msgEl.innerText = message;
 iconEl.innerText = type === 'success' ? '✅' : '❌';
-
 toast.classList.add('show');
 setTimeout(() => {
 toast.classList.remove('show');
@@ -962,7 +960,6 @@ reject(err);
 }, ms))
 ]);
 }
-
 function resetLocalUserState() {
 appData.currentUser = null;
 appData.credits = 0;
@@ -1004,7 +1001,6 @@ updateUI();
 try {
 const userRef = db.ref('users/' + user.uid);
 const snapshot = await withTimeout(userRef.once('value'), 5000, 'La base de données Firebase ne répond pas.');
-
 // Si une autre connexion s'est produite entre-temps, ne pas écraser son état.
 if (token !== profileLoadToken || !auth.currentUser || auth.currentUser.uid !== user.uid) return true;
 
@@ -1026,6 +1022,7 @@ redeemedCodes: [],
 dailyGames: {},
 hubTasks: {date:'', done:{}}
 };
+
 // Écriture non bloquante : une panne de Realtime Database ne déconnecte pas le joueur.
 userRef.set(data).catch(err => console.warn('Création profil DB:', err));
 }
@@ -1067,6 +1064,7 @@ if (needsFriendIdMigration) {
   db.ref('users/' + user.uid + '/friendId').set(appData.friendId)
     .catch(err => console.warn('Migration ID ami:', err));
 }
+
 listenToTrades();
 listenToFriendRequests();
 updateUI();
@@ -1087,6 +1085,7 @@ friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, 
 return true;
 } catch (error) {
 console.warn('Realtime Database indisponible pendant la connexion:', error);
+
 // On tente le dernier profil local connu.
 try {
 const cached = JSON.parse(localStorage.getItem('drop2027_profile_' + user.uid) || 'null');
@@ -1359,6 +1358,7 @@ setTimeout(() => {
   else showToast('💥 CARTE DÉBLOQUÉE : ' + picked.emoji + ' ' + picked.name, 'success');
 }, 2300);
 }
+
 function showCardRewardAnimation(card, rarity) {
 const existing = document.getElementById('rewardFlash');
 if (existing) existing.remove();
@@ -1421,6 +1421,7 @@ document.getElementById('usernameBox').style.display = isRegister ? 'block' : 'n
 document.getElementById('authUsername').required = isRegister;
 document.getElementById('authSubmitBtn').innerText = isRegister ? "S'INSCRIRE" : 'SE CONNECTER';
 }
+
 function firebaseAuthErrorMessage(err) {
 const code = err && err.code ? err.code : '';
 const messages = {
@@ -1608,7 +1609,6 @@ if ((appData.friends || []).some(f => f.uid === senderUid)) {
   try { await db.ref('friend_requests/' + myUid + '/' + reqId).remove(); } catch (_) {}
   return showToast('Cet utilisateur est déjà votre ami.', 'error');
 }
-
 const me = {
   uid: myUid,
   username: appData.currentUser.username || 'Joueur',
@@ -1629,7 +1629,6 @@ updates['friend_requests/' + myUid + '/' + reqId] = null;
 
 try {
   await withTimeout(db.ref().update(updates), 10000, 'Firebase ne répond pas pour la validation de la demande.');
-
   appData.friends = Array.isArray(appData.friends) ? appData.friends : [];
   appData.friends.push(them);
   try {
@@ -1713,7 +1712,6 @@ function renderTradeChoices(container, cards, kind) {
     container.appendChild(el);
   });
 }
-
 function selectTradeCard(kind,id,el){
   id=Number(id);
   if(!Number.isInteger(id))return;
@@ -1736,27 +1734,44 @@ const ok=!!o&&!!w; const btn=document.getElementById('tradeConfirmBtn'); btn.dis
 document.getElementById('tradeSummary').innerText=ok?'Tu donnes '+o.emoji+' '+o.name+'  ⇄  Tu demandes la carte #'+w.id:'Sélectionne une carte à donner et une carte à demander.';
 }
 function closeTradeModal(){document.getElementById('tradeModal').classList.remove('active');activeTrade={targetUid:null,targetName:'',offerId:null,wantId:null};}
+let tradeInboxCache = {};
+let tradeOutboxCache = {};
+function renderTradePanel(){
+ const tl=document.getElementById('tradesList'); if(!tl)return;
+ tl.innerHTML=''; let count=0;
+ Object.keys(tradeInboxCache||{}).forEach(tid=>{const t=tradeInboxCache[tid];if(!t||t.status!=='pending')return;count++;const div=document.createElement('div');div.className='trade-card-box';div.dataset.tradeId=tid;div.innerHTML=`<p style="font-size:.75rem;">📩 <b>${t.senderName}</b> propose un échange.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Donne #${t.offeredCardId} • Demande #${t.wantedCardId}</p><div style="display:flex;gap:6px;margin-top:8px;"><button class="btn btn-success" style="padding:6px;font-size:.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button><button class="btn btn-danger" style="padding:6px;font-size:.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button></div>`;tl.appendChild(div);});
+ Object.keys(tradeOutboxCache||{}).forEach(tid=>{const t=tradeOutboxCache[tid];if(!t||t.status!=='pending')return;count++;const div=document.createElement('div');div.className='trade-card-box';div.dataset.tradeId=tid;div.innerHTML=`<p style="font-size:.75rem;color:var(--text-muted);">⏳ Offre envoyée à <b>${t.receiverUid}</b>.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Tu donnes #${t.offeredCardId} • Tu demandes #${t.wantedCardId}</p>`;tl.appendChild(div);});
+ if(!count)tl.innerHTML='<i style="color:var(--text-muted);font-size:.75rem;">Aucune offre en cours.</i>';
+}
 function confirmTradeModal(){
 if(!activeTrade.targetUid || activeTrade.offerId == null || activeTrade.wantId == null)return showToast('❌ Sélectionne une carte à donner ET une carte à recevoir.','error');
 const offered=findCardById(activeTrade.offerId); if(!offered||!offered.unlocked||offered.tradeable!==true)return showToast('❌ Cette carte n’est pas échangeable ou n’est plus disponible.', 'error');
 if(Number(activeTrade.offerId)===Number(activeTrade.wantId))return showToast('❌ Tu ne peux pas demander la même carte que celle que tu donnes.','error');
 const tradeId='trade_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-db.ref('trades/'+tradeId).set({senderUid:appData.currentUser.uid,senderName:appData.currentUser.username,receiverUid:activeTrade.targetUid,offeredCardId:activeTrade.offerId,wantedCardId:activeTrade.wantId,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP}).then(()=>{closeTradeModal();showToast('📩 Offre d’échange envoyée !','success');}).catch(err=>showToast('❌ Erreur d’envoi : '+err.message,'error'));
+const trade={senderUid:appData.currentUser.uid,senderName:appData.currentUser.username,receiverUid:activeTrade.targetUid,offeredCardId:activeTrade.offerId,wantedCardId:activeTrade.wantId,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
+const updates={};
+updates['trades/'+tradeId]=trade;
+updates['trade_inbox/'+activeTrade.targetUid+'/'+tradeId]=trade;
+updates['trade_outbox/'+appData.currentUser.uid+'/'+tradeId]=trade;
+db.ref().update(updates).then(()=>{closeTradeModal();showToast('📩 Offre d’échange envoyée !','success');}).catch(err=>showToast('❌ Erreur d’envoi : '+err.message,'error'));
 }
 
 function listenToTrades() {
 if(!appData.currentUser) return;
-const render = snapshot => {
- const trades=snapshot.val()||{}; const tl=document.getElementById('tradesList'); if(!tl)return; tl.innerHTML=''; let count=0;
- Object.keys(trades).forEach(tid=>{ const t=trades[tid]; if(!t||t.status!=='pending')return; count++; const div=document.createElement('div');div.className='trade-card-box';
- if(t.receiverUid===appData.currentUser.uid) div.innerHTML=`<p style="font-size:.75rem;">📩 <b>${t.senderName}</b> propose un échange.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Donne #${t.offeredCardId} • Demande #${t.wantedCardId}</p><div style="display:flex;gap:6px;margin-top:8px;"><button class="btn btn-success" style="padding:6px;font-size:.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button><button class="btn btn-danger" style="padding:6px;font-size:.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button></div>`;
- else div.innerHTML=`<p style="font-size:.75rem;color:var(--text-muted);">⏳ Offre envoyée à ${t.receiverUid===appData.currentUser.uid?'vous':'votre ami'}.</p>`;
- tl.appendChild(div); });
- if(!count)tl.innerHTML='<i style="color:var(--text-muted);font-size:.75rem;">Aucune offre en cours.</i>';
-};
-db.ref('trades').orderByChild('senderUid').equalTo(appData.currentUser.uid).on('value',render);
-db.ref('trades').orderByChild('receiverUid').equalTo(appData.currentUser.uid).on('value',snap=>{ const first=snap.val()||{}; const tl=document.getElementById('tradesList'); if(!tl)return; Object.keys(first).forEach(tid=>{ const t=first[tid]; if(!t||t.status!=='pending')return; const exists=document.querySelector('[data-trade-id="'+tid+'"]'); if(exists)return; const div=document.createElement('div');div.className='trade-card-box';div.dataset.tradeId=tid;div.innerHTML=`<p style="font-size:.75rem;">📩 <b>${t.senderName}</b> propose un échange.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Donne #${t.offeredCardId} • Demande #${t.wantedCardId}</p><div style="display:flex;gap:6px;margin-top:8px;"><button class="btn btn-success" style="padding:6px;font-size:.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button><button class="btn btn-danger" style="padding:6px;font-size:.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button></div>`;tl.appendChild(div); }); });
-db.ref('trades').orderByChild('senderUid').equalTo(appData.currentUser.uid).on('value',snap=>{ const vals=snap.val()||{}; Object.keys(vals).forEach(tid=>{const t=vals[tid]; if(t&&t.status==='accepted') processAcceptedTradeForSender(tid,t);}); });
+const uid=appData.currentUser.uid;
+tradeInboxCache={}; tradeOutboxCache={};
+const inboxRef=db.ref('trade_inbox/'+uid);
+const outboxRef=db.ref('trade_outbox/'+uid);
+inboxRef.on('value',snap=>{
+ const next=snap.val()||{}; const hadPending=Object.values(tradeInboxCache).some(t=>t&&t.status==='pending');
+ tradeInboxCache=next; renderTradePanel();
+ const newPending=Object.values(next).some(t=>t&&t.status==='pending');
+ if(newPending&&!hadPending)showToast('📩 Nouvelle offre d’échange reçue !','success');
+});
+outboxRef.on('value',snap=>{
+ const vals=snap.val()||{}; tradeOutboxCache=vals; renderTradePanel();
+ Object.keys(vals).forEach(tid=>{const t=vals[tid];if(t&&t.status==='accepted')processAcceptedTradeForSender(tid,t);});
+});
 }
 
 function acceptTrade(tradeId) {
@@ -1769,7 +1784,12 @@ db.ref('trades/'+tradeId).once('value').then(async snap=>{
  const offered=findCardById(Number(t.offeredCardId));
  if(offered) offered.unlocked=true;
  await withTimeout(db.ref('users/'+appData.currentUser.uid+'/catalogs').set(appData.catalogs),8000,'Firebase ne répond pas pour la synchronisation de votre classeur.');
- await withTimeout(db.ref('trades/'+tradeId).update({status:'accepted',receiverApplied:true,acceptedAt:firebase.database.ServerValue.TIMESTAMP}),8000,'Firebase ne répond pas pour la validation de l’échange.');
+ const acceptedPatch={status:'accepted',receiverApplied:true,acceptedAt:firebase.database.ServerValue.TIMESTAMP};
+ await withTimeout(db.ref('trades/'+tradeId).update(acceptedPatch),8000,'Firebase ne répond pas pour la validation de l’échange.');
+ await withTimeout(db.ref('trade_inbox/'+appData.currentUser.uid+'/'+tradeId).update(acceptedPatch),8000,'Firebase ne répond pas pour la synchronisation de l’offre.');
+ await withTimeout(db.ref('trade_outbox/'+t.senderUid+'/'+tradeId).update(acceptedPatch),8000,'Firebase ne répond pas pour prévenir l’expéditeur.');
+ tradeInboxCache[tradeId]=Object.assign({},tradeInboxCache[tradeId]||t,acceptedPatch);
+ renderTradePanel();
  saveAppData(); showToast('🎉 Échange accepté ! Votre carte est maintenant dans le classeur.','success');
 }).catch(err=>{console.error(err);showToast('❌ Impossible de finaliser l’échange : '+err.message,'error');});
 }
@@ -1792,7 +1812,7 @@ if (item) result = item;
 return result;
 }
 
-function refuseTrade(tradeId) { db.ref('trades/' + tradeId).update({status:'refused'}).then(()=>showToast("Offre d’échange refusée.",'success')).catch(err=>showToast('❌ '+err.message,'error')); }
+function refuseTrade(tradeId) { const patch={status:'refused'}; db.ref('trades/' + tradeId).update(patch).then(()=>db.ref('trade_inbox/'+appData.currentUser.uid+'/'+tradeId).update(patch)).then(()=>{delete tradeInboxCache[tradeId];renderTradePanel();showToast("Offre d’échange refusée.",'success');}).catch(err=>showToast('❌ '+err.message,'error')); }
 
 function unlockCardById(id) {
 Object.keys(appData.catalogs).forEach(cat => {
@@ -1882,6 +1902,7 @@ activeGameType = gameType;
 if (!appData.dailyGames) appData.dailyGames = {};
 appData.dailyGames[gameType] = getLocalDayKey();
 saveAppData();
+
 document.getElementById('gameArea').classList.add('active');
 startGameMusic();
 const container = document.getElementById('gameCanvasContainer');
@@ -1965,6 +1986,7 @@ return false;
 }
 draw();
 }
+
 function runSnakeGame(c) {
 document.getElementById('gameTitle').innerText = "Snake Néon 2027";
 c.innerHTML = '<canvas id="sc" width="240" height="240" style="background:#0a0814; border-radius:14px; border:1px solid var(--card-border);"></canvas>';
@@ -2006,6 +2028,7 @@ if(timerEl) timerEl.innerText = timeLeft + 's';
 if(timeLeft <= 0) rewardPlayer(score >= 4 ? Math.min(10 + score * 2, 50) : 0);
 }, 1000);
 }
+
 function runMemoryGame(c) {
 document.getElementById('gameTitle').innerText = "Mémoire Flash";
 c.innerHTML = '<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;"><div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div><div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div><div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div><div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div></div>';
@@ -2024,7 +2047,6 @@ if(id === seq[step]) { step++; if(step >= seq.length) rewardPlayer(50); }
 else rewardPlayer(0);
 };
 }
-
 function runStackGame(c) {
 document.getElementById('gameTitle').innerText = "Stack Néon";
 c.innerHTML = '<div style="text-align:center;"><div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div><p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p><button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button></div>';
@@ -2045,7 +2067,6 @@ currentPos += currentDir;
 if (currentPos > (BOARD_WIDTH - currentWidth) || currentPos < 0) currentDir *= -1;
 const m = document.getElementById('movingBlock'); if (m) m.style.left = currentPos + 'px';
 }, 16);
-
 function renderBlock(left, width, level, isMoving = false) {
 const b = document.createElement('div');
 b.style.cssText = 'width:' + width + 'px; height:' + BLOCK_HEIGHT + 'px; left:' + left + 'px; bottom:' + (level * BLOCK_HEIGHT) + 'px; position:absolute; background:' + (isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)') + '; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;';
@@ -2143,14 +2164,27 @@ function runPrecisionGame(c){
  btn.onclick=()=>{if(pos>=43&&pos<=57){score++;sc.innerText=score+' / 4';if(score>=4)return rewardPlayer(150);}else return rewardPlayer(0);};
 }
 
-let gameMusicEnabled=true, gameMusicTimer=null, gameMusicStep=0;
+let gameMusicEnabled=true, gameMusicTimer=null, gameMusicStep=0, gameMusicTrack=0;
+const DROP_MUSIC_TRACKS=[
+ {name:'NEON DROP',tempo:360,lead:[261.63,329.63,392,493.88,392,329.63,293.66,349.23,440,523.25,440,349.23,392,493.88,587.33,659.25],bass:[130.81,164.81,196,146.83]},
+ {name:'CYBER RUN',tempo:320,lead:[329.63,392,493.88,587.33,659.25,587.33,493.88,392,369.99,440,554.37,659.25,739.99,659.25,554.37,440],bass:[164.81,196,246.94,220]},
+ {name:'PIXEL RUSH',tempo:300,lead:[392,440,523.25,659.25,783.99,659.25,587.33,523.25,392,493.88,587.33,739.99,880,739.99,659.25,493.88],bass:[196,220,261.63,246.94]},
+ {name:'MIDNIGHT DROP',tempo:400,lead:[220,277.18,329.63,369.99,440,369.99,329.63,277.18,246.94,329.63,369.99,493.88,440,369.99,329.63,246.94],bass:[110,138.59,164.81,123.47]}
+];
 function ensureAudio(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();return ctx;}
-function musicVoice(ctx,freq,dur,type,gain,when){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,when);g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(gain,when+.03);g.gain.exponentialRampToValueAtTime(.0001,when+dur);o.connect(g);g.connect(ctx.destination);o.start(when);o.stop(when+dur+.04);}
-function playGameMusicNote(){try{if(!gameMusicEnabled)return;const ctx=ensureAudio();if(!ctx)return;const now=ctx.currentTime,master=ctx.createGain();master.gain.value=.065;master.connect(ctx.destination);const lead=[261.63,329.63,392,523.25,392,329.63,293.66,349.23,440,587.33,440,349.23,329.63,392,493.88,659.25];const bass=[130.81,146.83,164.81,196,174.61,146.83,130.81,196];const f=lead[gameMusicStep%lead.length],b=bass[Math.floor(gameMusicStep/2)%bass.length];musicVoice(ctx,f,.48,'triangle',.13,now);musicVoice(ctx,f*2,.28,'sine',.045,now+.12);musicVoice(ctx,b,.72,'sine',.095,now);if(gameMusicStep%4===0){musicVoice(ctx,82.41,.18,'square',.025,now);musicVoice(ctx,123.47,.12,'square',.02,now+.28);}gameMusicStep++;}catch(e){}}
-function startGameMusic(){if(!gameMusicEnabled)return;stopGameMusic();gameMusicStep=0;playGameMusicNote();gameMusicTimer=setInterval(playGameMusicNote,520);const btn=document.getElementById('musicToggle');if(btn)btn.innerText='🔊';}
+function musicVoice(ctx,freq,dur,type,gain,when){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,when);g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(gain,when+.025);g.gain.exponentialRampToValueAtTime(.0001,when+dur);o.connect(g);g.connect(ctx.destination);o.start(when);o.stop(when+dur+.04);}
+function playGameMusicNote(){try{if(!gameMusicEnabled)return;const ctx=ensureAudio();if(!ctx)return;const track=DROP_MUSIC_TRACKS[gameMusicTrack];const now=ctx.currentTime;const step=gameMusicStep%track.lead.length;const master=ctx.createGain();master.gain.value=.052;master.connect(ctx.destination);const lead=track.lead[step],bass=track.bass[Math.floor(step/4)%track.bass.length];
+ musicVoice(ctx,lead,.28,'triangle',.12,now);musicVoice(ctx,lead*2,.12,'sine',.035,now+.08);musicVoice(ctx,bass,.38,'sine',.085,now);
+ if(step%4===0){musicVoice(ctx,82.41,.10,'square',.025,now);musicVoice(ctx,164.81,.07,'square',.018,now+.13);}else if(step%2===0){musicVoice(ctx,220,.055,'square',.012,now);}
+ gameMusicStep++;if(gameMusicStep%track.lead.length===0){gameMusicTrack=(gameMusicTrack+1)%DROP_MUSIC_TRACKS.length;gameMusicStep=0;}}
+ catch(e){}}
+function startGameMusic(){if(!gameMusicEnabled)return;stopGameMusic();const track=DROP_MUSIC_TRACKS[gameMusicTrack];playGameMusicNote();gameMusicTimer=setInterval(playGameMusicNote,track.tempo);const btn=document.getElementById('musicToggle');if(btn)btn.innerText='🔊';}
 function stopGameMusic(){if(gameMusicTimer){clearInterval(gameMusicTimer);gameMusicTimer=null;}}
 function toggleGameMusic(){gameMusicEnabled=!gameMusicEnabled;const btn=document.getElementById('musicToggle');if(btn)btn.innerText=gameMusicEnabled?'🔊':'🔇';if(gameMusicEnabled)startGameMusic();else stopGameMusic();}
+function bootMusic(){if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();}
+window.addEventListener('load',()=>{setTimeout(bootMusic,80);});
 window.addEventListener('pointerdown',()=>{if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();},{once:true});
+window.addEventListener('touchstart',()=>{if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();},{once:true,passive:true});
 
 function playEntrySound(kind){
  try{
