@@ -203,6 +203,52 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 .friend-badge { background: rgba(139, 92, 246, 0.15); border: 1px solid var(--card-border); padding: 12px; border-radius: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 .request-card-box { background: rgba(217, 70, 239, 0.08); border: 1px solid var(--card-border-glow); border-radius: 14px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; }
 .trade-card-box { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+
+/* DROP 2027 — extension animation / cartes / échanges */
+.entry-cinema { position:fixed; inset:0; z-index:3000; display:none; align-items:center; justify-content:center; overflow:hidden; background:radial-gradient(circle at 50% 45%, #241044 0%, #080511 42%, #020205 100%); }
+.entry-cinema.active { display:flex; animation:cinemaIn .45s ease-out; }
+.entry-cinema::before { content:""; position:absolute; inset:-20%; background:conic-gradient(from 0deg, transparent 0 25%, rgba(217,70,239,.14), transparent 38%, rgba(6,182,212,.12), transparent 62%); animation:spinGlow 9s linear infinite; }
+.entry-scan { position:absolute; inset:0; background:repeating-linear-gradient(0deg, transparent 0 7px, rgba(255,255,255,.018) 8px 9px); pointer-events:none; }
+.entry-content { width:min(92vw,620px); text-align:center; position:relative; z-index:2; padding:28px 20px; }
+.entry-logo { font-family:'Space Grotesk'; font-size:clamp(2.8rem,13vw,6rem); font-weight:900; letter-spacing:8px; background:linear-gradient(90deg,#fff,var(--glow-cyan),var(--glow-magenta),#fff); background-size:300%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:logoFlow 3s linear infinite, logoPulse 1.4s ease-in-out infinite alternate; }
+.entry-sub { color:#c4b5fd; letter-spacing:3px; font-size:.72rem; text-transform:uppercase; margin-top:8px; }
+.entry-progress { width:100%; height:5px; border-radius:99px; background:rgba(255,255,255,.08); margin:22px 0 10px; overflow:hidden; }
+.entry-progress > div { height:100%; width:0; background:linear-gradient(90deg,var(--glow-cyan),var(--glow-magenta)); box-shadow:0 0 18px var(--glow-magenta); transition:width 1s linear; }
+.entry-timer { font-family:'Space Grotesk'; font-size:.75rem; color:#fff; opacity:.8; }
+.entry-panel { margin-top:18px; min-height:125px; padding:18px; border:1px solid var(--card-border-glow); border-radius:20px; background:rgba(10,7,22,.72); box-shadow:0 0 45px rgba(139,92,246,.22); text-align:left; }
+.entry-panel h3 { font-family:'Space Grotesk'; font-size:1rem; margin-bottom:8px; color:#fff; }
+.entry-panel p { font-size:.72rem; color:var(--text-muted); line-height:1.55; }
+.entry-cards-preview { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; justify-content:center; max-height:190px; overflow:auto; }
+.entry-mini-card { width:62px; height:76px; border-radius:12px; border:1px solid var(--card-border); background:linear-gradient(145deg,#17102d,#090711); display:flex; flex-direction:column; align-items:center; justify-content:center; animation:miniFloat 1.8s ease-in-out infinite alternate; }
+.entry-mini-card b { font-size:1.4rem; }
+.entry-mini-card span { font-size:.48rem; text-align:center; padding:3px; color:#ddd; }
+.entry-logo-explode { animation:entryLogoExplode 2s ease-in forwards !important; }
+.trade-modal { position:fixed; inset:0; z-index:1200; display:none; align-items:center; justify-content:center; padding:14px; background:rgba(2,2,5,.92); backdrop-filter:blur(18px); }
+.trade-modal.active { display:flex; }
+.trade-box { width:min(96vw,560px); max-height:90vh; overflow:auto; background:linear-gradient(145deg,rgba(20,13,39,.98),rgba(7,6,15,.98)); border:1px solid var(--card-border-glow); border-radius:24px; padding:18px; box-shadow:0 0 55px rgba(217,70,239,.25); }
+.trade-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+.trade-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.trade-select-card { min-height:105px; border:1px solid var(--card-border); background:rgba(255,255,255,.035); border-radius:14px; padding:8px; text-align:center; cursor:pointer; transition:.2s; }
+.trade-select-card:hover { transform:translateY(-2px); border-color:var(--glow-magenta); }
+.trade-select-card.selected { border-color:var(--glow-cyan); box-shadow:0 0 18px rgba(6,182,212,.3); background:rgba(6,182,212,.08); transform:translateY(-3px) scale(1.02); }
+.trade-select-card.disabled { opacity:.35; cursor:not-allowed; filter:grayscale(1); }
+.trade-select-card .big { font-size:1.9rem; }
+.trade-select-card small { display:block; font-size:.56rem; color:var(--text-muted); margin-top:4px; line-height:1.2; }
+.trade-summary { margin:12px 0; padding:10px; border-radius:14px; background:rgba(139,92,246,.08); border:1px solid var(--card-border); font-size:.68rem; text-align:center; }
+.rarity-common { border-color:rgba(161,161,170,.45)!important; }
+.rarity-rare { border-color:#22d3ee!important; box-shadow:0 0 14px rgba(34,211,238,.15); }
+.rarity-epic { border-color:#a855f7!important; box-shadow:0 0 18px rgba(168,85,247,.22); }
+.rarity-legendary { border-color:#f59e0b!important; box-shadow:0 0 22px rgba(245,158,11,.25); }
+.rarity-ultra { border-color:#f0abfc!important; box-shadow:0 0 28px rgba(217,70,239,.38); animation:ultraCardPulse 1.3s ease-in-out infinite alternate; }
+@keyframes cinemaIn { from{opacity:0;transform:scale(1.04)} to{opacity:1;transform:none} }
+@keyframes spinGlow { to{transform:rotate(360deg)} }
+@keyframes logoFlow { to{background-position:300% 0} }
+@keyframes logoPulse { from{filter:drop-shadow(0 0 4px rgba(217,70,239,.2))} to{filter:drop-shadow(0 0 28px rgba(217,70,239,.7))} }
+@keyframes miniFloat { from{transform:translateY(0) rotate(-1deg)} to{transform:translateY(-6px) rotate(1deg)} }
+@keyframes entryLogoExplode { 0%{transform:scale(1);filter:brightness(1)} 35%{transform:scale(1.08);filter:brightness(2.5)} 70%{transform:scale(1.35);opacity:.9;filter:blur(1px) brightness(3)} 100%{transform:scale(5);opacity:0;filter:blur(12px) brightness(5)} }
+@keyframes ultraCardPulse { from{filter:brightness(1)} to{filter:brightness(1.35) drop-shadow(0 0 12px rgba(240,171,252,.7))} }
+@keyframes rewardPop { 0%{transform:scale(.6) rotate(-5deg);opacity:0} 65%{transform:scale(1.08) rotate(2deg)} 100%{transform:scale(1);opacity:1} }
+.reward-pop { animation:rewardPop .55s cubic-bezier(.2,.8,.2,1); }
 </style>
 </head>
 <body>
@@ -212,6 +258,35 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div id="appToast" class="app-toast">
 <span id="toastIcon">ℹ️</span>
 <span id="toastMsg">Message</span>
+</div>
+
+<div id="entryCinema" class="entry-cinema" aria-hidden="true">
+  <div class="entry-scan"></div>
+  <div class="entry-content">
+    <div id="entryLogo" class="entry-logo">DROP 2027</div>
+    <div id="entrySub" class="entry-sub">Chargement de l'univers DROP</div>
+    <div class="entry-progress"><div id="entryProgressBar"></div></div>
+    <div class="entry-timer" id="entryTimer">20s</div>
+    <div class="entry-panel" id="entryPanel"></div>
+  </div>
+</div>
+
+<div id="tradeModal" class="trade-modal">
+  <div class="trade-box">
+    <div class="trade-head">
+      <div>
+        <div class="card-title" style="margin-bottom:4px;">ÉCHANGE DE CARTES</div>
+        <div id="tradeTargetName" style="font-size:.75rem;color:var(--text-muted);">Avec votre ami</div>
+      </div>
+      <button class="btn btn-danger" style="width:auto;padding:7px 11px;" onclick="closeTradeModal()">FERMER</button>
+    </div>
+    <div style="font-size:.7rem;color:var(--glow-cyan);font-weight:800;margin-bottom:7px;">1. CHOISIS TA CARTE À DONNER</div>
+    <div id="tradeOfferGrid" class="trade-grid"></div>
+    <div style="font-size:.7rem;color:var(--glow-magenta);font-weight:800;margin:14px 0 7px;">2. CHOISIS LA CARTE QUE TU DEMANDES</div>
+    <div id="tradeRequestGrid" class="trade-grid"></div>
+    <div id="tradeSummary" class="trade-summary">Sélectionne deux cartes échangeables.</div>
+    <button id="tradeConfirmBtn" class="btn" disabled onclick="confirmTradeModal()">ENVOYER L'OFFRE</button>
+  </div>
 </div>
 
 <header class="hud-header">
@@ -261,6 +336,11 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="binder-tab" onclick="switchCategory('memes', this)">🎭 Pop Culture & Mèmes</div>
 <div class="binder-tab" onclick="switchCategory('gaming', this)">🎮 Gaming & Tech</div>
 <div class="binder-tab" onclick="switchCategory('football', this)">⚽ Football</div>
+<div class="binder-tab" onclick="switchCategory('cinema', this)">🎬 Cinéma</div>
+<div class="binder-tab" onclick="switchCategory('space', this)">🚀 Espace</div>
+<div class="binder-tab" onclick="switchCategory('animals', this)">🐾 Animaux</div>
+<div class="binder-tab" onclick="switchCategory('food', this)">🍕 Food</div>
+<div class="binder-tab" onclick="switchCategory('starter', this)">🧩 Départ</div>
 <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
 </div>
 
@@ -273,14 +353,18 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="glass-card">
 <div class="card-title"><span>ARCADE — GAIN DE CRÉDITS</span></div>
 <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:12px;">Coût : 25 🪙 | Gain : 10 à 50 🪙</p>
-
 <div style="display:flex; flex-direction:column; gap:10px;">
 <div class="game-card"><div class="game-info"><h4>⚡ Réaction Extrême</h4><p>Stoppe le curseur hyper rapide !</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('reaction')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🔴 Puissance 4</h4><p>VS Robot Tactique</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('connect4')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🐍 Snake Néon</h4><p>Serpent tactile classique</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('snake')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🥞 Stack Néon</h4><p>Empilement de blocs précis</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('stack')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🎯 Tap Cible</h4><p>Touche les cibles en 10s</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('tap')">JOUER</button></div>
-<div class="game-card"><div class="game-info"><h4>🧠 Mémoire Flash</h4><p>Répète la séquence néon</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('memory')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🧠 Mémoire Flash</h4><p>Répète la séquence néon — 50 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('memory')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🔐 Code Crack</h4><p>Décode une combinaison — 70 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('code')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🟣 Pattern Rush</h4><p>Reproduis une séquence infernale — 80 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('pattern')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>💠 Chasse aux Orbes</h4><p>Attrape les orbes avant la fin — 60 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('orbs')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🧮 Math Panic</h4><p>5 calculs sans erreur — 90 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('math')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>☄️ Laser Escape</h4><p>Évite les lasers — 100 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('laser')">JOUER</button></div>
 </div>
 </div>
 </section>
@@ -333,6 +417,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">👥 MES AMIS</h4>
 <div id="friendsList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucun ami ajouté.</i></div>
+
 <h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">🔄 ÉCHANGES DE CARTES</h4>
 <div id="tradesList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i></div>
 </div>
@@ -353,6 +438,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="nav-item" onclick="switchTab('scr-shop', this)"><span class="nav-icon">💎</span><span>SHOP</span></button>
 <button class="nav-item" onclick="switchTab('scr-account', this)"><span class="nav-icon">👤</span><span>COMPTE</span></button>
 </nav>
+
 <!-- MODALS -->
 <div class="game-modal" id="gameArea">
 <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -511,11 +597,108 @@ secret: [
 { id: 414, name: "Carte de Crédit Obsidienne", emoji: "🖤", price: 400000, unlocked: false },
 { id: 415, name: "Sceau Absolu de l'Infiniment Grand", emoji: "🌌", price: 600000, unlocked: false },
 { id: 416, name: "Passeport Cosmique 2027", emoji: "🛸", price: 800000, unlocked: false },
-{ id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false }
+{ id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false, tradeable: false, rarity: "ultra" }
+],
+starter: [
+{ id: 1, name: "DROP — Première Carte", emoji: "🟦", price: 0, unlocked: true, tradeable: false, rarity: "common" },
+{ id: 2, name: "Ticket de Départ", emoji: "🎟️", price: 0, unlocked: true, tradeable: false, rarity: "common" },
+{ id: 3, name: "Mini Cristal", emoji: "💠", price: 0, unlocked: true, tradeable: false, rarity: "common" },
+{ id: 4, name: "Badge Nouveau Joueur", emoji: "🏷️", price: 0, unlocked: true, tradeable: false, rarity: "common" },
+{ id: 5, name: "Pixel DROP", emoji: "🟪", price: 0, unlocked: true, tradeable: false, rarity: "common" },
+{ id: 6, name: "Jeton Basique", emoji: "🪙", price: 0, unlocked: true, tradeable: false, rarity: "common" },
+{ id: 7, name: "Étoile de Départ", emoji: "⭐", price: 0, unlocked: true, tradeable: false, rarity: "common" },
+{ id: 8, name: "Carte Test", emoji: "🧪", price: 0, unlocked: true, tradeable: false, rarity: "common" }
+],
+cinema: [
+{ id: 601, name: "Clap de Tournage", emoji: "🎬", price: 220, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 602, name: "Projecteur 35mm", emoji: "📽️", price: 420, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 603, name: "Caméra de Plateau", emoji: "📹", price: 650, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 604, name: "Bobine Collector", emoji: "🎞️", price: 900, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 605, name: "Fauteuil Réalisateur", emoji: "💺", price: 1100, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 606, name: "Badge Premier Rôle", emoji: "🏅", price: 1500, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 607, name: "Script Original", emoji: "📜", price: 1900, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 608, name: "Lumière de Plateau", emoji: "💡", price: 2400, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 609, name: "Micro Perche", emoji: "🎙️", price: 2800, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 610, name: "Bande Démo Platinum", emoji: "💿", price: 4000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 611, name: "Pass Festival de Cannes", emoji: "🏆", price: 7000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 612, name: "Caméra Fantôme", emoji: "👻", price: 9000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 613, name: "Projecteur des Étoiles", emoji: "🌟", price: 12000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 614, name: "Clap Légendaire 2027", emoji: "🎬", price: 18000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 615, name: "Palme Cosmique", emoji: "🌴", price: 30000, unlocked: false, tradeable: true, rarity: "ultra" }
+],
+space: [
+{ id: 701, name: "Mini Fusée", emoji: "🚀", price: 250, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 702, name: "Satellite Pocket", emoji: "🛰️", price: 500, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 703, name: "Combinaison Lunaire", emoji: "👨‍🚀", price: 800, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 704, name: "Rover Rouge", emoji: "🛸", price: 1200, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 705, name: "Météorite Numérique", emoji: "☄️", price: 1700, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 706, name: "Anneau de Saturne", emoji: "🪐", price: 2300, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 707, name: "Lune Miniature", emoji: "🌙", price: 3000, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 708, name: "Galaxie en Capsule", emoji: "🌌", price: 5000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 709, name: "Trou Noir", emoji: "🕳️", price: 8000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 710, name: "Portail Interstellaire", emoji: "🌀", price: 12000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 711, name: "Comète Royale", emoji: "☄️", price: 15000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 712, name: "Étoile à Neutrons", emoji: "✨", price: 22000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 713, name: "Station DROP", emoji: "🏗️", price: 28000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 714, name: "Univers Poche", emoji: "🌠", price: 35000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 715, name: "Cosmos Absolu", emoji: "🌌", price: 50000, unlocked: false, tradeable: true, rarity: "ultra" }
+],
+animals: [
+{ id: 801, name: "Chat Pixel", emoji: "🐱", price: 180, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 802, name: "Renard Néon", emoji: "🦊", price: 320, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 803, name: "Panda Turbo", emoji: "🐼", price: 450, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 804, name: "Axolotl Royal", emoji: "🦎", price: 650, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 805, name: "Loup Holographique", emoji: "🐺", price: 900, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 806, name: "Poulpe Cosmique", emoji: "🐙", price: 1200, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 807, name: "Tigre Galactique", emoji: "🐯", price: 1800, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 808, name: "Aigle de Foudre", emoji: "🦅", price: 2500, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 809, name: "Dragon Pixel", emoji: "🐉", price: 4000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 810, name: "Licorne Chromée", emoji: "🦄", price: 6500, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 811, name: "Phénix Néon", emoji: "🔥", price: 9000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 812, name: "Baleine Stellaire", emoji: "🐋", price: 12000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 813, name: "Cerf Astral", emoji: "🦌", price: 15000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 814, name: "Tigre du Néant", emoji: "🐅", price: 22000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 815, name: "Bête Mythique DROP", emoji: "🦁", price: 30000, unlocked: false, tradeable: true, rarity: "ultra" }
+],
+food: [
+{ id: 901, name: "Pizza Pixel", emoji: "🍕", price: 150, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 902, name: "Burger Néon", emoji: "🍔", price: 250, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 903, name: "Sushi Laser", emoji: "🍣", price: 400, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 904, name: "Taco Galactique", emoji: "🌮", price: 600, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 905, name: "Donut Hologramme", emoji: "🍩", price: 850, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 906, name: "Ramen Infini", emoji: "🍜", price: 1200, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 907, name: "Gâteau Diamant", emoji: "🍰", price: 1700, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 908, name: "Glace Cosmique", emoji: "🍦", price: 2200, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 909, name: "Jus du Futur", emoji: "🧃", price: 3500, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 910, name: "Burger Royal", emoji: "🍔", price: 5000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 911, name: "Pomme d'Or", emoji: "🍎", price: 8000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 912, name: "Sushi Galactique", emoji: "🍣", price: 11000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 913, name: "Pizza Multivers", emoji: "🍕", price: 16000, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 914, name: "Nectar Absolu", emoji: "🍯", price: 24000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 915, name: "Le Dernier Jus", emoji: "🧃", price: 40000, unlocked: false, tradeable: true, rarity: "ultra" }
 ]
 };
 
 let activeCategory = 'tiktok';
+const NEW_CARD_IDS = new Set([601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915]);
+const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
+function normalizeCatalogs(raw) {
+  const base = JSON.parse(JSON.stringify(CATALOGS));
+  Object.keys(base).forEach(cat => {
+    const saved = raw && Array.isArray(raw[cat]) ? raw[cat] : [];
+    const byId = Object.fromEntries(saved.map(x => [x.id, x]));
+    base[cat] = base[cat].map(item => {
+      const old = byId[item.id];
+      return old ? {...item, ...old, tradeable: old.tradeable !== undefined ? old.tradeable : item.tradeable !== false, rarity: old.rarity || item.rarity || 'common'} : {...item};
+    });
+  });
+  return base;
+}
+function ensureStarterCards() {
+  if (!appData.catalogs) appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
+  appData.catalogs = normalizeCatalogs(appData.catalogs);
+  appData.catalogs.starter.forEach(c => c.unlocked = true);
+}
 let appData = {
 credits: 0,
 redeemedCodes: [],
@@ -547,7 +730,6 @@ toast.classList.remove('show');
 // AUTHENTIFICATION ROBUSTE : l'authentification ne doit JAMAIS être bloquée par la base de données.
 let authLoading = false;
 let profileLoadToken = 0;
-
 function withTimeout(promise, ms, label) {
 return Promise.race([
 promise,
@@ -568,7 +750,6 @@ appData.isAdmin = false;
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = [];
 }
-
 async function loadFirebaseUserProfile(user) {
 if (!user) {
 resetLocalUserState();
@@ -605,7 +786,8 @@ if (token !== profileLoadToken || !auth.currentUser || auth.currentUser.uid !== 
 let data = snapshot.val();
 if (!data) {
 const fId = fallbackFriendId;
-const freshCatalogs = JSON.parse(JSON.stringify(CATALOGS));
+const freshCatalogs = normalizeCatalogs(CATALOGS);
+freshCatalogs.starter.forEach(c => c.unlocked = true);
 if (isAdminEmail) Object.keys(freshCatalogs).forEach(cat => freshCatalogs[cat].forEach(i => i.unlocked = true));
 
 data = {
@@ -646,7 +828,8 @@ try {
   console.warn('Amitiés partagées:', friendErr);
 }
 appData.isAdmin = data.isAdmin === true || isAdminEmail;
-appData.catalogs = data.catalogs || JSON.parse(JSON.stringify(CATALOGS));
+appData.catalogs = normalizeCatalogs(data.catalogs);
+ensureStarterCards();
 appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes : [];
 
 // Migration silencieuse de l'ancien ID court vers le nouvel ID complet.
@@ -659,13 +842,18 @@ listenToTrades();
 listenToFriendRequests();
 updateUI();
 
+const introKey = 'drop2027_intro_seen_' + user.uid;
+if (!localStorage.getItem(introKey)) {
+  localStorage.setItem(introKey, '1');
+  setTimeout(() => startEntryAnimation(60, true), 350);
+}
+
 // Cache local pour que l'interface reste utilisable même si Firebase DB tombe
 // momentanément lors de la prochaine connexion.
 try { localStorage.setItem('drop2027_profile_' + user.uid, JSON.stringify({
 username: appData.currentUser.username, credits: appData.credits, friendId: appData.friendId,
 friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, redeemedCodes: appData.redeemedCodes
 })); } catch (_) {}
-
 return true;
 } catch (error) {
 console.warn('Realtime Database indisponible pendant la connexion:', error);
@@ -679,7 +867,8 @@ appData.credits = Number(cached.credits) || 0;
 appData.friendId = cached.friendId || fallbackFriendId;
 appData.friends = Array.isArray(cached.friends) ? cached.friends : [];
 appData.isAdmin = cached.isAdmin === true || isAdminEmail;
-appData.catalogs = cached.catalogs || appData.catalogs;
+appData.catalogs = normalizeCatalogs(cached.catalogs || appData.catalogs);
+ensureStarterCards();
 appData.redeemedCodes = Array.isArray(cached.redeemedCodes) ? cached.redeemedCodes : [];
 updateUI();
 } } catch (_) {}
@@ -722,19 +911,26 @@ return String(code || '').trim().replace(/^#/, '');
 
 function saveAppData() {
 if (appData.currentUser) {
-db.ref('users/' + appData.currentUser.uid).update({
+const userData = {
 credits: appData.credits,
 catalogs: appData.catalogs,
 friends: appData.friends,
 friendId: appData.friendId,
 isAdmin: appData.isAdmin,
 redeemedCodes: appData.redeemedCodes
-});
+};
+db.ref('users/' + appData.currentUser.uid).update(userData).catch(err => console.warn('Sauvegarde profil:', err));
+const publicCards = {};
+Object.keys(appData.catalogs || {}).forEach(cat => (appData.catalogs[cat] || []).forEach(card => {
+  if (card.unlocked && card.tradeable === true) publicCards[String(card.id)] = {id:card.id,name:card.name,emoji:card.emoji,rarity:card.rarity || 'common'};
+}));
+db.ref('public_collections/' + appData.currentUser.uid).set(publicCards).catch(err => console.warn('Collection publique:', err));
 }
 updateUI();
 }
 
 function updateUI() {
+ensureStarterCards();
 document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
 
 const authSec = document.getElementById('authSection');
@@ -762,7 +958,6 @@ authSec.style.display = 'block';
 profSec.style.display = 'none';
 friendsSec.style.display = 'none';
 }
-
 renderCatalogGrid();
 }
 
@@ -772,6 +967,7 @@ document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')
 document.getElementById(id).classList.add('active');
 if (btn) btn.classList.add('active');
 }
+
 function switchCategory(catKey, tabBtn) {
 activeCategory = catKey;
 document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
@@ -782,7 +978,6 @@ renderCatalogGrid();
 function renderCatalogGrid() {
 const grid = document.getElementById('catalogGrid');
 grid.innerHTML = '';
-
 if (activeCategory === 'football') {
 const bgPattern = document.createElement('div');
 bgPattern.className = 'football-bg-pattern';
@@ -794,14 +989,15 @@ const currentItems = appData.catalogs[activeCategory] || [];
 
 currentItems.forEach(item => {
 const div = document.createElement('div');
-div.className = 'catalog-card' + (item.unlocked ? '' : ' locked');
+const rarity = item.rarity || 'common';
+const rarityLabel = {common:'BASIQUE',rare:'RARE',epic:'ÉPIQUE',legendary:'LÉGENDAIRE',ultra:'ULTRA RARE'}[rarity] || 'BASIQUE';
+div.className = 'catalog-card ' + (item.unlocked ? '' : 'locked') + ' rarity-' + rarity;
 div.innerHTML = `<div class="emoji">${item.emoji}</div>
-<div class="item-name">${item.name}</div><div class="item-price">${item.price} 🪙</div>
-<button class="btn ${item.unlocked ? 'btn-secondary' : ''}" style="padding:6px; font-size:0.7rem; margin-top:8px;" ${item.unlocked ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">${item.unlocked ? 'Acquis' : 'Obtenir'}</button>`;
+<div class="item-name">${item.name}</div><div style="font-size:.55rem;color:var(--text-muted);font-weight:800;letter-spacing:1px;">${rarityLabel}${item.tradeable ? ' • ÉCHANGEABLE' : ' • NON ÉCHANGEABLE'}</div><div class="item-price">${item.price === 0 ? 'GRATUITE' : item.price + ' 🪙'}</div>
+<button class="btn ${item.unlocked ? 'btn-secondary' : ''}" style="padding:6px; font-size:0.7rem; margin-top:8px;" ${item.unlocked || item.tradeable === false ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">${item.unlocked ? 'Acquis' : item.tradeable === false ? 'Départ' : 'Obtenir'}</button>`;
 grid.appendChild(div);
 });
 }
-
 function buyItemDirect(id) {
 let found = null;
 Object.keys(appData.catalogs).forEach(cat => {
@@ -818,6 +1014,8 @@ return showToast('Crédits insuffisants ! Il faut ' + found.price + ' 🪙', 'er
 
 if (!appData.isAdmin) appData.credits -= found.price;
 found.unlocked = true;
+playUnlockSound(found.rarity || 'rare');
+showCardRewardAnimation(found, found.rarity || 'rare');
 
 if (found.id === 2000) triggerAnnihilation();
 else showToast('🎉 FÉLICITATIONS ! Objet obtenu : ' + found.emoji + ' ' + found.name, 'success');
@@ -827,57 +1025,68 @@ saveAppData();
 function openRandomDrop() {
 if (isDropping) return;
 if (!appData.isAdmin && appData.credits < 150) return showToast('150 Crédits requis pour lancer un drop !', 'error');
-
+ensureStarterCards();
 const roll = Math.random();
-let isUltraRare = roll < 0.1;
-
+const isUltraRare = roll < 0.06;
+const isLegendary = !isUltraRare && roll < 0.16;
+const wantedRarities = isUltraRare ? ['ultra'] : isLegendary ? ['legendary'] : ['common','rare','epic'];
 let pool = [];
-if (isUltraRare) {
-appData.catalogs.secret.forEach(i => { if(!i.unlocked) pool.push(i); });
-} else {
-['tiktok', 'memes', 'gaming', 'football'].forEach(cat => {
-if(appData.catalogs[cat]) {
-appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
-}
-});
-}
-
-if (pool.length === 0) {
 Object.keys(appData.catalogs).forEach(cat => {
-appData.catalogs[cat].forEach(i => { if(!i.unlocked) pool.push(i); });
+  if (cat === 'starter') return;
+  (appData.catalogs[cat] || []).forEach(i => {
+    if (!i.unlocked && i.tradeable !== false && wantedRarities.includes(i.rarity || 'common')) pool.push(i);
+  });
 });
+if (pool.length === 0) {
+  Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(i => { if(!i.unlocked && i.tradeable !== false) pool.push(i); }));
 }
-
-if (pool.length === 0) return showToast('Félicitations, tout le classeur est déjà débloqué !', 'success');
-
+if (pool.length === 0) return showToast('🎉 Félicitations, tout le classeur échangeable est déjà débloqué !', 'success');
 if (!appData.isAdmin) appData.credits -= 150;
-saveAppData();
-
 const picked = pool[Math.floor(Math.random() * pool.length)];
 picked.unlocked = true;
+const rarity = picked.rarity || (isUltraRare ? 'ultra' : 'rare');
+showCardRewardAnimation(picked, rarity);
+playUnlockSound(rarity);
+saveAppData();
 isDropping = true;
 const card = document.getElementById('dropCard');
 const btn = document.getElementById('btnDrop');
 btn.disabled = true;
-
 card.classList.remove('revealed', 'exploding');
-
 document.getElementById('dropCardEmoji').innerText = picked.emoji;
 document.getElementById('dropCardName').innerText = picked.name;
-document.getElementById('dropCardRarity').innerText = isUltraRare ? "⚡ ULTRA RARE (1/10)" : "🌟 CLASSIQUE / RARE";
-document.getElementById('dropCardRarity').style.color = isUltraRare ? "var(--glow-magenta)" : "var(--glow-cyan)";
-
+document.getElementById('dropCardRarity').innerText = rarity === 'ultra' ? '✨ ULTRA RARE' : rarity === 'legendary' ? '👑 LÉGENDAIRE' : rarity === 'epic' ? '💜 ÉPIQUE' : rarity === 'rare' ? '💎 RARE' : '⚪ BASIQUE';
+document.getElementById('dropCardRarity').style.color = rarity === 'ultra' ? '#f0abfc' : rarity === 'legendary' ? '#f59e0b' : rarity === 'epic' ? '#a855f7' : rarity === 'rare' ? 'var(--glow-cyan)' : 'var(--text-muted)';
 setTimeout(() => card.classList.add('revealed'), 300);
 setTimeout(() => { card.classList.add('exploding'); createExplosionParticles(); }, 1400);
-
 setTimeout(() => {
-isDropping = false;
-btn.disabled = false;
-saveAppData();
+  isDropping = false; btn.disabled = false; saveAppData();
+  if (picked.id === 2000) triggerAnnihilation();
+  else showToast('💥 CARTE DÉBLOQUÉE : ' + picked.emoji + ' ' + picked.name, 'success');
+}, 2300);
+}
 
-if (picked.id === 2000) triggerAnnihilation();
-else showToast('💥 UNBOXING EXPLOSIF ! Obtenu : ' + picked.emoji + ' ' + picked.name, 'success');
-}, 2200);
+function showCardRewardAnimation(card, rarity) {
+const existing = document.getElementById('rewardFlash');
+if (existing) existing.remove();
+const el = document.createElement('div');
+el.id = 'rewardFlash'; el.style.cssText='position:fixed;inset:0;z-index:1400;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle,rgba(217,70,239,.16),transparent 55%);';
+el.innerHTML = `<div class="catalog-card rarity-${rarity} reward-pop" style="width:190px;min-height:240px;background:rgba(8,6,18,.96);transform:scale(1.15);"><div class="emoji" style="font-size:4rem;">${card.emoji}</div><div class="item-name" style="font-size:.9rem;">${card.name}</div><div style="color:var(--glow-cyan);font-size:.7rem;font-weight:900;margin-top:8px;">${rarity === 'ultra' ? '✨ HYPER RARE ✨' : rarity.toUpperCase()}</div><div style="font-size:.6rem;color:var(--text-muted);margin-top:7px;">${card.tradeable === false ? 'NON ÉCHANGEABLE' : 'ÉCHANGEABLE'}</div></div>`;
+document.body.appendChild(el);
+setTimeout(()=>el.remove(), rarity === 'ultra' ? 2600 : 1700);
+}
+
+function playUnlockSound(rarity='rare') {
+try {
+const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+const ctx = window.__dropAudio || new AC(); window.__dropAudio = ctx;
+if (ctx.state === 'suspended') ctx.resume();
+const now = ctx.currentTime;
+const master = ctx.createGain(); master.gain.setValueAtTime(.0001,now); master.gain.exponentialRampToValueAtTime(.16,now+.03); master.gain.exponentialRampToValueAtTime(.0001,now+(rarity==='ultra'?2.5:1.1)); master.connect(ctx.destination);
+const notes = rarity==='ultra' ? [261.63,329.63,392,523.25,659.25,783.99] : rarity==='legendary' ? [329.63,415.3,523.25,659.25] : [392,493.88,587.33];
+notes.forEach((freq,i)=>{ const o=ctx.createOscillator(); const g=ctx.createGain(); o.type=rarity==='ultra'?'sine':'triangle'; o.frequency.value=freq; g.gain.setValueAtTime(.0001,now+i*.12); g.gain.exponentialRampToValueAtTime(.28,now+i*.12+.025); g.gain.exponentialRampToValueAtTime(.0001,now+i*.12+.45); o.connect(g); g.connect(master); o.start(now+i*.12); o.stop(now+i*.12+.5); });
+if(rarity==='ultra') { const n=ctx.createOscillator(),g=ctx.createGain(); n.type='sine'; n.frequency.setValueAtTime(880,now+.65); n.frequency.exponentialRampToValueAtTime(1760,now+1.35); g.gain.setValueAtTime(.0001,now+.65); g.gain.exponentialRampToValueAtTime(.18,now+.75); g.gain.exponentialRampToValueAtTime(.0001,now+1.7); n.connect(g);g.connect(master);n.start(now+.65);n.stop(now+1.75); }
+} catch(e) { console.warn('Audio récompense:',e); }
 }
 
 function createExplosionParticles() {
@@ -970,7 +1179,8 @@ auth.createUserWithEmailAndPassword(email, pass),
 );
 const u = credential.user;
 const fId = generateFriendCode(u.uid);
-const initialCatalogs = JSON.parse(JSON.stringify(CATALOGS));
+const initialCatalogs = normalizeCatalogs(CATALOGS);
+initialCatalogs.starter.forEach(c => c.unlocked = true);
 const isAdminEmail = email === 'carer.nathan11@gmail.com';
 if (isAdminEmail) Object.keys(initialCatalogs).forEach(cat => initialCatalogs[cat].forEach(i => i.unlocked = true));
 
@@ -987,6 +1197,7 @@ updateUI();
 
 db.ref('users/' + u.uid).set(initialData).catch(err => console.warn('Profil inscription:', err));
 listenToTrades(); listenToFriendRequests();
+saveAppData();
 showToast('✨ Compte créé avec succès !', 'success');
 }
 } catch (err) {
@@ -1059,7 +1270,6 @@ showToast('❌ ' + (err.message || 'Impossible d’envoyer la demande.'), 'error
 if (btn) { btn.disabled = false; btn.innerText = 'AJOUTER'; }
 });
 }
-
 function listenToFriendRequests() {
 if (!appData.currentUser) return;
 db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
@@ -1176,123 +1386,87 @@ fl.appendChild(div);
 });
 }
 
-function openTradePrompt(targetUid, targetName) {
-let myUnlocked = [];
-Object.keys(appData.catalogs).forEach(cat => {
-appData.catalogs[cat].forEach(i => { if(i.unlocked) myUnlocked.push(i); });
-});
-
-if (myUnlocked.length === 0) return showToast("Vous n'avez aucune carte débloquée à proposer !", 'error');
-
-let msg = "Proposer un échange à " + targetName + " :\nEntrez l'ID de la carte que vous DONNEZ :\n" + myUnlocked.map(i => '#' + i.id + ' - ' + i.name).join('\n');
-let myCardId = prompt(msg);
-if (!myCardId) return;
-
-let wantedCardInput = prompt("Entrez l'ID de la carte que vous DEMANDEZ en échange :");
-if (!wantedCardInput) return;
-const offeredCardId = Number(String(myCardId).replace('#', '').trim());
-const wantedCardId = Number(String(wantedCardInput).replace('#', '').trim());
-if (!Number.isInteger(offeredCardId) || !Number.isInteger(wantedCardId)) {
-  return showToast('❌ ID de carte invalide.', 'error');
+let activeTrade = {targetUid:null,targetName:'',offerId:null,wantId:null};
+let entryTimerHandle = null, entryMusicHandle = null;
+async function openTradePrompt(targetUid, targetName) {
+if (!appData.currentUser) return;
+activeTrade = {targetUid,targetName,offerId:null,wantId:null};
+document.getElementById('tradeTargetName').innerText = 'Avec ' + targetName;
+document.getElementById('tradeModal').classList.add('active');
+const offerGrid=document.getElementById('tradeOfferGrid'), requestGrid=document.getElementById('tradeRequestGrid');
+offerGrid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;">Chargement de ton classeur…</div>';
+requestGrid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;">Chargement des cartes de ton ami…</div>';
+const mine=[]; Object.keys(appData.catalogs).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>{if(c.unlocked&&c.tradeable===true)mine.push(c);}));
+renderTradeChoices(offerGrid,mine,'offer');
+try {
+ const snap=await withTimeout(db.ref('public_collections/'+targetUid).once('value'),6000,'Impossible de charger le classeur de votre ami.');
+ const vals=snap.val()||{}; const theirs=Object.values(vals);
+ renderTradeChoices(requestGrid,theirs,'want');
+} catch(e) { requestGrid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--danger);font-size:.7rem;">Le classeur échangeable de cet ami est indisponible.</div>'; }
+updateTradeSummary();
 }
-const offeredCard = findCardById(offeredCardId);
-if (!offeredCard || !offeredCard.unlocked) {
-  return showToast('❌ Cette carte n’est pas débloquée dans votre classeur.', 'error');
+function renderTradeChoices(container, cards, kind) {
+container.innerHTML='';
+if(!cards.length){container.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;padding:10px;">Aucune carte échangeable disponible.</div>';return;}
+cards.forEach(card=>{ const el=document.createElement('div'); el.className='trade-select-card rarity-'+(card.rarity||'common'); el.dataset.id=card.id; el.innerHTML=`<div class="big">${card.emoji||'🃏'}</div><b style="font-size:.62rem;">${card.name||('Carte #'+card.id)}</b><small>${(card.rarity||'common').toUpperCase()}</small>`; el.onclick=()=>selectTradeCard(kind,Number(card.id),el); container.appendChild(el); });
 }
-const tradeId = 'trade_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-db.ref('trades/' + tradeId).set({
-senderUid: appData.currentUser.uid,
-senderName: appData.currentUser.username,
-receiverUid: targetUid,
-offeredCardId,
-wantedCardId,
-status: 'pending'
-}).catch(err => showToast('❌ Erreur d’envoi : ' + err.message, 'error'));
-
-showToast("📩 Offre d'échange envoyée avec succès !", 'success');
+function selectTradeCard(kind,id,el){
+if(kind==='offer') { activeTrade.offerId=id; document.querySelectorAll('#tradeOfferGrid .trade-select-card').forEach(x=>x.classList.remove('selected')); }
+else { activeTrade.wantId=id; document.querySelectorAll('#tradeRequestGrid .trade-select-card').forEach(x=>x.classList.remove('selected')); }
+el.classList.add('selected'); updateTradeSummary();
+}
+function updateTradeSummary(){
+const o=findCardById(activeTrade.offerId), w=activeTrade.wantId?{id:activeTrade.wantId}:null;
+const ok=!!o&&!!w; const btn=document.getElementById('tradeConfirmBtn'); btn.disabled=!ok;
+document.getElementById('tradeSummary').innerText=ok?'Tu donnes '+o.emoji+' '+o.name+'  ⇄  Tu demandes la carte #'+w.id:'Sélectionne une carte à donner et une carte à demander.';
+}
+function closeTradeModal(){document.getElementById('tradeModal').classList.remove('active');activeTrade={targetUid:null,targetName:'',offerId:null,wantId:null};}
+function confirmTradeModal(){
+if(!activeTrade.targetUid||!activeTrade.offerId||!activeTrade.wantId)return;
+const offered=findCardById(activeTrade.offerId); if(!offered||!offered.unlocked||offered.tradeable!==true)return showToast('❌ Cette carte n’est pas échangeable.', 'error');
+const tradeId='trade_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+db.ref('trades/'+tradeId).set({senderUid:appData.currentUser.uid,senderName:appData.currentUser.username,receiverUid:activeTrade.targetUid,offeredCardId:activeTrade.offerId,wantedCardId:activeTrade.wantId,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP}).then(()=>{closeTradeModal();showToast('📩 Offre d’échange envoyée !','success');}).catch(err=>showToast('❌ Erreur d’envoi : '+err.message,'error'));
 }
 
 function listenToTrades() {
-db.ref('trades').on('value', snapshot => {
-const trades = snapshot.val();
-const tl = document.getElementById('tradesList');
-if(!tl) return;
-tl.innerHTML = '';
-
-if (!trades) { tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>'; return; }
-
-let count = 0;
-Object.keys(trades).forEach(tid => {
-const t = trades[tid];
-if (appData.currentUser && (t.receiverUid === appData.currentUser.uid || t.senderUid === appData.currentUser.uid) && t.status === 'pending') {
-count++;
-const div = document.createElement('div');
-div.className = 'trade-card-box';
-
-if (t.receiverUid === appData.currentUser.uid) {
-div.innerHTML = `<p style="font-size:0.75rem;">📩 <b>${t.senderName}</b> souhaite faire un échange !</p>
-<p style="font-size:0.7rem; color:var(--glow-cyan);">Propose #${t.offeredCardId} | Demande #${t.wantedCardId}</p>
-<div style="display:flex; gap:6px; margin-top:8px;">
-<button class="btn btn-success" style="padding:6px; font-size:0.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button>
-<button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button>
-</div>`;
-} else {
-div.innerHTML = `<p style="font-size:0.75rem; color:var(--text-muted);">⏳ Offre envoyée à votre ami (En attente...)</p>`;
-}
-tl.appendChild(div);
-}
-});
-
-if (count === 0) tl.innerHTML = '<i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i>';
-});
+if(!appData.currentUser) return;
+const render = snapshot => {
+ const trades=snapshot.val()||{}; const tl=document.getElementById('tradesList'); if(!tl)return; tl.innerHTML=''; let count=0;
+ Object.keys(trades).forEach(tid=>{ const t=trades[tid]; if(!t||t.status!=='pending')return; count++; const div=document.createElement('div');div.className='trade-card-box';
+ if(t.receiverUid===appData.currentUser.uid) div.innerHTML=`<p style="font-size:.75rem;">📩 <b>${t.senderName}</b> propose un échange.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Donne #${t.offeredCardId} • Demande #${t.wantedCardId}</p><div style="display:flex;gap:6px;margin-top:8px;"><button class="btn btn-success" style="padding:6px;font-size:.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button><button class="btn btn-danger" style="padding:6px;font-size:.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button></div>`;
+ else div.innerHTML=`<p style="font-size:.75rem;color:var(--text-muted);">⏳ Offre envoyée à ${t.receiverUid===appData.currentUser.uid?'vous':'votre ami'}.</p>`;
+ tl.appendChild(div); });
+ if(!count)tl.innerHTML='<i style="color:var(--text-muted);font-size:.75rem;">Aucune offre en cours.</i>';
+};
+db.ref('trades').orderByChild('senderUid').equalTo(appData.currentUser.uid).on('value',render);
+db.ref('trades').orderByChild('receiverUid').equalTo(appData.currentUser.uid).on('value',snap=>{ const first=snap.val()||{}; const tl=document.getElementById('tradesList'); if(!tl)return; Object.keys(first).forEach(tid=>{ const t=first[tid]; if(!t||t.status!=='pending')return; const exists=document.querySelector('[data-trade-id="'+tid+'"]'); if(exists)return; const div=document.createElement('div');div.className='trade-card-box';div.dataset.tradeId=tid;div.innerHTML=`<p style="font-size:.75rem;">📩 <b>${t.senderName}</b> propose un échange.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Donne #${t.offeredCardId} • Demande #${t.wantedCardId}</p><div style="display:flex;gap:6px;margin-top:8px;"><button class="btn btn-success" style="padding:6px;font-size:.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button><button class="btn btn-danger" style="padding:6px;font-size:.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button></div>`;tl.appendChild(div); }); });
+db.ref('trades').orderByChild('senderUid').equalTo(appData.currentUser.uid).on('value',snap=>{ const vals=snap.val()||{}; Object.keys(vals).forEach(tid=>{const t=vals[tid]; if(t&&t.status==='accepted') processAcceptedTradeForSender(tid,t);}); });
 }
 
 function acceptTrade(tradeId) {
-db.ref('trades/' + tradeId).once('value').then(snapshot => {
-const t = snapshot.val();
-if (!t || t.status !== 'pending') return;
-if (!appData.currentUser || t.receiverUid !== appData.currentUser.uid) return;
-const offeredCard = findCardById(t.offeredCardId);
-const wantedCard = findCardById(t.wantedCardId);
-if (!offeredCard || !wantedCard || !wantedCard.unlocked) {
-  return showToast('❌ Échange impossible : la carte demandée n’est plus disponible.', 'error');
+db.ref('trades/'+tradeId).once('value').then(async snap=>{
+ const t=snap.val(); if(!t||t.status!=='pending'||!appData.currentUser||t.receiverUid!==appData.currentUser.uid)return;
+ const wanted=findCardById(Number(t.wantedCardId)); if(!wanted||!wanted.unlocked||wanted.tradeable!==true)throw new Error('La carte demandée n’est plus disponible dans votre classeur.');
+ const offeredMeta={id:Number(t.offeredCardId),name:'Carte #'+t.offeredCardId,emoji:'🃏',rarity:'common'};
+ try { const ps=await db.ref('public_collections/'+t.senderUid+'/'+t.offeredCardId).once('value'); const pv=ps.val(); if(pv) Object.assign(offeredMeta,pv); } catch(_){ }
+ wanted.unlocked=false;
+ const offered=findCardById(Number(t.offeredCardId));
+ if(offered) offered.unlocked=true;
+ await withTimeout(db.ref('users/'+appData.currentUser.uid+'/catalogs').set(appData.catalogs),8000,'Firebase ne répond pas pour la synchronisation de votre classeur.');
+ await withTimeout(db.ref('trades/'+tradeId).update({status:'accepted',receiverApplied:true,acceptedAt:firebase.database.ServerValue.TIMESTAMP}),8000,'Firebase ne répond pas pour la validation de l’échange.');
+ saveAppData(); showToast('🎉 Échange accepté ! Votre carte est maintenant dans le classeur.','success');
+}).catch(err=>{console.error(err);showToast('❌ Impossible de finaliser l’échange : '+err.message,'error');});
 }
 
-db.ref('users/' + t.senderUid + '/catalogs').once('value').then(snap => {
-const senderCats = snap.val();
-if (!senderCats) throw new Error('Données du joueur introuvables.');
-
-let senderOffered = false;
-let senderWanted = false;
-Object.keys(senderCats).forEach(cat => {
-  senderCats[cat].forEach(i => {
-    if (i.id === Number(t.offeredCardId) && i.unlocked) senderOffered = true;
-    if (i.id === Number(t.wantedCardId)) i.unlocked = true;
-  });
-});
-if (!senderOffered) throw new Error('La carte proposée n’est plus disponible.');
-
-Object.keys(senderCats).forEach(cat => {
-  senderCats[cat].forEach(i => {
-    if (i.id === Number(t.offeredCardId)) i.unlocked = false;
-    if (i.id === Number(t.wantedCardId)) i.unlocked = true;
-  });
-});
-
-return db.ref('users/' + t.senderUid + '/catalogs').set(senderCats);
-}).then(() => {
-wantedCard.unlocked = false;
-offeredCard.unlocked = true;
-return db.ref('trades/' + tradeId).update({ status: 'accepted' });
-}).then(() => {
-saveAppData();
-showToast('🎉 Échange réussi ! Les cartes ont été synchronisées.', 'success');
-}).catch(err => {
-console.error(err);
-showToast('❌ Impossible de finaliser l’échange : ' + err.message, 'error');
-});
-});
+function processAcceptedTradeForSender(tid,t){
+if(!appData.currentUser||t.senderUid!==appData.currentUser.uid||!t.receiverApplied||t.senderApplied)return;
+const offered=findCardById(Number(t.offeredCardId));
+const wanted=findCardById(Number(t.wantedCardId));
+if(!offered||!offered.unlocked||offered.tradeable!==true||!wanted)return;
+offered.unlocked=false; wanted.unlocked=true;
+db.ref('users/'+appData.currentUser.uid+'/catalogs').set(appData.catalogs).then(()=>db.ref('trades/'+tid).update({senderApplied:true})).then(()=>{saveAppData();showToast('🔄 Échange synchronisé ! Tu as reçu ta nouvelle carte.','success');}).catch(err=>console.warn('Synchronisation échange:',err));
 }
+
 function findCardById(id) {
 let result = null;
 Object.keys(appData.catalogs).forEach(cat => {
@@ -1302,10 +1476,7 @@ if (item) result = item;
 return result;
 }
 
-function refuseTrade(tradeId) {
-db.ref('trades/' + tradeId).update({ status: 'refused' });
-showToast("Offre d'échange refusée.", 'success');
-}
+function refuseTrade(tradeId) { db.ref('trades/' + tradeId).update({status:'refused'}).then(()=>showToast("Offre d’échange refusée.",'success')).catch(err=>showToast('❌ '+err.message,'error')); }
 
 function unlockCardById(id) {
 Object.keys(appData.catalogs).forEach(cat => {
@@ -1329,7 +1500,6 @@ showToast('🎉 CODE VALIDE ! +10 000 Crédits ajoutés.', 'success');
 showToast('❌ Code promotionnel invalide ou expiré.', 'error');
 }
 }
-
 /* PUBLICITÉ 30S */
 let adInterval = null, adTimeRemaining = 30;
 function startAdModal() {
@@ -1370,18 +1540,19 @@ else if (gameType === 'snake') runSnakeGame(container);
 else if (gameType === 'tap') runTapGame(container);
 else if (gameType === 'memory') runMemoryGame(container);
 else if (gameType === 'stack') runStackGame(container);
+else if (gameType === 'code') runCodeGame(container);
+else if (gameType === 'pattern') runPatternGame(container);
+else if (gameType === 'orbs') runOrbGame(container);
+else if (gameType === 'math') runMathGame(container);
+else if (gameType === 'laser') runLaserGame(container);
 }
 
 function closeGame() {
 if(currentGameInterval) clearInterval(currentGameInterval);
 document.getElementById('gameArea').classList.remove('active');
 }
-function rewardPlayer(amount) {
-showToast('🎮 Fin de partie ! Gains : +' + amount + ' Crédits 🪙', 'success');
-appData.credits += amount;
-saveAppData();
-closeGame();
-}
+
+function rewardPlayer(amount) { const win=Number(amount)>0; showToast(win?'🎮 Victoire ! Gains : +'+amount+' Crédits 🪙':'💀 Partie perdue. 0 crédit gagné.',win?'success':'error'); if(win) appData.credits+=Number(amount); saveAppData(); closeGame(); }
 
 function runReactionGame(c) {
 document.getElementById('gameTitle').innerText = "Réaction Extrême";
@@ -1394,7 +1565,7 @@ if(cur) cur.style.left = pos + 'px';
 }, 4);
 window.stopReaction = () => {
 clearInterval(currentGameInterval);
-rewardPlayer((pos >= 100 && pos <= 150) ? 50 : 10);
+rewardPlayer((pos >= 100 && pos <= 150) ? 50 : 0);
 };
 }
 
@@ -1423,10 +1594,10 @@ aiPlay(); draw(); return;
 }
 function aiPlay() {
 let valid = []; for(let c=0; c<7; c++) if(board[0][c] === 0) valid.push(c);
-if(valid.length === 0) return rewardPlayer(20);
+if(valid.length === 0) return rewardPlayer(40);
 let choice = valid[Math.floor(Math.random() * valid.length)];
 for(let r=5; r>=0; r--) { if(board[r][choice] === 0) { board[r][choice] = 2; break; } }
-if(checkWin(2)) rewardPlayer(10);
+if(checkWin(2)) rewardPlayer(0);
 }
 function checkWin(p) {
 for(let r=0; r<6; r++) for(let c=0; c<4; c++) if(board[r][c]==p && board[r][c+1]==p && board[r][c+2]==p && board[r][c+3]==p) return true;
@@ -1449,7 +1620,7 @@ else { dy = y > 0 ? 1 : -1; dx = 0; }
 };
 currentGameInterval = setInterval(() => {
 let head = {x: snake[0].x + dx, y: snake[0].y + dy};
-if(head.x<0||head.x>=24||head.y<0||head.y>=24) return rewardPlayer(Math.min(10 + score * 5, 50));
+if(head.x<0||head.x>=24||head.y<0||head.y>=24) return rewardPlayer(score >= 2 ? Math.min(10 + score * 5, 50) : 0);
 snake.unshift(head);
 if(head.x === food.x && head.y === food.y) { score++; food = {x:Math.floor(Math.random()*24), y:Math.floor(Math.random()*24)}; }
 else snake.pop();
@@ -1474,7 +1645,7 @@ currentGameInterval = setInterval(() => {
 timeLeft--;
 const timerEl = document.getElementById('timer');
 if(timerEl) timerEl.innerText = timeLeft + 's';
-if(timeLeft <= 0) rewardPlayer(Math.min(10 + score * 2, 50));
+if(timeLeft <= 0) rewardPlayer(score >= 4 ? Math.min(10 + score * 2, 50) : 0);
 }, 1000);
 }
 
@@ -1493,10 +1664,9 @@ i++; if(i >= seq.length) clearInterval(interval);
 setTimeout(playSeq, 500);
 window.userTap = (id) => {
 if(id === seq[step]) { step++; if(step >= seq.length) rewardPlayer(50); }
-else rewardPlayer(10);
+else rewardPlayer(0);
 };
 }
-
 function runStackGame(c) {
 document.getElementById('gameTitle').innerText = "Stack Néon";
 c.innerHTML = '<div style="text-align:center;"><div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div><p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p><button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button></div>';
@@ -1517,7 +1687,6 @@ currentPos += currentDir;
 if (currentPos > (BOARD_WIDTH - currentWidth) || currentPos < 0) currentDir *= -1;
 const m = document.getElementById('movingBlock'); if (m) m.style.left = currentPos + 'px';
 }, 16);
-
 function renderBlock(left, width, level, isMoving = false) {
 const b = document.createElement('div');
 b.style.cssText = 'width:' + width + 'px; height:' + BLOCK_HEIGHT + 'px; left:' + left + 'px; bottom:' + (level * BLOCK_HEIGHT) + 'px; position:absolute; background:' + (isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)') + '; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;';
@@ -1527,7 +1696,7 @@ if(board) board.appendChild(b);
 window.stackDrop = () => {
 const prevBlock = stack[stack.length - 1];
 const diff = currentPos - prevBlock.left;
-if (Math.abs(diff) >= currentWidth) { clearInterval(currentGameInterval); rewardPlayer(Math.max(10, stack.length * 5)); return; }
+if (Math.abs(diff) >= currentWidth) { clearInterval(currentGameInterval); rewardPlayer(0); return; }
 let newWidth = currentWidth - Math.abs(diff), newLeft = diff > 0 ? currentPos : prevBlock.left;
 const m = document.getElementById('movingBlock'); if (m) m.remove();
 stack.push({ left: newLeft, width: newWidth }); renderBlock(newLeft, newWidth, currentLevel, false);
@@ -1537,6 +1706,91 @@ if(sCount) sCount.innerText = stack.length - 1;
 if (currentLevel >= 8) { clearInterval(currentGameInterval); rewardPlayer(50); } else createMovingBlock();
 };
 }
+
+function runCodeGame(c){
+ document.getElementById('gameTitle').innerText='Code Crack'; let code=String(Math.floor(1000+Math.random()*9000)), attempts=0;
+ c.innerHTML='<div style="text-align:center;max-width:320px"><p style="font-size:.75rem;color:var(--text-muted)">Trouve le code à 4 chiffres. 4 essais. Aucun indice gratuit, parce que la vie est déjà assez généreuse.</p><input id="codeInput" class="input-field" inputmode="numeric" maxlength="4" placeholder="1234"><button class="btn" id="codeBtn">TENTER</button><p id="codeHint" style="font-size:.7rem;margin-top:10px;color:var(--glow-cyan)">Code généré.</p></div>';
+ document.getElementById('codeBtn').onclick=()=>{const v=document.getElementById('codeInput').value.trim();attempts++;if(v===code)return rewardPlayer(70);if(attempts>=4)return rewardPlayer(0);let exact=0;for(let i=0;i<4;i++)if(v[i]===code[i])exact++;document.getElementById('codeHint').innerText=exact+' chiffre(s) bien placé(s).';};
+}
+function runPatternGame(c){
+ document.getElementById('gameTitle').innerText='Pattern Rush'; let seq=Array.from({length:5},()=>Math.floor(Math.random()*4)),step=0;
+ c.innerHTML='<div style="text-align:center"><p style="font-size:.7rem;color:var(--text-muted)">Mémorise la séquence. Chaque erreur = défaite.</p><div id="patGrid" style="display:grid;grid-template-columns:repeat(2,90px);gap:10px"></div><p id="patStatus" style="font-size:.7rem;margin-top:10px">Prépare-toi…</p></div>';
+ const colors=['#ef4444','#3b82f6','#22c55e','#eab308'];const grid=document.getElementById('patGrid');for(let i=0;i<4;i++){const b=document.createElement('button');b.style.cssText='height:90px;border:0;border-radius:16px;background:'+colors[i]+';opacity:.8';b.onclick=()=>{if(seq[step]!==i)return rewardPlayer(0);step++;if(step===seq.length)return rewardPlayer(80);document.getElementById('patStatus').innerText=''+step+' / '+seq.length;};grid.appendChild(b);}
+ let i=0;const t=setInterval(()=>{if(i>=seq.length){clearInterval(t);document.getElementById('patStatus').innerText='À toi !';return;}grid.children[seq[i]].style.opacity='.15';setTimeout(()=>{if(grid.children[seq[i]])grid.children[seq[i]].style.opacity='.8';},260);i++;},600);
+}
+function runOrbGame(c){
+ document.getElementById('gameTitle').innerText='Chasse aux Orbes';let score=0,time=12;
+ c.innerHTML='<div style="text-align:center"><div id="orbArena" style="width:min(88vw,320px);height:300px;border:1px solid var(--card-border);border-radius:18px;position:relative;background:#070511;overflow:hidden"><button id="orb" style="position:absolute;width:38px;height:38px;border:0;border-radius:50%;background:var(--glow-cyan);box-shadow:0 0 25px var(--glow-cyan)"></button></div><p style="font-size:.75rem">Temps <b id="orbTime">12</b>s • Orbes <b id="orbScore">0</b>/10</p></div>';
+ const orb=document.getElementById('orb'),arena=document.getElementById('orbArena');const move=()=>{orb.style.left=Math.random()*(arena.clientWidth-40)+'px';orb.style.top=Math.random()*(arena.clientHeight-40)+'px';};orb.onclick=()=>{score++;document.getElementById('orbScore').innerText=score;move();if(score>=10)rewardPlayer(60);};move();currentGameInterval=setInterval(()=>{time--;document.getElementById('orbTime').innerText=time;if(time<=0)rewardPlayer(score>=7?45:0);},1000);
+}
+function runMathGame(c){
+ document.getElementById('gameTitle').innerText='Math Panic';let q=0;
+ c.innerHTML='<div style="text-align:center;max-width:320px"><h2 id="mathQ">?</h2><input id="mathA" class="input-field" inputmode="numeric" placeholder="Réponse"><button class="btn" id="mathBtn">VALIDER</button><p id="mathProg" style="font-size:.7rem;color:var(--text-muted)">1 / 5</p></div>';
+ const next=()=>{const a=Math.floor(Math.random()*18)+2,b=Math.floor(Math.random()*12)+2,ops=['+','×','−'],op=ops[Math.floor(Math.random()*ops.length)];let ans=op==='+'?a+b:op==='×'?a*b:a-b;document.getElementById('mathQ').innerText=a+' '+op+' '+b;document.getElementById('mathA').value='';document.getElementById('mathA').focus();document.getElementById('mathQ').dataset.answer=ans;};next();document.getElementById('mathBtn').onclick=()=>{if(Number(document.getElementById('mathA').value)!==Number(document.getElementById('mathQ').dataset.answer))return rewardPlayer(0);q++;if(q>=5)return rewardPlayer(90);document.getElementById('mathProg').innerText=(q+1)+' / 5';next();};
+}
+function runLaserGame(c){
+ document.getElementById('gameTitle').innerText='Laser Escape';
+ let x=50, life=0, lasers=[];
+ c.innerHTML='<div style="text-align:center"><div id="laserArena" style="width:min(88vw,320px);height:260px;position:relative;background:#050508;border:1px solid var(--card-border);border-radius:18px;overflow:hidden"><div id="playerDot" style="position:absolute;width:28px;height:28px;border-radius:50%;background:var(--glow-cyan);bottom:12px;left:50%;transform:translateX(-50%);box-shadow:0 0 18px var(--glow-cyan)"></div></div><p style="font-size:.7rem">Survis 10 secondes. Glisse à gauche/droite.</p></div>';
+ const arena=document.getElementById('laserArena'),p=document.getElementById('playerDot');
+ const move=e=>{const r=arena.getBoundingClientRect(),clientX=e.touches?e.touches[0].clientX:e.clientX;x=Math.max(5,Math.min(95,(clientX-r.left)/r.width*100));p.style.left=x+'%';if(e.preventDefault)e.preventDefault();};
+ arena.ontouchmove=move; arena.onmousemove=e=>{if(e.buttons)move(e);};
+ currentGameInterval=setInterval(()=>{
+   life++;
+   const laser=document.createElement('div'); const left=Math.random()*92; laser.style.cssText='position:absolute;top:0;width:18px;height:100%;background:linear-gradient(90deg,transparent,var(--glow-magenta),transparent);left:'+left+'%;opacity:.85;transition:opacity .5s'; arena.appendChild(laser); lasers.push({el:laser,left:left});
+   const playerLeft=x; if(Math.abs((left+4)-playerLeft)<8){clearInterval(currentGameInterval);return rewardPlayer(0);}
+   setTimeout(()=>{laser.remove();lasers=lasers.filter(v=>v.el!==laser);},650);
+   if(life>=20)rewardPlayer(100);
+ },500);
+}
+function playEntrySound(kind){
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();
+  if(entryMusicHandle)clearInterval(entryMusicHandle);
+  const notes=kind==='first'?[130.81,164.81,196,246.94,261.63,329.63,392,493.88]:[196,246.94,293.66,392,493.88];
+  let step=0;
+  const playNote=()=>{const now=ctx.currentTime,master=ctx.createGain(),o=ctx.createOscillator(),g=ctx.createGain();master.gain.value=.045;master.connect(ctx.destination);o.type='sine';o.frequency.value=notes[step++%notes.length];g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.22,now+.04);g.gain.exponentialRampToValueAtTime(.0001,now+1.25);o.connect(g);g.connect(master);o.start();o.stop(now+1.3);};
+  playNote(); entryMusicHandle=setInterval(playNote,1100);
+ }catch(e){console.warn('Audio intro:',e)}
+}
+function stopEntryMusic(){if(entryMusicHandle){clearInterval(entryMusicHandle);entryMusicHandle=null;}}
+
+function playEntryCrack(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();const now=ctx.currentTime;const b=ctx.createBuffer(1,ctx.sampleRate*.3,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);const s=ctx.createBufferSource(),g=ctx.createGain();g.gain.value=.28;s.buffer=b;s.connect(g);g.connect(ctx.destination);s.start();}catch(e){}}
+function playEntryExplosion(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();const o=ctx.createOscillator(),g=ctx.createGain(),now=ctx.currentTime;o.type='sawtooth';o.frequency.setValueAtTime(180,now);o.frequency.exponentialRampToValueAtTime(45,now+.65);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.28,now+.03);g.gain.exponentialRampToValueAtTime(.0001,now+.8);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+.85);}catch(e){}}
+function getUnlockedCards(){const arr=[];Object.keys(appData.catalogs||{}).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>{if(c.unlocked)arr.push(c);}));return arr;}
+function startEntryAnimation(seconds,first){
+ const overlay=document.getElementById('entryCinema');if(!overlay)return;
+ if(entryTimerHandle)clearInterval(entryTimerHandle); stopEntryMusic();
+ overlay.classList.add('active');overlay.dataset.locked='1';
+ const logo=document.getElementById('entryLogo'),sub=document.getElementById('entrySub'),panel=document.getElementById('entryPanel'),bar=document.getElementById('entryProgressBar'),timer=document.getElementById('entryTimer');
+ logo.classList.remove('entry-logo-explode');playEntrySound(first?'first':'entry');let elapsed=0;
+ sub.innerText=first?'BIENVENUE DANS DROP 2027':'NOUVELLE SESSION — DROP 2027';
+ const cards=getUnlockedCards();
+ const news=Array.from(NEW_CARD_IDS).map(id=>findCardById(id)).filter(Boolean);
+ const renderFirstSlide=()=>{const slides=[
+  ['🎬 BIENVENUE DANS DROP','Tu collectionnes des cartes et tu construis ton classeur DROP. Chaque joueur reçoit automatiquement ses cartes de départ gratuites.'],
+  ['🧩 CARTES DE DÉPART','Les cartes basiques sont disponibles dès la première connexion. Elles sont volontairement non échangeables.'],
+  ['🔮 LE DROP','Un drop coûte 150 🪙 et révèle une carte aléatoire. Les raretés vont de basique à ultra rare.'],
+  ['🎮 LES MINI-JEUX','Chaque mini-jeu coûte 25 🪙. Tu récupères des crédits uniquement si tu réussis. Une défaite = 0 crédit gagné.'],
+  ['🤝 TES AMIS','Ajoute un joueur avec son ID Ami, accepte les demandes puis ouvre le menu ÉCHANGER sur sa fiche.'],
+  ['🔄 LES ÉCHANGES','Seules les cartes marquées ÉCHANGEABLE sont proposées. Tu sélectionnes ta carte et celle que tu demandes dans le classeur de ton ami.'],
+  ['✨ LES RARETÉS','Les cartes rares ont des animations et des sons renforcés. Une hyper rare déclenche la séquence magique complète.'],
+  ['🚀 TON OBJECTIF','Collectionne, joue, échange, découvre les nouvelles catégories et complète ton classeur. DROP 2027 commence maintenant.']
+ ]; const idx=Math.min(slides.length-1,Math.floor(elapsed/7.5));const sl=slides[idx];panel.innerHTML='<h3>'+sl[0]+'</h3><p>'+sl[1]+'</p><p style="margin-top:9px;color:var(--glow-cyan);font-size:.65rem">Étape '+(idx+1)+' / '+slides.length+'</p>';};
+ const renderEntry=()=>{panel.innerHTML='<h3>📦 RÉCAP DE TA COLLECTION</h3><p>'+cards.length+' cartes obtenues au total.</p><div class="entry-cards-preview">'+cards.map(c=>`<div class="entry-mini-card"><b>${c.emoji}</b><span>${c.name}</span></div>`).join('')+'</div><p style="margin-top:8px;color:var(--glow-magenta)">✨ Nouvelles cartes : '+news.slice(0,5).map(c=>c.name).join(' • ')+'</p>';};
+ if(first)renderFirstSlide();else renderEntry();
+ entryTimerHandle=setInterval(()=>{
+  elapsed++;bar.style.width=(elapsed/seconds*100)+'%';timer.innerText=Math.max(0,seconds-elapsed)+'s';
+  if(first)renderFirstSlide();
+  if(!first&&elapsed===seconds-3){logo.classList.add('entry-logo-explode');playEntryCrack();}
+  if(!first&&elapsed===seconds-1)playEntryExplosion();
+  if(elapsed>=seconds){clearInterval(entryTimerHandle);entryTimerHandle=null;stopEntryMusic();overlay.classList.remove('active');overlay.dataset.locked='0';}
+ },1000);
+}
+
+function bootEntrySequence(){startEntryAnimation(20,false);}
+window.addEventListener('load',()=>setTimeout(bootEntrySequence,250));
+
 </script>
 </body>
-</html>
+  </html>
