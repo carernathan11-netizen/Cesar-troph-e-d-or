@@ -379,6 +379,11 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="binder-tab" onclick="switchCategory('grosfail', this)">💀 Gros Fails</div>
 <div class="binder-tab" onclick="switchCategory('objetsmaudits', this)">🧿 Objets Maudits</div>
 <div class="binder-tab" onclick="switchCategory('situations', this)">😵 Situations Gênantes</div>
+<div class="binder-tab" onclick="switchCategory('mauvaisesidees', this)">💡 Mauvaises Idées</div>
+<div class="binder-tab" onclick="switchCategory('parents', this)">👨‍👩‍👦 Parents</div>
+<div class="binder-tab" onclick="switchCategory('transports', this)">🚌 Transports Maudits</div>
+<div class="binder-tab" onclick="switchCategory('reunion', this)">💻 Réunions</div>
+
 <div class="binder-tab" onclick="switchCategory('starter', this)">🧩 Départ</div>
 <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
 </div>
@@ -423,6 +428,32 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </div>
 </section>
 
+<!-- HUB DROP : MISSIONS / STATS / CONSEILS -->
+<section id="scr-hub" class="screen">
+<div class="glass-card">
+<div class="card-title"><span>🧠 HUB DROP</span><span>TON ESPACE UTILE</span></div>
+<div class="grid-2">
+<div class="glass-card" style="padding:14px;">
+<div style="font-size:1.7rem;">📊</div><b style="font-size:.8rem;">MES STATS</b>
+<div style="font-size:.68rem;color:var(--text-muted);margin-top:5px;">Cartes possédées : <span id="hubOwned">0</span><br>Cartes échangeables : <span id="hubTradeable">0</span></div>
+</div>
+<div class="glass-card" style="padding:14px;">
+<div style="font-size:1.7rem;">🎯</div><b style="font-size:.8rem;">OBJECTIF DU JOUR</b>
+<div id="hubMission" style="font-size:.68rem;color:var(--text-muted);margin-top:5px;">Ouvre un DROP ou termine un mini-jeu.</div>
+</div>
+</div>
+</div>
+<div class="glass-card">
+<div class="card-title"><span>🎁 BONUS DU HUB</span></div>
+<div style="font-size:.75rem;color:var(--text-muted);margin-bottom:10px;">Un petit coin pour retrouver les infos utiles sans fouiller cinq menus, exploit rarissime dans les interfaces humaines.</div>
+<button class="btn btn-secondary" onclick="hubDailyBonus()">🎁 RÉCUPÉRER LE BONUS DU JOUR</button>
+</div>
+<div class="glass-card">
+<div class="card-title"><span>📚 CONSEILS DROP</span></div>
+<div id="hubTips" style="font-size:.72rem;line-height:1.6;color:var(--text-muted);"></div>
+</div>
+</section>
+
 <!-- 5. COMPTE & AMIS -->
 <section id="scr-account" class="screen">
 <div id="authSection" class="glass-card">
@@ -459,6 +490,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--glow-magenta);">📬 DEMANDES D'AMIS REÇUES</h4>
 <div id="friendRequestsList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i></div>
+
 <h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">👥 MES AMIS</h4>
 <div id="friendsList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucun ami ajouté.</i></div>
 
@@ -480,6 +512,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="nav-item" onclick="switchTab('scr-collection', this)"><span class="nav-icon">📁</span><span>CLASSEUR</span></button>
 <button class="nav-item" onclick="switchTab('scr-games', this)"><span class="nav-icon">🎮</span><span>JEUX</span></button>
 <button class="nav-item" onclick="switchTab('scr-shop', this)"><span class="nav-icon">💎</span><span>SHOP</span></button>
+<button class="nav-item" onclick="switchTab('scr-hub', this)"><span class="nav-icon">🧠</span><span>HUB</span></button>
 <button class="nav-item" onclick="switchTab('scr-account', this)"><span class="nav-icon">👤</span><span>COMPTE</span></button>
 </nav>
 
@@ -705,6 +738,46 @@ secret: [
 { id: 416, name: "Passeport Cosmique 2027", emoji: "🛸", price: 800000, unlocked: false },
 { id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false, tradeable: false, rarity: "ultra" }
 ],
+mauvaisesidees: [
+{id:1501,name:'Idée Géniale à 3h du Matin',emoji:'💡',price:150,unlocked:false,tradeable:true,rarity:'common'},
+{id:1502,name:'Plan Sans Aucun Plan',emoji:'🗺️',price:240,unlocked:false,tradeable:true,rarity:'common'},
+{id:1503,name:'Projet Commencé Jamais Fini',emoji:'🧱',price:380,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1504,name:'“Ça Prendra 5 Minutes”',emoji:'⏱️',price:650,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1505,name:'Motivation de 7 Minutes',emoji:'🔥',price:1000,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1506,name:'Décision Prise Sans Réfléchir',emoji:'🎲',price:1800,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1507,name:'Plan B Qui N’existe Pas',emoji:'🫠',price:3200,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1508,name:'Génie Incompris Certifié',emoji:'🧠',price:7500,unlocked:false,tradeable:true,rarity:'ultra'}
+],
+parents: [
+{id:1601,name:'“Range Ta Chambre”',emoji:'🧹',price:140,unlocked:false,tradeable:true,rarity:'common'},
+{id:1602,name:'Question à Laquelle Tu Réponds “Je Sais Pas”',emoji:'🤷',price:220,unlocked:false,tradeable:true,rarity:'common'},
+{id:1603,name:'“On Part Dans 5 Minutes”',emoji:'🚗',price:360,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1604,name:'Le Regard Silencieux',emoji:'👀',price:600,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1605,name:'Téléphone Confisqué Imaginaire',emoji:'📵',price:950,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1606,name:'“T’as Fini Tes Devoirs ?”',emoji:'📚',price:1500,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1607,name:'Le Grand Soupir',emoji:'😮‍💨',price:2800,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1608,name:'Pouvoir Parental Absolu',emoji:'👑',price:7000,unlocked:false,tradeable:true,rarity:'ultra'}
+],
+transports: [
+{id:1701,name:'Bus Qui Arrive Dès Que Tu Pars',emoji:'🚌',price:160,unlocked:false,tradeable:true,rarity:'common'},
+{id:1702,name:'Feu Rouge Sans Fin',emoji:'🚦',price:230,unlocked:false,tradeable:true,rarity:'common'},
+{id:1703,name:'Place de Parking Mystique',emoji:'🅿️',price:400,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1704,name:'Vélo Qui Couine',emoji:'🚲',price:560,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1705,name:'GPS Qui Change d’Avis',emoji:'🗺️',price:850,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1706,name:'Train Sur Le Quai D’à Côté',emoji:'🚆',price:1400,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1707,name:'Correspondance de 47 Secondes',emoji:'🏃',price:2600,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1708,name:'Téléportation Urbaine',emoji:'🌀',price:6800,unlocked:false,tradeable:true,rarity:'ultra'}
+],
+reunion: [
+{id:1801,name:'“On Va Faire Rapide”',emoji:'⏰',price:150,unlocked:false,tradeable:true,rarity:'common'},
+{id:1802,name:'Personne N’a Lu Le Document',emoji:'📄',price:250,unlocked:false,tradeable:true,rarity:'common'},
+{id:1803,name:'Micro Qui Ne Marche Pas',emoji:'🎙️',price:420,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1804,name:'“Tu M’Entends ?”',emoji:'📡',price:650,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1805,name:'Partage d’Écran Involontaire',emoji:'🖥️',price:1100,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1806,name:'Quelqu’un Dit “Pour Moi C’est Bon”',emoji:'👍',price:1700,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1807,name:'Réunion Qui Aurait Pu Être Un Message',emoji:'💬',price:3000,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1808,name:'La Réunion Sans Fin',emoji:'♾️',price:8000,unlocked:false,tradeable:true,rarity:'ultra'}
+],
 starter: [
 { id: 1, name: "DROP — Première Carte", emoji: "🟦", price: 0, unlocked: true, tradeable: false, rarity: "common" },
 { id: 2, name: "Ticket de Départ", emoji: "🎟️", price: 0, unlocked: true, tradeable: false, rarity: "common" },
@@ -826,8 +899,8 @@ situations: [
 };
 
 let activeCategory = 'tiktok';
-const NEW_CARD_IDS = new Set([601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408]);
-const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
+const NEW_CARD_IDS = new Set([601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408,1501,1502,1503,1504,1505,1506,1507,1508,1601,1602,1603,1604,1605,1606,1607,1608,1701,1702,1703,1704,1705,1706,1707,1708,1801,1802,1803,1804,1805,1806,1807,1808]);
+const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
 function normalizeCatalogs(raw) {
   const base = JSON.parse(JSON.stringify(CATALOGS));
   Object.keys(base).forEach(cat => {
@@ -857,6 +930,7 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS))
 
 let currentAuthMode = 'login';
 let isDropping = false;
+
 function showToast(message, type = 'success') {
 const toast = document.getElementById('appToast');
 const msgEl = document.getElementById('toastMsg');
@@ -994,7 +1068,6 @@ if (!localStorage.getItem(introKey)) {
   localStorage.setItem(introKey, '1');
   setTimeout(() => startEntryAnimation(60, true), 350);
 }
-
 // Cache local pour que l'interface reste utilisable même si Firebase DB tombe
 // momentanément lors de la prochaine connexion.
 try { localStorage.setItem('drop2027_profile_' + user.uid, JSON.stringify({
@@ -1108,6 +1181,23 @@ friendsSec.style.display = 'none';
 }
 
 renderCatalogGrid();
+renderHub();
+}
+
+function renderHub(){
+ const all=Object.values(appData.catalogs||{}).flat();
+ const owned=all.filter(c=>c.unlocked);
+ const tradeable=owned.filter(c=>c.tradeable===true);
+ const a=document.getElementById('hubOwned'), b=document.getElementById('hubTradeable');
+ if(a)a.textContent=owned.length; if(b)b.textContent=tradeable.length;
+ const tips=['Les cartes échangeables apparaissent dans le marché entre amis.','Une carte ultra rare mérite probablement une animation dramatique.','Les mini-jeux coûtent 25 🪙 : une défaite ne rapporte rien.','Regarde les pubs de 30 secondes pour récupérer des crédits gratuits.'];
+ const t=document.getElementById('hubTips'); if(t)t.innerHTML=tips.map(x=>'• '+x).join('<br>');
+}
+function hubDailyBonus(){
+ if(!appData.currentUser)return showToast('🔐 Connecte-toi pour récupérer le bonus.','error');
+ const key='drop2027_daily_bonus_'+appData.currentUser.uid; const today=new Date().toISOString().slice(0,10);
+ if(localStorage.getItem(key)===today)return showToast('🎁 Bonus déjà récupéré aujourd’hui.','error');
+ appData.credits+=75; localStorage.setItem(key,today); saveAppData(); showToast('🎁 +75 🪙 ! Bonus quotidien récupéré.','success');
 }
 
 function switchTab(id, btn) {
@@ -1297,6 +1387,7 @@ return messages[code] || (err && err.message) || 'Une erreur inconnue est surven
 async function handleAuth(e) {
 e.preventDefault();
 if (authLoading) return;
+
 const submitBtn = document.getElementById('authSubmitBtn');
 const email = document.getElementById('authEmail').value.trim().toLowerCase();
 const pass = document.getElementById('authPass').value;
@@ -1317,6 +1408,7 @@ auth.signInWithEmailAndPassword(email, pass),
 12000,
 'Firebase Authentication ne répond pas. Vérifie ta connexion Internet.'
 );
+
 // Connexion Firebase réussie : on ne dépend PAS de la Realtime Database.
 await loadFirebaseUserProfile(credential.user);
 showToast('👋 Connexion réussie !', 'success');
@@ -1332,7 +1424,6 @@ const initialCatalogs = normalizeCatalogs(CATALOGS);
 initialCatalogs.starter.forEach(c => c.unlocked = true);
 const isAdminEmail = email === 'carer.nathan11@gmail.com';
 if (isAdminEmail) Object.keys(initialCatalogs).forEach(cat => initialCatalogs[cat].forEach(i => i.unlocked = true));
-
 // Ne bloque pas l'inscription sur une écriture DB qui pourrait être refusée.
 const initialData = {
 username: username || email.split('@')[0], credits: isAdminEmail ? 999999999 : 0,
@@ -1358,6 +1449,7 @@ submitBtn.disabled = false;
 submitBtn.innerText = currentAuthMode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE";
 }
 }
+
 async function logoutUser() {
 try {
 await auth.signOut();
@@ -1373,11 +1465,11 @@ showToast('❌ Impossible de se déconnecter : ' + (err.message || err), 'error'
 // GESTION CORRIGÉE DES AMIS ET DES DEMANDES
 function sendFriendRequest() {
 if (!appData.currentUser) return showToast('❌ Connectez-vous pour ajouter un ami.', 'error');
-
 const input = document.getElementById('addFriendInput');
 const raw = input.value.trim();
 const key = friendCodeKey(raw);
 const targetUid = /^DROP-/i.test(key) ? key.slice(5).trim() : '';
+
 if (!targetUid || targetUid.length < 20) {
 return showToast('❌ ID invalide. Utilisez le nouvel ID affiché dans le profil.', 'error');
 }
@@ -1456,7 +1548,6 @@ if (listEl) listEl.innerHTML = '<i style="color:var(--danger); font-size:0.75rem
 
 async function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
 if (!appData.currentUser || !senderUid) return;
-
 const myUid = appData.currentUser.uid;
 if (senderUid === myUid) return;
 if ((appData.friends || []).some(f => f.uid === senderUid)) {
@@ -1671,6 +1762,7 @@ showToast('🎉 CODE VALIDE ! +10 000 Crédits ajoutés.', 'success');
 showToast('❌ Code promotionnel invalide ou expiré.', 'error');
 }
 }
+
 /* PUBLICITÉ 30S */
 let adInterval = null, adTimeRemaining = 30;
 const INTERNAL_ADS = [
@@ -1985,6 +2077,7 @@ function startGameMusic(){if(!gameMusicEnabled)return;stopGameMusic();gameMusicS
 function stopGameMusic(){if(gameMusicTimer){clearInterval(gameMusicTimer);gameMusicTimer=null;}}
 function toggleGameMusic(){gameMusicEnabled=!gameMusicEnabled;const btn=document.getElementById('musicToggle');if(btn)btn.innerText=gameMusicEnabled?'🔊':'🔇';if(gameMusicEnabled)startGameMusic();else stopGameMusic();}
 window.addEventListener('pointerdown',()=>{if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();},{once:true});
+
 function playEntrySound(kind){
  try{
   const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();
