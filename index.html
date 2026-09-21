@@ -996,6 +996,19 @@ situations: [
 let activeCategory = 'starter';
 const NEW_CARD_IDS = new Set([601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408,1501,1502,1503,1504,1505,1506,1507,1508,1601,1602,1603,1604,1605,1606,1607,1608,1701,1702,1703,1704,1705,1706,1707,1708,1801,1802,1803,1804,1805,1806,1807,1808]);
 const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
+function canonicalCardRarity(cat, item) {
+  // Les cartes de la catégorie Ultra Rares sont toujours ultra rares,
+  // même si une ancienne sauvegarde les avait enregistrées comme common.
+  if (cat === 'secret') return 'ultra';
+  if (item && item.rarity && ['common','rare','epic','legendary','ultra'].includes(item.rarity)) return item.rarity;
+  // Anciennes cartes sans rareté : classement cohérent selon leur valeur.
+  const price = Number(item && item.price) || 0;
+  if (price >= 25000) return 'ultra';
+  if (price >= 7000) return 'legendary';
+  if (price >= 1800) return 'epic';
+  if (price >= 700) return 'rare';
+  return 'common';
+}
 function normalizeCatalogs(raw) {
   const base = JSON.parse(JSON.stringify(CATALOGS));
   Object.keys(base).forEach(cat => {
@@ -1003,7 +1016,8 @@ function normalizeCatalogs(raw) {
     const byId = Object.fromEntries(saved.map(x => [x.id, x]));
     base[cat] = base[cat].map(item => {
       const old = byId[item.id];
-      return old ? {...item, ...old, tradeable: old.tradeable !== undefined ? old.tradeable : item.tradeable !== false, rarity: old.rarity || item.rarity || 'common'} : {...item};
+      const canonicalRarity = canonicalCardRarity(cat, item);
+      return old ? {...item, ...old, tradeable: old.tradeable !== undefined ? old.tradeable : item.tradeable !== false, rarity: canonicalRarity} : {...item, rarity: canonicalRarity};
     });
   });
   return base;
@@ -1135,7 +1149,6 @@ const storedFriendSuffix = friendCodeKey(storedFriendId).slice(5);
 const needsFriendIdMigration = !storedFriendSuffix || storedFriendSuffix.length < 20;
 appData.friendId = needsFriendIdMigration ? fallbackFriendId : storedFriendId;
 appData.friends = Array.isArray(data.friends) ? data.friends : [];
-
 // Les amitiés partagées sont stockées séparément pour éviter qu'un joueur
 // ait besoin d'écrire dans le profil Firebase d'un autre joueur.
 try {
@@ -1282,7 +1295,6 @@ if (appData.currentUser) {
 authSec.style.display = 'none';
 profSec.style.display = 'block';
 friendsSec.style.display = 'block';
-
 document.getElementById('profileName').innerText = appData.currentUser.username;
 document.getElementById('userFriendId').innerText = 'ID Ami : ' + appData.friendId;
 
@@ -1303,7 +1315,6 @@ friendsSec.style.display = 'none';
 renderCatalogGrid();
 renderHub();
 }
-
 function getLocalDayKey(){
  const d=new Date();
  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1716,13 +1727,13 @@ function renderCatalogGrid() {
    grid.appendChild(div);
  });
 }
+
 function buyItemDirect(id) {
 let found = null;
 Object.keys(appData.catalogs).forEach(cat => {
 const item = appData.catalogs[cat].find(i => i.id === id);
 if(item) found = item;
 });
-
 if (!found) return;
 if (found.unlocked) return showToast('Article déjà débloqué !', 'error');
 
@@ -1883,6 +1894,7 @@ if (currentAuthMode === 'register' && pass.length < 6) return showToast('❌ Le 
 authLoading = true;
 submitBtn.disabled = true;
 submitBtn.innerText = currentAuthMode === 'login' ? 'CONNEXION...' : 'CRÉATION...';
+
 try {
 if (currentAuthMode === 'login') {
 // Timeout de sécurité : le bouton ne peut plus rester grisé indéfiniment.
@@ -1945,6 +1957,7 @@ console.error('LOGOUT ERROR:', err);
 showToast('❌ Impossible de se déconnecter : ' + (err.message || err), 'error');
 }
 }
+
 // GESTION CORRIGÉE DES AMIS ET DES DEMANDES
 function sendFriendRequest() {
 if (!appData.currentUser) return showToast('❌ Connectez-vous pour ajouter un ami.', 'error');
@@ -1993,7 +2006,6 @@ showToast('❌ ' + (err.message || 'Impossible d’envoyer la demande.'), 'error
 if (btn) { btn.disabled = false; btn.innerText = 'AJOUTER'; }
 });
 }
-
 function listenToFriendRequests() {
 if (!appData.currentUser) return;
 db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
@@ -2112,6 +2124,7 @@ fl.appendChild(div);
 
 let activeTrade = {targetUid:null,targetName:'',offerId:null,wantId:null,offerCard:null,wantCard:null};
 let entryTimerHandle = null, entryMusicHandle = null;
+
 async function openTradePrompt(targetUid, targetName) {
 if (!appData.currentUser || !targetUid) return;
 activeTrade = {targetUid:String(targetUid),targetName:String(targetName || 'ton ami'),offerId:null,wantId:null,offerCard:null,wantCard:null};
@@ -2181,7 +2194,6 @@ if(kind==='offer'){
 if(el)el.classList.add('selected');
 updateTradeSummary();
 }
-
 function updateTradeSummary(){
 const o=activeTrade.offerId!=null?findCardById(Number(activeTrade.offerId)):null;
 const w=activeTrade.wantId!=null?Number(activeTrade.wantId):null;
@@ -2195,6 +2207,7 @@ if(btn){
 const summary=document.getElementById('tradeSummary');
 if(summary)summary.innerText=ok?'Tu donnes '+o.emoji+' '+o.name+'  ⇄  Tu demandes la carte #'+w:'Sélectionne une carte à donner et une carte à demander.';
 }
+
 function closeTradeModal(){
 const modal=document.getElementById('tradeModal');
 if(modal)modal.classList.remove('active');
@@ -2390,7 +2403,6 @@ const code = document.getElementById('secretCodeInput').value.trim().toUpperCase
 if (!code) return;
 
 if (appData.redeemedCodes.includes(code)) return showToast('❌ Ce code a déjà été utilisé.', 'error');
-
 if (code === 'DROPDROP2627GIVEFREE10000') {
 appData.credits += 10000;
 appData.redeemedCodes.push(code);
@@ -2467,6 +2479,7 @@ activeGameType = gameType;
 if (!appData.dailyGames) appData.dailyGames = {};
 appData.dailyGames[gameType] = getLocalDayKey();
 saveAppData();
+
 document.getElementById('gameArea').classList.add('active');
 startGameMusic();
 const container = document.getElementById('gameCanvasContainer');
@@ -2760,12 +2773,14 @@ function runSafeTileGame(c){
  const grid=document.getElementById('stGrid'),status=document.getElementById('stStatus'),scoreEl=document.getElementById('stScore');let round=0,done=false;
  const next=()=>{grid.innerHTML='';const trap=Math.floor(Math.random()*16);for(let i=0;i<16;i++){const b=document.createElement('button');b.type='button';b.textContent='?';b.style.cssText='height:56px;border-radius:12px;border:1px solid var(--card-border);background:rgba(255,255,255,.06);color:#fff;font-size:1.1rem;';b.onclick=()=>{if(done)return;if(i===trap){done=true;return rewardPlayer(0);}round++;b.textContent='✓';b.disabled=true;scoreEl.textContent=round+' / 12';if(round>=12){done=true;return rewardPlayer(95);}next();};grid.appendChild(b);}};next();
 }
+
 let gameMusicEnabled=true, gameMusicTimer=null, gameMusicStep=0, gameMusicTrack=0;
 const DROP_MUSIC_TRACKS=[
  {name:'NEON DROP',tempo:360,lead:[261.63,329.63,392,493.88,392,329.63,293.66,349.23,440,523.25,440,349.23,392,493.88,587.33,659.25],bass:[130.81,164.81,196,146.83]},
  {name:'CYBER RUN',tempo:320,lead:[329.63,392,493.88,587.33,659.25,587.33,493.88,392,369.99,440,554.37,659.25,739.99,659.25,554.37,440],bass:[164.81,196,246.94,220]},
  {name:'PIXEL RUSH',tempo:300,lead:[392,440,523.25,659.25,783.99,659.25,587.33,523.25,392,493.88,587.33,739.99,880,739.99,659.25,493.88],bass:[196,220,261.63,246.94]},
- {name:'MIDNIGHT DROP',tempo:400,lead:[220,277.18,329.63,369.99,440,369.99,329.63,277.18,246.94,329.63,369.99,493.88,440,369.99,329.63,246.94],bass:[110,138.59,164.81,123.47]}
+ {name:'MIDNIGHT DROP',tempo:400,lead:[220,277.18,329.63,369.99,440,369.99,329.63,277.18,246.94,329.63,369.99,493.88,440,369.99,329.63,246.94],bass:[110,138.59,164.81,123.47]},
+ {name:'GALAXY FLUX',tempo:280,lead:[293.66,369.99,440,554.37,659.25,739.99,659.25,554.37,493.88,587.33,698.46,880,783.99,698.46,587.33,493.88],bass:[146.83,184.99,220,246.94]}
 ];
 function ensureAudio(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume().catch(()=>{});return ctx;}
 function musicVoice(ctx,freq,dur,type,gain,when){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,when);g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(Math.max(.0002,gain),when+.025);g.gain.exponentialRampToValueAtTime(.0001,when+dur);o.connect(g);g.connect(ctx.destination);o.start(when);o.stop(when+dur+.04);}
@@ -2822,9 +2837,10 @@ function startEntryAnimation(seconds,first){
   if(elapsed>=seconds){clearInterval(entryTimerHandle);entryTimerHandle=null;stopEntryMusic();overlay.classList.remove('active');overlay.dataset.locked='0';}
  },1000);
 }
+
 function bootEntrySequence(){startEntryAnimation(20,false);}
 window.addEventListener('load',()=>setTimeout(bootEntrySequence,250));
 
 </script>
 </body>
-  </html>
+                          </html>
