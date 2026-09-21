@@ -416,6 +416,10 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="game-card"><div class="game-info"><h4>⚡ Charge Parfaite</h4><p>Arrête l'énergie au bon moment — 110 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('charge')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🧨 Bombes à Mémoire</h4><p>Repère la mauvaise case — 140 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('bombmemory')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🎯 Precision DROP</h4><p>Vise la zone parfaite — 150 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('precision')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🟢 Color Switch</h4><p>Trouve la bonne couleur avant le chrono — 65 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('colorswitch')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🪙 Coin Catch</h4><p>Attrape les pièces qui tombent — 75 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('coincatch')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🎯 Quick Target</h4><p>Explose 8 cibles avant la fin — 85 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('quicktarget')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🟦 Safe Tile</h4><p>Évite la case piégée pendant 12 tours — 95 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('safetile')">JOUER</button></div>
 </div>
 </div>
 </section>
@@ -480,6 +484,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <p style="font-size:0.8rem; color:var(--glow-cyan); margin-top:8px;" id="userFriendId">ID Ami : Chargement...</p>
 <button class="btn btn-danger" style="margin-top:15px;" onclick="logoutUser()">SE DÉCONNECTER</button>
 </div>
+
 <!-- SECTION AMIS ET DEMANDES -->
 <div id="friendsSection" class="glass-card" style="display:none;">
 <div class="card-title"><span>🤝 CENTRE D'AMIS & DEMANDES</span></div>
@@ -542,6 +547,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </div>
 
 </div>
+
 <script>
 // CONFIGURATION FIREBASE
 const firebaseConfig = {
@@ -936,10 +942,10 @@ function showToast(message, type = 'success') {
 const toast = document.getElementById('appToast');
 const msgEl = document.getElementById('toastMsg');
 const iconEl = document.getElementById('toastIcon');
-
 toast.className = 'app-toast ' + type;
 msgEl.innerText = message;
 iconEl.innerText = type === 'success' ? '✅' : '❌';
+
 toast.classList.add('show');
 setTimeout(() => {
 toast.classList.remove('show');
@@ -960,6 +966,7 @@ reject(err);
 }, ms))
 ]);
 }
+
 function resetLocalUserState() {
 appData.currentUser = null;
 appData.credits = 0;
@@ -997,10 +1004,10 @@ appData.isAdmin = isAdminEmail;
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = [];
 updateUI();
-
 try {
 const userRef = db.ref('users/' + user.uid);
 const snapshot = await withTimeout(userRef.once('value'), 5000, 'La base de données Firebase ne répond pas.');
+
 // Si une autre connexion s'est produite entre-temps, ne pas écraser son état.
 if (token !== profileLoadToken || !auth.currentUser || auth.currentUser.uid !== user.uid) return true;
 
@@ -1563,7 +1570,6 @@ showToast('❌ ' + (err.message || 'Impossible d’envoyer la demande.'), 'error
 if (btn) { btn.disabled = false; btn.innerText = 'AJOUTER'; }
 });
 }
-
 function listenToFriendRequests() {
 if (!appData.currentUser) return;
 db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
@@ -1609,6 +1615,7 @@ if ((appData.friends || []).some(f => f.uid === senderUid)) {
   try { await db.ref('friend_requests/' + myUid + '/' + reqId).remove(); } catch (_) {}
   return showToast('Cet utilisateur est déjà votre ami.', 'error');
 }
+
 const me = {
   uid: myUid,
   username: appData.currentUser.username || 'Joueur',
@@ -1629,6 +1636,7 @@ updates['friend_requests/' + myUid + '/' + reqId] = null;
 
 try {
   await withTimeout(db.ref().update(updates), 10000, 'Firebase ne répond pas pour la validation de la demande.');
+
   appData.friends = Array.isArray(appData.friends) ? appData.friends : [];
   appData.friends.push(them);
   try {
@@ -1814,8 +1822,8 @@ const trade={
 };
 try {
  // On utilise les deux boîtes dédiées. Le chemin /trades n'est plus nécessaire pour envoyer une offre.
- await withTimeout(db.ref('trade_inbox/'+activeTrade.targetUid+'/'+tradeId).set(trade),8000,'Firebase ne répond pas pour la boîte de réception.');
- await withTimeout(db.ref('trade_outbox/'+appData.currentUser.uid+'/'+tradeId).set(trade),8000,'Firebase ne répond pas pour ta boîte d’envoi.');
+ await withTimeout(db.ref('trade_inbox/'+activeTrade.targetUid+'/'+tradeId).set(trade),8000,'Firebase a refusé la création de l’offre. Vérifie les règles trade_inbox.');
+ await withTimeout(db.ref('trade_outbox/'+appData.currentUser.uid+'/'+tradeId).set(trade),8000,'Firebase a refusé ta boîte d’envoi. Vérifie les règles trade_outbox.');
  closeTradeModal();
  showToast('📩 Offre d’échange envoyée !','success');
 } catch(err) {
@@ -1960,7 +1968,6 @@ saveAppData();
 document.getElementById('adModal').classList.remove('active');
 showToast('Pub visionnée avec succès ! +15 Crédits 🪙', 'success');
 }
-
 /* MINI-JEUX ARCADE */
 let currentGameInterval = null;
 let activeGameType = null;
@@ -2011,6 +2018,10 @@ else if (gameType === 'chaos') runChaosMemoryGame(container);
 else if (gameType === 'charge') runChargeGame(container);
 else if (gameType === 'bombmemory') runBombMemoryGame(container);
 else if (gameType === 'precision') runPrecisionGame(container);
+else if (gameType === 'colorswitch') runColorSwitchGame(container);
+else if (gameType === 'coincatch') runCoinCatchGame(container);
+else if (gameType === 'quicktarget') runQuickTargetGame(container);
+else if (gameType === 'safetile') runSafeTileGame(container);
 }
 
 function closeGame() {
@@ -2253,6 +2264,33 @@ function runPrecisionGame(c){
  btn.onclick=()=>{if(pos>=43&&pos<=57){score++;sc.innerText=score+' / 4';if(score>=4)return rewardPlayer(150);}else return rewardPlayer(0);};
 }
 
+function runColorSwitchGame(c){
+ document.getElementById('gameTitle').innerText='Color Switch';
+ c.innerHTML='<div style="text-align:center;width:100%;max-width:340px"><p id="csQ" style="font-size:.9rem;margin-bottom:12px">Trouve : <b></b></p><div id="csGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div><p id="csTime" style="font-size:.75rem;margin-top:12px">10 s</p></div>';
+ const colors=[['ROUGE','#ef4444'],['BLEU','#3b82f6'],['VERT','#22c55e'],['JAUNE','#eab308']]; const grid=document.getElementById('csGrid'),q=document.getElementById('csQ').querySelector('b'),timeEl=document.getElementById('csTime'); let score=0,time=10,done=false;
+ const next=()=>{const target=Math.floor(Math.random()*colors.length);q.textContent=colors[target][0];grid.innerHTML='';colors.forEach((col,i)=>{const b=document.createElement('button');b.type='button';b.className='btn';b.style.background=col[1];b.style.color='#fff';b.textContent=col[0];b.onclick=()=>{if(done)return;if(i!==target){done=true;return rewardPlayer(0);}score++;if(score>=8){done=true;return rewardPlayer(65);}next();};grid.appendChild(b);});};
+ next(); currentGameInterval=setInterval(()=>{time--;timeEl.textContent=time+' s';if(time<=0&&!done){done=true;rewardPlayer(score>=6?45:0);}},1000);
+}
+function runCoinCatchGame(c){
+ document.getElementById('gameTitle').innerText='Coin Catch';
+ c.innerHTML='<div style="text-align:center;width:100%;max-width:340px"><p style="font-size:.72rem;color:var(--text-muted)">Attrape 10 pièces. La zone bouge à chaque pièce.</p><div id="coinArena" style="height:260px;position:relative;overflow:hidden;border:1px solid var(--card-border);border-radius:16px;background:#090711"><button id="coin" type="button" style="position:absolute;width:48px;height:48px;border-radius:50%;border:0;background:#facc15;font-size:1.5rem;box-shadow:0 0 22px #facc15">🪙</button></div><p id="coinScore" style="font-size:.75rem;margin-top:10px">0 / 10</p></div>';
+ const arena=document.getElementById('coinArena'),coin=document.getElementById('coin'),scoreEl=document.getElementById('coinScore');let score=0,time=15,done=false;
+ const move=()=>{coin.style.left=Math.max(4,Math.random()*(arena.clientWidth-58))+'px';coin.style.top=Math.max(4,Math.random()*(arena.clientHeight-58))+'px';};
+ coin.onclick=()=>{if(done)return;score++;scoreEl.textContent=score+' / 10';move();if(score>=10){done=true;rewardPlayer(75);}};move();currentGameInterval=setInterval(()=>{time--;if(time<=0&&!done){done=true;rewardPlayer(score>=7?50:0);}},1000);
+}
+function runQuickTargetGame(c){
+ document.getElementById('gameTitle').innerText='Quick Target';
+ c.innerHTML='<div style="text-align:center;width:100%;max-width:340px"><p style="font-size:.72rem;color:var(--text-muted)">Clique les 8 cibles le plus vite possible.</p><div id="qtArena" style="height:270px;position:relative;overflow:hidden;border:1px solid var(--card-border);border-radius:16px;background:#090711"></div><p id="qtScore" style="font-size:.75rem;margin-top:10px">0 / 8</p></div>';
+ const arena=document.getElementById('qtArena'),scoreEl=document.getElementById('qtScore');let score=0,done=false;
+ const spawn=()=>{arena.innerHTML='';const b=document.createElement('button');b.type='button';b.textContent='✦';b.style.cssText='position:absolute;width:52px;height:52px;border-radius:50%;border:1px solid var(--glow-cyan);background:rgba(6,182,212,.18);color:#fff;font-size:1.3rem;box-shadow:0 0 22px var(--glow-cyan);';b.style.left=Math.random()*80+'%';b.style.top=Math.random()*78+'%';b.onclick=()=>{if(done)return;score++;scoreEl.textContent=score+' / 8';if(score>=8){done=true;return rewardPlayer(85);}spawn();};arena.appendChild(b);};spawn();currentGameInterval=setTimeout(()=>{if(!done){done=true;rewardPlayer(score>=6?55:0);}},12000);
+}
+function runSafeTileGame(c){
+ document.getElementById('gameTitle').innerText='Safe Tile';
+ c.innerHTML='<div style="text-align:center;width:100%;max-width:340px"><p id="stStatus" style="font-size:.72rem;color:var(--text-muted)">Choisis une case sûre.</p><div id="stGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div><p id="stScore" style="font-size:.75rem;margin-top:10px">0 / 12</p></div>';
+ const grid=document.getElementById('stGrid'),status=document.getElementById('stStatus'),scoreEl=document.getElementById('stScore');let round=0,done=false;
+ const next=()=>{grid.innerHTML='';const trap=Math.floor(Math.random()*16);for(let i=0;i<16;i++){const b=document.createElement('button');b.type='button';b.textContent='?';b.style.cssText='height:56px;border-radius:12px;border:1px solid var(--card-border);background:rgba(255,255,255,.06);color:#fff;font-size:1.1rem;';b.onclick=()=>{if(done)return;if(i===trap){done=true;return rewardPlayer(0);}round++;b.textContent='✓';b.disabled=true;scoreEl.textContent=round+' / 12';if(round>=12){done=true;return rewardPlayer(95);}next();};grid.appendChild(b);}};next();
+}
+
 let gameMusicEnabled=true, gameMusicTimer=null, gameMusicStep=0, gameMusicTrack=0;
 const DROP_MUSIC_TRACKS=[
  {name:'NEON DROP',tempo:360,lead:[261.63,329.63,392,493.88,392,329.63,293.66,349.23,440,523.25,440,349.23,392,493.88,587.33,659.25],bass:[130.81,164.81,196,146.83]},
@@ -2260,20 +2298,16 @@ const DROP_MUSIC_TRACKS=[
  {name:'PIXEL RUSH',tempo:300,lead:[392,440,523.25,659.25,783.99,659.25,587.33,523.25,392,493.88,587.33,739.99,880,739.99,659.25,493.88],bass:[196,220,261.63,246.94]},
  {name:'MIDNIGHT DROP',tempo:400,lead:[220,277.18,329.63,369.99,440,369.99,329.63,277.18,246.94,329.63,369.99,493.88,440,369.99,329.63,246.94],bass:[110,138.59,164.81,123.47]}
 ];
-function ensureAudio(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();return ctx;}
-function musicVoice(ctx,freq,dur,type,gain,when){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,when);g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(gain,when+.025);g.gain.exponentialRampToValueAtTime(.0001,when+dur);o.connect(g);g.connect(ctx.destination);o.start(when);o.stop(when+dur+.04);}
-function playGameMusicNote(){try{if(!gameMusicEnabled)return;const ctx=ensureAudio();if(!ctx)return;const track=DROP_MUSIC_TRACKS[gameMusicTrack];const now=ctx.currentTime;const step=gameMusicStep%track.lead.length;const master=ctx.createGain();master.gain.value=.052;master.connect(ctx.destination);const lead=track.lead[step],bass=track.bass[Math.floor(step/4)%track.bass.length];
- musicVoice(ctx,lead,.28,'triangle',.12,now);musicVoice(ctx,lead*2,.12,'sine',.035,now+.08);musicVoice(ctx,bass,.38,'sine',.085,now);
- if(step%4===0){musicVoice(ctx,82.41,.10,'square',.025,now);musicVoice(ctx,164.81,.07,'square',.018,now+.13);}else if(step%2===0){musicVoice(ctx,220,.055,'square',.012,now);}
- gameMusicStep++;if(gameMusicStep%track.lead.length===0){gameMusicTrack=(gameMusicTrack+1)%DROP_MUSIC_TRACKS.length;gameMusicStep=0;}}
- catch(e){}}
-function startGameMusic(){if(!gameMusicEnabled)return;stopGameMusic();const track=DROP_MUSIC_TRACKS[gameMusicTrack];playGameMusicNote();gameMusicTimer=setInterval(playGameMusicNote,track.tempo);const btn=document.getElementById('musicToggle');if(btn)btn.innerText='🔊';}
-function stopGameMusic(){if(gameMusicTimer){clearInterval(gameMusicTimer);gameMusicTimer=null;}}
+function ensureAudio(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume().catch(()=>{});return ctx;}
+function musicVoice(ctx,freq,dur,type,gain,when){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,when);g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(Math.max(.0002,gain),when+.025);g.gain.exponentialRampToValueAtTime(.0001,when+dur);o.connect(g);g.connect(ctx.destination);o.start(when);o.stop(when+dur+.04);}
+function playGameMusicNote(){try{if(!gameMusicEnabled)return;const ctx=ensureAudio();if(!ctx||ctx.state==='suspended')return;const track=DROP_MUSIC_TRACKS[gameMusicTrack],step=gameMusicStep%track.lead.length,now=ctx.currentTime;musicVoice(ctx,track.lead[step],.26,'triangle',.075,now);musicVoice(ctx,track.lead[step]*2,.09,'sine',.022,now+.09);musicVoice(ctx,track.bass[Math.floor(step/4)%track.bass.length],.34,'sine',.055,now);if(step%4===0)musicVoice(ctx,82.41,.09,'square',.018,now);else if(step%2===0)musicVoice(ctx,220,.05,'square',.009,now);gameMusicStep++;if(gameMusicStep%track.lead.length===0){gameMusicTrack=(gameMusicTrack+1)%DROP_MUSIC_TRACKS.length;gameMusicStep=0;}}catch(e){console.warn('Musique:',e)}}
+function scheduleGameMusic(){if(!gameMusicEnabled)return;playGameMusicNote();const track=DROP_MUSIC_TRACKS[gameMusicTrack];gameMusicTimer=setTimeout(()=>{gameMusicTimer=null;scheduleGameMusic();},track.tempo);}
+function startGameMusic(){if(!gameMusicEnabled)return;stopGameMusic();scheduleGameMusic();const btn=document.getElementById('musicToggle');if(btn)btn.innerText='🔊';}
+function stopGameMusic(){if(gameMusicTimer){clearTimeout(gameMusicTimer);gameMusicTimer=null;}}
 function toggleGameMusic(){gameMusicEnabled=!gameMusicEnabled;const btn=document.getElementById('musicToggle');if(btn)btn.innerText=gameMusicEnabled?'🔊':'🔇';if(gameMusicEnabled)startGameMusic();else stopGameMusic();}
 function bootMusic(){if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();}
 window.addEventListener('load',()=>{setTimeout(bootMusic,80);});
-window.addEventListener('pointerdown',()=>{if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();},{once:true});
-window.addEventListener('touchstart',()=>{if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();},{once:true,passive:true});
+window.addEventListener('pointerdown',()=>{if(gameMusicEnabled){const ctx=ensureAudio();if(ctx&&ctx.state==='running'&&!gameMusicTimer)startGameMusic();else if(ctx&&ctx.state==='suspended')ctx.resume().then(()=>{if(!gameMusicTimer)startGameMusic();}).catch(()=>{});}}, {passive:true});
 
 function playEntrySound(kind){
  try{
@@ -2325,4 +2359,4 @@ window.addEventListener('load',()=>setTimeout(bootEntrySequence,250));
 
 </script>
 </body>
-                                                                                                                       </html>
+  </html>
