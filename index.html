@@ -135,7 +135,23 @@ text-align: center; position: relative; display: flex; flex-direction: column; a
 .catalog-card .emoji { font-size: 2.2rem; margin: 6px 0; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
 .catalog-card .item-name { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; min-height: 2.2em; display: flex; align-items: center; justify-content: center; }
 .catalog-card .item-price { font-size: 0.7rem; color: var(--glow-cyan); font-weight: 800; font-family: 'Space Grotesk'; }
-.catalog-card.locked { opacity: 0.6; filter: grayscale(0.6); }
+.catalog-card { overflow:hidden; cursor:pointer; transition:transform .24s ease, box-shadow .24s ease, border-color .24s ease, filter .24s ease; }
+.catalog-card:not(.locked):hover { transform:translateY(-5px) scale(1.025); }
+.catalog-card:not(.locked)::before { content:''; position:absolute; inset:-45%; background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.16) 50%,transparent 62%); transform:translateX(-75%) rotate(8deg); animation:catalogShimmer 4.8s ease-in-out infinite; pointer-events:none; }
+.catalog-card:not(.locked)::after { content:'✦'; position:absolute; top:6px; right:8px; font-size:.55rem; color:rgba(255,255,255,.75); animation:catalogSpark 2.2s ease-in-out infinite; pointer-events:none; }
+.catalog-card.locked { opacity: 0.48; filter: grayscale(1) saturate(0) brightness(.7); cursor:default; border-style:dashed!important; box-shadow:none!important; }
+.catalog-card.locked .emoji { filter:grayscale(1) blur(1px); opacity:.28; }
+.catalog-card.locked .item-name { color:#71717a; letter-spacing:1.2px; }
+.catalog-card.locked .item-price { color:#52525b; }
+.catalog-card.rarity-common:not(.locked) { background:linear-gradient(145deg,rgba(63,63,70,.22),rgba(20,16,38,.72)); }
+.catalog-card.rarity-rare:not(.locked) { background:linear-gradient(145deg,rgba(6,182,212,.14),rgba(20,16,38,.72)); box-shadow:0 0 20px rgba(34,211,238,.25), inset 0 0 24px rgba(34,211,238,.06); }
+.catalog-card.rarity-epic:not(.locked) { background:linear-gradient(145deg,rgba(168,85,247,.16),rgba(20,16,38,.72)); box-shadow:0 0 24px rgba(168,85,247,.3), inset 0 0 28px rgba(168,85,247,.07); }
+.catalog-card.rarity-legendary:not(.locked) { background:linear-gradient(145deg,rgba(245,158,11,.16),rgba(20,16,38,.72)); box-shadow:0 0 28px rgba(245,158,11,.34), inset 0 0 30px rgba(245,158,11,.08); }
+.catalog-card.rarity-ultra:not(.locked) { background:linear-gradient(145deg,rgba(217,70,239,.18),rgba(20,16,38,.7)); }
+@keyframes catalogShimmer { 0%,55%{transform:translateX(-80%) rotate(8deg)} 76%,100%{transform:translateX(85%) rotate(8deg)} }
+@keyframes catalogSpark { 0%,100%{opacity:.2;transform:scale(.8) rotate(0)} 50%{opacity:1;transform:scale(1.45) rotate(25deg)} }
+.catalog-card.locked { animation:cardRise .45s ease both, catalogLocked 3.5s ease-in-out infinite; }
+@keyframes catalogLocked { 0%,100%{opacity:.48} 50%{opacity:.58} }
 
 .football-bg-pattern {
 position: absolute; inset: 0; pointer-events: none; opacity: 0.08; z-index: 1;
@@ -170,7 +186,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 .drop-card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 18px; border: 2px solid var(--glow-magenta); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(217, 70, 239, 0.4); background: rgba(15, 12, 29, 0.9); }
 .drop-card-back { background: linear-gradient(135deg, #100b26, #28124d); border-color: var(--glow-violet); }
 .drop-card-front { transform: rotateY(180deg); background: linear-gradient(135deg, #1f103c, #090514); border-color: var(--glow-cyan); padding: 10px; text-align: center; }
-
 @keyframes cardExplode {
 0% { transform: scale(1) rotateY(180deg); filter: brightness(1); }
 50% { transform: scale(1.3) rotateY(180deg); filter: brightness(3) drop-shadow(0 0 50px var(--glow-magenta)); }
@@ -277,6 +292,49 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 @keyframes entryBreath{50%{transform:scale(1.012)}}
 .catalog-card{animation:cardRise .45s ease both;}
 @keyframes cardRise{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+
+/* UPDATE 8 — classeur vivant + histoires de cartes */
+.card-story-modal{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(2,2,7,.84);backdrop-filter:blur(14px);}
+.card-story-modal.active{display:flex;animation:storyBackdropIn .28s ease both;}
+.card-story-box{position:relative;width:min(440px,96vw);max-height:88vh;overflow:auto;padding:20px;border:1px solid rgba(217,70,239,.48);border-radius:26px;background:radial-gradient(circle at 50% 5%,rgba(217,70,239,.18),transparent 34%),linear-gradient(145deg,rgba(18,13,36,.98),rgba(5,5,12,.98));box-shadow:0 0 70px rgba(217,70,239,.24),0 20px 80px rgba(0,0,0,.55);animation:storyBoxIn .42s cubic-bezier(.2,.9,.2,1) both;}
+.card-story-box::before{content:'';position:absolute;inset:1px;border-radius:25px;pointer-events:none;background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.07) 50%,transparent 80%);animation:storySweep 3.2s ease-in-out infinite;}
+.card-story-close{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;font-size:1.35rem;cursor:pointer;z-index:2;}
+.story-rarity{text-align:center;font-size:.58rem;font-weight:900;letter-spacing:2px;margin-bottom:8px;color:var(--glow-cyan);text-shadow:0 0 12px currentColor;}
+.story-card-hero{width:145px;height:185px;margin:2px auto 12px;border-radius:20px;border:2px solid var(--glow-magenta);display:flex;align-items:center;justify-content:center;font-size:4.4rem;background:linear-gradient(145deg,#17102d,#080610);box-shadow:0 0 35px rgba(217,70,239,.25);position:relative;overflow:hidden;animation:storyCardFloat 2.8s ease-in-out infinite;}
+.story-card-hero::after{content:'';position:absolute;inset:-80%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.25) 50%,transparent 58%);transform:translateX(-45%) rotate(10deg);animation:storyHolo 2.6s ease-in-out infinite;}
+.story-title{text-align:center;font-family:'Space Grotesk';font-size:1.2rem;font-weight:900;line-height:1.15;color:#fff;}
+.story-category{text-align:center;margin-top:5px;color:var(--text-muted);font-size:.62rem;text-transform:uppercase;letter-spacing:1.3px;}
+.story-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(217,70,239,.55),transparent);margin:15px 0;}
+.story-label{font-size:.62rem;color:var(--glow-cyan);font-weight:900;letter-spacing:1.4px;}
+.story-text{font-size:.76rem;line-height:1.7;color:#ddd;margin:8px 0 14px;}
+.story-stats{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;}
+.story-stat{padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid rgba(139,92,246,.22);font-size:.56rem;color:#c4b5fd;}
+@keyframes storyBackdropIn{from{opacity:0}to{opacity:1}}
+@keyframes storyBoxIn{from{opacity:0;transform:translateY(22px) scale(.9) rotateX(7deg)}to{opacity:1;transform:none}}
+@keyframes storySweep{0%,55%{transform:translateX(-70%)}80%,100%{transform:translateX(70%)}}
+@keyframes storyCardFloat{50%{transform:translateY(-7px) rotate(1.2deg);box-shadow:0 0 48px rgba(217,70,239,.42)}}
+@keyframes storyHolo{0%,45%{transform:translateX(-70%) rotate(10deg)}75%,100%{transform:translateX(70%) rotate(10deg)}}
+@media (prefers-reduced-motion:reduce){.catalog-card,.card-story-box,.story-card-hero,.card-story-modal,.catalog-card::before,.catalog-card::after{animation:none!important;transition:none!important;}}
+
+/* UPDATE 7 — apercu des offres + progression du classeur */
+.trade-offer-box{margin-top:10px;padding:10px;border:1px solid rgba(99,102,241,.28);border-radius:14px;background:linear-gradient(135deg,rgba(18,18,32,.9),rgba(31,16,60,.55));animation:offerReveal .38s ease both;}
+.trade-offer-pair{display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;gap:7px;}
+.trade-preview-card{min-width:0;padding:9px 7px;border-radius:12px;border:1px solid rgba(255,255,255,.13);background:rgba(8,7,18,.72);text-align:center;animation:previewFloat 3s ease-in-out infinite;}
+.trade-preview-card .emoji{font-size:1.65rem;line-height:1.1;margin-bottom:5px;}
+.trade-preview-card .name{font-size:.62rem;font-weight:800;line-height:1.15;word-break:break-word;}
+.trade-preview-card .rarity{font-size:.5rem;color:var(--glow-cyan);margin-top:4px;letter-spacing:.7px;}
+.trade-arrow{font-size:1.1rem;text-align:center;color:var(--glow-magenta);font-weight:900;animation:arrowPulse 1.5s ease-in-out infinite;}
+.trade-view-btn{margin-top:8px;width:100%;padding:7px 9px;font-size:.62rem!important;}
+@keyframes offerReveal{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes previewFloat{50%{transform:translateY(-2px)}}
+@keyframes arrowPulse{50%{transform:scale(1.15);filter:drop-shadow(0 0 7px rgba(217,70,239,.7))}}
+.trade-preview-modal{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;z-index:9998;padding:18px;}
+.trade-preview-modal.active{display:flex;animation:offerReveal .25s ease both;}
+.trade-preview-box{width:min(430px,100%);padding:18px;border:1px solid rgba(217,70,239,.5);border-radius:22px;background:linear-gradient(145deg,#0c0a18,#17102a);box-shadow:0 0 45px rgba(217,70,239,.2);}
+.collection-progress{height:9px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:9px;}
+.collection-progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--glow-cyan),var(--glow-magenta));border-radius:99px;transition:width .7s cubic-bezier(.2,.8,.2,1);}
+.collection-progress-label{display:flex;justify-content:space-between;font-size:.62rem;color:var(--text-muted);margin-top:5px;}
+
 </style>
 </head>
 <body>
@@ -316,6 +374,18 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
     <button id="tradeConfirmBtn" class="btn" disabled onclick="confirmTradeModal()">ENVOYER L'OFFRE</button>
   </div>
 </div>
+<div id="tradePreviewModal" class="trade-preview-modal" aria-hidden="true" onclick="if(event.target===this)closeTradePreview()">
+  <div class="trade-preview-box">
+    <div class="trade-head" style="margin-bottom:12px;">
+      <div>
+        <div class="card-title" style="margin-bottom:4px;">APERÇU DE L’ÉCHANGE</div>
+        <div id="tradePreviewSubtitle" style="font-size:.68rem;color:var(--text-muted);">Les cartes proposées</div>
+      </div>
+      <button class="btn btn-danger" style="width:auto;padding:7px 11px;" onclick="closeTradePreview()">FERMER</button>
+    </div>
+    <div id="tradePreviewContent"></div>
+  </div>
+</div>
 
 <header class="hud-header">
 <div class="brand-logo"><div class="brand-dot"></div>DROP 2027</div>
@@ -324,7 +394,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="pill"><span>🪙</span><span id="creditVal">0</span></div>
 </div>
 </header>
-
 <main class="screen-container">
 
 <!-- 1. ACCUEIL / DROP MYSTÈRE ANIMÉ -->
@@ -443,6 +512,12 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div style="font-size:.68rem;color:var(--text-muted);margin-top:5px;">Cartes possédées : <span id="hubOwned">0</span><br>Cartes échangeables : <span id="hubTradeable">0</span></div>
 </div>
 <div class="glass-card" style="padding:14px;">
+<div style="font-size:1.7rem;">📈</div><b style="font-size:.8rem;">PROGRESSION DU CLASSEUR</b>
+<div id="hubProgressText" style="font-size:.68rem;color:var(--text-muted);margin-top:5px;">0 / 0 cartes</div>
+<div class="collection-progress"><div id="hubProgressBar"></div></div>
+<div id="hubProgressLabel" class="collection-progress-label"><span>0%</span><span>Collection</span></div>
+</div>
+<div class="glass-card" style="padding:14px;">
 <div style="font-size:1.7rem;">🎯</div><b style="font-size:.8rem;">MISSIONS DU JOUR</b>
 <div id="hubMission" style="font-size:.68rem;color:var(--text-muted);margin-top:7px;"></div>
 </div>
@@ -522,6 +597,20 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </nav>
 
 <!-- MODALS -->
+<div class="card-story-modal" id="cardStoryModal" aria-hidden="true">
+  <div class="card-story-box" id="cardStoryBox">
+    <button class="card-story-close" onclick="closeCardStory()">×</button>
+    <div class="story-rarity" id="storyRarity">RARE</div>
+    <div class="story-card-hero" id="storyCardHero"></div>
+    <div class="story-title" id="storyCardTitle">Carte</div>
+    <div class="story-category" id="storyCardCategory">Collection</div>
+    <div class="story-divider"></div>
+    <div class="story-label">📖 L'HISTOIRE DE LA CARTE</div>
+    <p class="story-text" id="storyCardText"></p>
+    <div class="story-stats" id="storyCardStats"></div>
+  </div>
+</div>
+
 <div class="game-modal" id="gameArea">
 <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
 <h3 style="font-family:'Space Grotesk';" id="gameTitle">Jeu</h3>
@@ -934,7 +1023,6 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS)),
 dailyGames: {},
 hubTasks: {date:'', done:{}}
 };
-
 let currentAuthMode = 'login';
 let isDropping = false;
 
@@ -942,6 +1030,7 @@ function showToast(message, type = 'success') {
 const toast = document.getElementById('appToast');
 const msgEl = document.getElementById('toastMsg');
 const iconEl = document.getElementById('toastIcon');
+
 toast.className = 'app-toast ' + type;
 msgEl.innerText = message;
 iconEl.innerText = type === 'success' ? '✅' : '❌';
@@ -1004,6 +1093,7 @@ appData.isAdmin = isAdminEmail;
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = [];
 updateUI();
+
 try {
 const userRef = db.ref('users/' + user.uid);
 const snapshot = await withTimeout(userRef.once('value'), 5000, 'La base de données Firebase ne répond pas.');
@@ -1242,6 +1332,10 @@ function renderHub(){
  const tradeable=owned.filter(c=>c.tradeable===true);
  const a=document.getElementById('hubOwned'), b=document.getElementById('hubTradeable');
  if(a)a.textContent=owned.length; if(b)b.textContent=tradeable.length;
+ const total=all.length; const pct=total?Math.round((owned.length/total)*100):0;
+ const pt=document.getElementById('hubProgressText'); if(pt)pt.textContent=owned.length+' / '+total+' cartes';
+ const pb=document.getElementById('hubProgressBar'); if(pb)pb.style.width=pct+'%';
+ const pl=document.getElementById('hubProgressLabel'); if(pl)pl.innerHTML='<span>'+pct+'%</span><span>'+(pct===100?'CLASSEUR COMPLET 🎉':'Collection')+'</span>';
  const state=ensureDailyHubState();
  const m=document.getElementById('hubMission');
  if(m){
@@ -1264,7 +1358,6 @@ document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')
 document.getElementById(id).classList.add('active');
 if (btn) btn.classList.add('active');
 }
-
 function switchCategory(catKey, tabBtn) {
 activeCategory = catKey;
 document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
@@ -1272,28 +1365,75 @@ if(tabBtn) tabBtn.classList.add('active');
 renderCatalogGrid();
 }
 
+function getCardStory(card, categoryKey){
+ const special={
+  1701:'Le bus qui arrive dès que tu pars a été observé pour la première fois à 7h42. Depuis, il a développé une technique imparable : attendre que tu regardes l’heure, que tu soupirs, puis apparaître au bout de la rue. Des scientifiques ont tenté de l’interroger. Il a répondu en ouvrant ses portes… puis les a refermées immédiatement.',
+  1501:'Cette mauvaise idée semblait excellente à 23h47. Le lendemain matin, absolument personne ne savait pourquoi elle avait paru géniale. La carte est depuis classée dans la catégorie « on verra demain ». Demain n’est jamais venu.',
+  1601:'Cette carte représente le fameux « JE DESCENDS DANS 5 MINUTES ». Les archives indiquent que ces cinq minutes peuvent durer entre 30 secondes et trois heures, selon l’humeur du parent concerné.',
+  1801:'La réunion devait durer dix minutes. Elle a duré une éternité, puis quelqu’un a dit « vous m’entendez ? ». Depuis, cette phrase est gravée dans les monuments officiels de DROP 2027.'
+ };
+ if(special[card.id]) return special[card.id];
+ const templates={
+  tiktok:`Tout a commencé avec une idée brillante : faire ${card.name.toLowerCase()} « juste cinq minutes ». Quatre heures plus tard, la carte était devenue une légende de TikTok. Personne ne sait exactement ce qui s’est passé entre les deux. Même le téléphone refuse de témoigner.`,
+  memes:`Un jour, ${card.name} a été aperçu au mauvais endroit, au pire moment possible. Quelqu’un a pris une photo. Internet a fait le reste. Depuis, la carte refuse catégoriquement de reconnaître son passé.`,
+  gaming:`Le système DROP a détecté ${card.name} dans une partie où il n’avait absolument rien à faire. Il a gagné quand même. Les développeurs ont appelé ça « un comportement inattendu ». Les joueurs ont appelé ça « normal ».`,
+  football:`Le match était presque terminé quand ${card.name} est apparu. Le stade a retenu son souffle. L’arbitre a regardé sa montre. Puis tout le monde a fait semblant de comprendre la situation.`,
+  cinema:`Cette carte devait être un simple figurant. Puis elle a volé la scène, improvisé trois répliques et demandé son propre générique. Le réalisateur a finalement accepté.`,
+  space:`Les radars ont détecté ${card.name} à une distance officiellement décrite comme « beaucoup trop loin ». Après trois calculs, deux cafés et une crise existentielle, les scientifiques ont conclu : oui, c’est bien réel.`,
+  animals:`Personne ne sait comment ${card.name} a obtenu cette carte. Les animaux du quartier, eux, savent. Ils ont signé un accord de confidentialité.`,
+  food:`La recette originale de ${card.name} prévoyait une seule étape. Quelqu’un a ajouté dix-sept ingrédients « pour voir ». Le résultat a obtenu une médaille et une interdiction temporaire de cuisine.`,
+  bureaucratie:`Le dossier de ${card.name} comporte 42 pages, 8 signatures et une case mystérieuse intitulée « autre ». Après trois semaines, l’administration a validé le dossier sans le lire. Victoire absolue.`,
+  objetsinutiles:`On ne sait toujours pas à quoi sert ${card.name}. Et c’est précisément pour ça qu’il est devenu indispensable.`,
+  vacancescatastrophe:`Les vacances étaient censées être reposantes. Puis ${card.name} est arrivé. Depuis, la famille raconte cette histoire comme une aventure. La famille appelle ça aussi « la pire semaine de l’année ».`,
+  internetbizarre:`Quelqu’un a posté ${card.name} à 03h12. À 03h13, c’était viral. À 03h14, personne ne comprenait pourquoi. À 03h15, il existait déjà trois théories complètement absurdes.`,
+  cantine:`Le jour où ${card.name} est apparu à la cantine, même les frites ont demandé une explication. Le menu officiel parle encore d’un « incident technique ».`,
+  lycee:`${card.name} est né dans un couloir, entre une sonnerie et un contrôle surprise. Depuis, il est transmis de classe en classe comme une légende scolaire.`,
+  grosfail:`Tout était parfaitement préparé. Puis ${card.name} est arrivé. Le plan a tenu exactement 2,7 secondes.`,
+  objetsmaudits:`La première personne qui a touché ${card.name} a dit « ça va aller ». Elle avait tort. Depuis, la carte est accompagnée d’un avertissement que personne ne lit.`,
+  situations:`Le moment gênant devait durer cinq secondes. Il a duré suffisamment longtemps pour devenir une carte officielle de DROP 2027.`,
+  mauvaisesidees:`Sur le papier, ${card.name} était une idée incroyable. Dans la réalité, le papier a demandé à être brûlé.`,
+  parents:`Cette carte contient une règle familiale universelle : quand un parent dit « viens deux secondes », prévois toujours une heure.`,
+  transports:`Le réseau de transport affirme que ${card.name} n’existe pas. Les voyageurs, eux, ont 87 témoignages, 14 vidéos et zéro explication.`,
+  reunion:`La réunion autour de ${card.name} aurait pu être un simple message. Elle a finalement nécessité un lien, un mot de passe, deux micros et quelqu’un qui demande « qui partage son écran ? ».`,
+  starter:`Une petite carte, une grande destinée. ${card.name} est l’une des premières traces laissées par ton aventure dans l’univers DROP.`,
+  secret:`Cette carte n’aurait jamais dû être trouvée. Le système prétend qu’elle n’existe pas. La carte, elle, vient de mettre un petit « vu » à cette déclaration.`
+ };
+ return templates[categoryKey] || `Personne ne sait exactement comment ${card.name} est devenu une carte DROP. Une chose est sûre : l’histoire est beaucoup trop étrange pour être racontée sérieusement.`;
+}
+function openCardStory(card, categoryKey){
+ if(!card || !card.unlocked)return;
+ const rarity=card.rarity||'common';
+ const labels={common:'BASIQUE',rare:'RARE',epic:'ÉPIQUE',legendary:'LÉGENDAIRE',ultra:'✨ ULTRA RARE'};
+ const colors={common:'#a1a1aa',rare:'#22d3ee',epic:'#a855f7',legendary:'#f59e0b',ultra:'#f0abfc'};
+ const modal=document.getElementById('cardStoryModal'), box=document.getElementById('cardStoryBox');
+ const hero=document.getElementById('storyCardHero'); hero.className='story-card-hero rarity-'+rarity; hero.innerHTML='<span style="position:relative;z-index:1;">'+(card.emoji||'🃏')+'</span>';
+ const r=document.getElementById('storyRarity'); r.textContent=labels[rarity]||'BASIQUE'; r.style.color=colors[rarity]||'#a1a1aa';
+ document.getElementById('storyCardTitle').textContent=card.name;
+ document.getElementById('storyCardCategory').textContent=CATEGORY_LABELS[categoryKey]||'Collection DROP';
+ document.getElementById('storyCardText').textContent=getCardStory(card,categoryKey);
+ document.getElementById('storyCardStats').innerHTML='<span class="story-stat">🆔 #'+card.id+'</span><span class="story-stat">'+(card.tradeable===false?'🔒 NON ÉCHANGEABLE':'🔄 ÉCHANGEABLE')+'</span><span class="story-stat">✓ DANS TON CLASSEUR</span>';
+ box.className='card-story-box rarity-'+rarity; modal.classList.add('active'); modal.setAttribute('aria-hidden','false');
+}
+function closeCardStory(){ const modal=document.getElementById('cardStoryModal'); if(!modal)return; modal.classList.remove('active'); modal.setAttribute('aria-hidden','true'); }
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCardStory();});
+
 function renderCatalogGrid() {
 const grid = document.getElementById('catalogGrid');
 grid.innerHTML = '';
-
 if (activeCategory === 'football') {
-const bgPattern = document.createElement('div');
-bgPattern.className = 'football-bg-pattern';
-bgPattern.innerHTML = '⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽';
-grid.appendChild(bgPattern);
+const bgPattern = document.createElement('div'); bgPattern.className = 'football-bg-pattern'; bgPattern.innerHTML = '⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽'; grid.appendChild(bgPattern);
 }
-
 const currentItems = appData.catalogs[activeCategory] || [];
-
-currentItems.forEach(item => {
-const div = document.createElement('div');
-const rarity = item.rarity || 'common';
-const rarityLabel = {common:'BASIQUE',rare:'RARE',epic:'ÉPIQUE',legendary:'LÉGENDAIRE',ultra:'ULTRA RARE'}[rarity] || 'BASIQUE';
-div.className = 'catalog-card ' + (item.unlocked ? '' : 'locked') + ' rarity-' + rarity;
-div.innerHTML = `<div class="emoji">${item.emoji}</div>
-<div class="item-name">${item.name}</div><div style="font-size:.55rem;color:var(--text-muted);font-weight:800;letter-spacing:1px;">${rarityLabel}${item.tradeable ? ' • ÉCHANGEABLE' : ' • NON ÉCHANGEABLE'}</div><div class="item-price">${item.price === 0 ? 'GRATUITE' : item.price + ' 🪙'}</div>
-<button class="btn ${item.unlocked ? 'btn-secondary' : ''}" style="padding:6px; font-size:0.7rem; margin-top:8px;" ${item.unlocked || item.tradeable === false ? 'disabled' : ''} onclick="buyItemDirect(${item.id})">${item.unlocked ? 'Acquis' : item.tradeable === false ? 'Départ' : 'Obtenir'}</button>`;
-grid.appendChild(div);
+currentItems.forEach((item,index) => {
+ const div=document.createElement('div'); const rarity=item.rarity||'common';
+ const rarityLabel={common:'BASIQUE',rare:'RARE',epic:'ÉPIQUE',legendary:'LÉGENDAIRE',ultra:'ULTRA RARE'}[rarity]||'BASIQUE';
+ const unlocked=!!item.unlocked; div.className='catalog-card '+(unlocked?'owned':'locked')+' rarity-'+rarity; div.style.animationDelay=(Math.min(index,11)*45)+'ms';
+ if(unlocked){div.setAttribute('role','button');div.tabIndex=0;div.onclick=()=>openCardStory(item,activeCategory);div.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openCardStory(item,activeCategory);}};}
+ const displayName=item.name; const displayEmoji=item.emoji;
+ div.innerHTML='<div class="emoji">'+displayEmoji+'</div><div class="item-name">'+displayName+'</div><div style="font-size:.55rem;color:'+(unlocked?'var(--text-muted)':'#52525b')+';font-weight:800;letter-spacing:1px;">'+(unlocked?rarityLabel+(item.tradeable?' • ÉCHANGEABLE':' • NON ÉCHANGEABLE'):'🔒 CARTE NON OBTENUE')+'</div><div class="item-price">'+(item.price===0?'GRATUITE':item.price+' 🪙')+'</div><button class="btn '+(unlocked?'btn-secondary':'')+'" style="padding:6px;font-size:0.7rem;margin-top:8px;">'+(unlocked?'📖 Histoire':item.tradeable===false?'Départ':'Obtenir')+'</button>';
+ const btn=div.querySelector('button');
+ if(unlocked){btn.onclick=e=>{e.stopPropagation();openCardStory(item,activeCategory);};}else{btn.disabled=item.tradeable===false;btn.onclick=e=>{e.stopPropagation();buyItemDirect(item.id);};}
+ grid.appendChild(div);
 });
 }
 
@@ -1570,6 +1710,7 @@ showToast('❌ ' + (err.message || 'Impossible d’envoyer la demande.'), 'error
 if (btn) { btn.disabled = false; btn.innerText = 'AJOUTER'; }
 });
 }
+
 function listenToFriendRequests() {
 if (!appData.currentUser) return;
 db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
@@ -1615,7 +1756,6 @@ if ((appData.friends || []).some(f => f.uid === senderUid)) {
   try { await db.ref('friend_requests/' + myUid + '/' + reqId).remove(); } catch (_) {}
   return showToast('Cet utilisateur est déjà votre ami.', 'error');
 }
-
 const me = {
   uid: myUid,
   username: appData.currentUser.username || 'Joueur',
@@ -1636,7 +1776,6 @@ updates['friend_requests/' + myUid + '/' + reqId] = null;
 
 try {
   await withTimeout(db.ref().update(updates), 10000, 'Firebase ne répond pas pour la validation de la demande.');
-
   appData.friends = Array.isArray(appData.friends) ? appData.friends : [];
   appData.friends.push(them);
   try {
@@ -1686,12 +1825,12 @@ fl.appendChild(div);
 });
 }
 
-let activeTrade = {targetUid:null,targetName:'',offerId:null,wantId:null};
+let activeTrade = {targetUid:null,targetName:'',offerId:null,wantId:null,offerCard:null,wantCard:null};
 let entryTimerHandle = null, entryMusicHandle = null;
 
 async function openTradePrompt(targetUid, targetName) {
 if (!appData.currentUser || !targetUid) return;
-activeTrade = {targetUid:String(targetUid),targetName:String(targetName || 'ton ami'),offerId:null,wantId:null};
+activeTrade = {targetUid:String(targetUid),targetName:String(targetName || 'ton ami'),offerId:null,wantId:null,offerCard:null,wantCard:null};
 const modal=document.getElementById('tradeModal');
 const title=document.getElementById('tradeTargetName');
 const offerGrid=document.getElementById('tradeOfferGrid');
@@ -1747,9 +1886,12 @@ if(kind==='offer'){
  const card=findCardById(num);
  if(!card||!card.unlocked||card.tradeable!==true)return showToast('❌ Cette carte n’est pas échangeable.','error');
  activeTrade.offerId=num;
+ activeTrade.offerCard=tradeCardSnapshot(findCardById(num));
  document.querySelectorAll('#tradeOfferGrid .trade-select-card').forEach(x=>x.classList.remove('selected'));
 }else if(kind==='want'){
  activeTrade.wantId=num;
+ const wantedEl=document.querySelector('#tradeRequestGrid .trade-select-card[data-id="'+String(num)+'"]');
+ activeTrade.wantCard=tradeCardSnapshot({id:num,name:wantedEl?wantedEl.querySelector('b')?.innerText:('Carte #'+num),emoji:wantedEl?wantedEl.querySelector('.big')?.innerText:'🃏',rarity:wantedEl?(wantedEl.className.match(/rarity-([\w-]+)/)||[])[1]:'common'});
  document.querySelectorAll('#tradeRequestGrid .trade-select-card').forEach(x=>x.classList.remove('selected'));
 }else return;
 if(el)el.classList.add('selected');
@@ -1773,30 +1915,73 @@ if(summary)summary.innerText=ok?'Tu donnes '+o.emoji+' '+o.name+'  ⇄  Tu deman
 function closeTradeModal(){
 const modal=document.getElementById('tradeModal');
 if(modal)modal.classList.remove('active');
-activeTrade={targetUid:null,targetName:'',offerId:null,wantId:null};
+activeTrade={targetUid:null,targetName:'',offerId:null,wantId:null,offerCard:null,wantCard:null};
 }
 
 let tradeInboxCache = {};
 let tradeOutboxCache = {};
 
+function tradeCardSnapshot(card){
+ if(!card)return null;
+ return {id:Number(card.id),name:String(card.name||('Carte #'+card.id)),emoji:String(card.emoji||'🃏'),rarity:String(card.rarity||'common')};
+}
+function tradePreviewHtml(card,label){
+ const c=card||{};
+ const rarity=String(c.rarity||'common').toUpperCase();
+ return '<div class="trade-preview-card rarity-'+(c.rarity||'common')+'"><div class="emoji">'+(c.emoji||'🃏')+'</div><div class="name">'+(c.name||('Carte #'+c.id))+'</div><div class="rarity">'+rarity+'</div><div style="font-size:.48rem;color:var(--text-muted);margin-top:3px;">'+label+'</div></div>';
+}
 function renderTradePanel(){
  const tl=document.getElementById('tradesList'); if(!tl)return;
  tl.innerHTML=''; let count=0;
  Object.keys(tradeInboxCache||{}).forEach(tid=>{
   const t=tradeInboxCache[tid]; if(!t||t.status!=='pending')return;
   count++;
+  const offered=t.offeredCard||null, wanted=t.wantedCard||null;
   const div=document.createElement('div'); div.className='trade-card-box'; div.dataset.tradeId=tid;
-  div.innerHTML=`<p style="font-size:.75rem;">📩 <b>${t.senderName||'Un joueur'}</b> propose un échange.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Donne #${t.offeredCardId} • Demande #${t.wantedCardId}</p><div style="display:flex;gap:6px;margin-top:8px;"><button class="btn btn-success" style="padding:6px;font-size:.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button><button class="btn btn-danger" style="padding:6px;font-size:.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button></div>`;
+  div.innerHTML='<p style="font-size:.75rem;">📩 <b>'+String(t.senderName||'Un joueur')+'</b> propose un échange.</p>'+
+   '<div class="trade-offer-box"><div class="trade-offer-pair">'+tradePreviewHtml(offered,'CARTE PROPOSÉE')+'<div class="trade-arrow">⇄</div>'+tradePreviewHtml(wanted,'CARTE DEMANDÉE')+'</div>'+
+   '<button class="btn btn-secondary trade-view-btn" onclick="viewTradeCards(\''+tid+'\',\'inbox\')">👀 CONSULTER LES CARTES</button></div>'+
+   '<div style="display:flex;gap:6px;margin-top:9px;"><button class="btn btn-success" style="padding:6px;font-size:.7rem;" onclick="acceptTrade(\''+tid+'\')">ACCEPTER</button><button class="btn btn-danger" style="padding:6px;font-size:.7rem;" onclick="refuseTrade(\''+tid+'\')">REFUSER</button></div>';
   tl.appendChild(div);
  });
  Object.keys(tradeOutboxCache||{}).forEach(tid=>{
   const t=tradeOutboxCache[tid]; if(!t||t.status!=='pending')return;
   count++;
+  const offered=t.offeredCard||null, wanted=t.wantedCard||null;
   const div=document.createElement('div'); div.className='trade-card-box'; div.dataset.tradeId=tid;
-  div.innerHTML=`<p style="font-size:.75rem;color:var(--text-muted);">⏳ Offre envoyée à <b>${t.receiverName||t.receiverUid||'ton ami'}</b>.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Tu donnes #${t.offeredCardId} • Tu demandes #${t.wantedCardId}</p>`;
+  div.innerHTML='<p style="font-size:.75rem;color:var(--text-muted);">⏳ Offre envoyée à <b>'+String(t.receiverName||t.receiverUid||'ton ami')+'</b>.</p>'+
+   '<div class="trade-offer-box"><div class="trade-offer-pair">'+tradePreviewHtml(offered,'TA CARTE')+'<div class="trade-arrow">⇄</div>'+tradePreviewHtml(wanted,'SA CARTE')+'</div>'+
+   '<button class="btn btn-secondary trade-view-btn" onclick="viewTradeCards(\''+tid+'\',\'outbox\')">👀 CONSULTER LES CARTES</button></div>';
   tl.appendChild(div);
  });
  if(!count)tl.innerHTML='<i style="color:var(--text-muted);font-size:.75rem;">Aucune offre en cours.</i>';
+}
+
+async function viewTradeCards(tradeId, source){
+ const cache=source==='inbox'?tradeInboxCache:tradeOutboxCache;
+ const t=cache&&cache[tradeId];
+ if(!t)return showToast('❌ Cette offre n’est plus disponible.','error');
+ const modal=document.getElementById('tradePreviewModal'), content=document.getElementById('tradePreviewContent'), subtitle=document.getElementById('tradePreviewSubtitle');
+ if(!modal||!content)return;
+ modal.classList.add('active'); modal.setAttribute('aria-hidden','false');
+ if(subtitle)subtitle.textContent=(t.senderName||'Joueur')+' ⇄ '+(t.receiverName||'Joueur');
+ content.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:.72rem;">Chargement des cartes…</div>';
+ try{
+   const [senderSnap,receiverSnap]=await Promise.all([
+     db.ref('public_collections/'+t.senderUid+'/'+t.offeredCardId).once('value'),
+     db.ref('public_collections/'+t.receiverUid+'/'+t.wantedCardId).once('value')
+   ]);
+   const offered=senderSnap.val()||t.offeredCard||{id:t.offeredCardId,name:'Carte indisponible',emoji:'❔',rarity:'common'};
+   const wanted=receiverSnap.val()||t.wantedCard||{id:t.wantedCardId,name:'Carte indisponible',emoji:'❔',rarity:'common'};
+   content.innerHTML='<div class="trade-offer-box" style="margin-top:0;"><div class="trade-offer-pair">'+tradePreviewHtml(offered,'CARTE PROPOSÉE')+'<div class="trade-arrow">⇄</div>'+tradePreviewHtml(wanted,'CARTE DEMANDÉE')+'</div></div><div style="text-align:center;font-size:.62rem;color:var(--text-muted);margin-top:11px;">ID #'+Number(offered.id)+' ⇄ ID #'+Number(wanted.id)+'</div>';
+ }catch(err){
+   const offered=t.offeredCard||{id:t.offeredCardId,name:'Carte indisponible',emoji:'❔',rarity:'common'};
+   const wanted=t.wantedCard||{id:t.wantedCardId,name:'Carte indisponible',emoji:'❔',rarity:'common'};
+   content.innerHTML='<div style="font-size:.7rem;color:var(--danger);text-align:center;margin-bottom:9px;">Impossible de charger les détails en direct.</div><div class="trade-offer-box" style="margin-top:0;"><div class="trade-offer-pair">'+tradePreviewHtml(offered,'CARTE PROPOSÉE')+'<div class="trade-arrow">⇄</div>'+tradePreviewHtml(wanted,'CARTE DEMANDÉE')+'</div></div>';
+ }
+}
+function closeTradePreview(){
+ const modal=document.getElementById('tradePreviewModal'); if(modal){modal.classList.remove('active');modal.setAttribute('aria-hidden','true');}
 }
 
 async function confirmTradeModal(){
@@ -1817,6 +2002,8 @@ const trade={
  receiverName:activeTrade.targetName,
  offeredCardId:Number(activeTrade.offerId),
  wantedCardId:Number(activeTrade.wantId),
+ offeredCard:activeTrade.offerCard||tradeCardSnapshot(offered),
+ wantedCard:activeTrade.wantCard||{id:Number(activeTrade.wantId),name:'Carte #'+activeTrade.wantId,emoji:'🃏',rarity:'common'},
  status:'pending',
  createdAt:firebase.database.ServerValue.TIMESTAMP
 };
@@ -1968,6 +2155,7 @@ saveAppData();
 document.getElementById('adModal').classList.remove('active');
 showToast('Pub visionnée avec succès ! +15 Crédits 🪙', 'success');
 }
+
 /* MINI-JEUX ARCADE */
 let currentGameInterval = null;
 let activeGameType = null;
@@ -2154,7 +2342,6 @@ let stack = [], currentWidth = 100, currentPos = 0, currentDir = 2, currentLevel
 if(board) {
 stack.push({ left: 50, width: 100 }); renderBlock(50, 100, 0, false); currentLevel = 1; createMovingBlock();
 }
-
 function createMovingBlock() {
 currentPos = 0;
 const movingEl = document.createElement('div'); movingEl.id = 'movingBlock';
