@@ -432,7 +432,9 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="card-title"><span>CLASSEUR DE CATALOGUES</span></div>
 
 <div class="binder-tabs">
-<div class="binder-tab active" onclick="switchCategory('tiktok', this)">📱 TikTok Trends</div>
+<div class="binder-tab active" onclick="switchCategory('starter', this)">🧩 Départ</div>
+<div class="binder-tab" onclick="switchCategory('__owned', this)">💎 Mes cartes</div>
+<div class="binder-tab" onclick="switchCategory('tiktok', this)">📱 TikTok Trends</div>
 <div class="binder-tab" onclick="switchCategory('memes', this)">🎭 Pop Culture & Mèmes</div>
 <div class="binder-tab" onclick="switchCategory('gaming', this)">🎮 Gaming & Tech</div>
 <div class="binder-tab" onclick="switchCategory('football', this)">⚽ Football</div>
@@ -454,7 +456,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="binder-tab" onclick="switchCategory('transports', this)">🚌 Transports Maudits</div>
 <div class="binder-tab" onclick="switchCategory('reunion', this)">💻 Réunions</div>
 
-<div class="binder-tab" onclick="switchCategory('starter', this)">🧩 Départ</div>
 <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
 </div>
 
@@ -992,7 +993,7 @@ situations: [
 ]
 };
 
-let activeCategory = 'tiktok';
+let activeCategory = 'starter';
 const NEW_CARD_IDS = new Set([601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408,1501,1502,1503,1504,1505,1506,1507,1508,1601,1602,1603,1604,1605,1606,1607,1608,1701,1702,1703,1704,1705,1706,1707,1708,1801,1802,1803,1804,1805,1806,1807,1808]);
 const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
 function normalizeCatalogs(raw) {
@@ -1023,6 +1024,7 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS)),
 dailyGames: {},
 hubTasks: {date:'', done:{}}
 };
+
 let currentAuthMode = 'login';
 let isDropping = false;
 
@@ -1358,48 +1360,306 @@ document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')
 document.getElementById(id).classList.add('active');
 if (btn) btn.classList.add('active');
 }
+
 function switchCategory(catKey, tabBtn) {
-activeCategory = catKey;
-document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
-if(tabBtn) tabBtn.classList.add('active');
-renderCatalogGrid();
+ activeCategory = catKey;
+ document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
+ if(tabBtn) tabBtn.classList.add('active');
+ renderCatalogGrid();
 }
 
+const CARD_STORIES = {
+  "101": "Quelqu'un a utilisé Anneau Lumineux LED dans une vidéo sans aucune explication. Les commentaires ont inventé 47 théories différentes, dont une impliquait un pigeon espion.",
+  "102": "La tendance autour de Micro-Cravate Sans Fil devait durer deux jours. Elle a finalement survécu assez longtemps pour revenir trois semaines plus tard comme si rien ne s'était passé.",
+  "103": "Trépied Suivi Automatique est devenu viral après une erreur minuscule que personne n'avait prévue. Depuis, tout le monde essaie de reproduire l'erreur volontairement, sans succès.",
+  "104": "À 2 h 03, Projecteur Galaxie TikTok n'intéressait absolument personne. À 2 h 04, quelqu'un a appuyé sur « publier ». L'histoire d'Internet pouvait commencer.",
+  "105": "Gourde Motivante 2L a commencé par une vidéo tournée à la va-vite. En une soirée, elle avait tellement de vues que le téléphone a commencé à chauffer par principe.",
+  "106": "Quelqu'un a utilisé Tapis Néon RGB dans une vidéo sans aucune explication. Les commentaires ont inventé 47 théories différentes, dont une impliquait un pigeon espion.",
+  "107": "La tendance autour de Mini Imprimante Thermique devait durer deux jours. Elle a finalement survécu assez longtemps pour revenir trois semaines plus tard comme si rien ne s'était passé.",
+  "108": "Miroir Néon Vague est devenu viral après une erreur minuscule que personne n'avait prévue. Depuis, tout le monde essaie de reproduire l'erreur volontairement, sans succès.",
+  "109": "À 2 h 03, Lampe Coucher de Soleil n'intéressait absolument personne. À 2 h 04, quelqu'un a appuyé sur « publier ». L'histoire d'Internet pouvait commencer.",
+  "110": "Micro Karaoke Bluetooth a commencé par une vidéo tournée à la va-vite. En une soirée, elle avait tellement de vues que le téléphone a commencé à chauffer par principe.",
+  "111": "Quelqu'un a utilisé Sac Banane Holographique dans une vidéo sans aucune explication. Les commentaires ont inventé 47 théories différentes, dont une impliquait un pigeon espion.",
+  "112": "La tendance autour de Veilleuse Pain de Mie devait durer deux jours. Elle a finalement survécu assez longtemps pour revenir trois semaines plus tard comme si rien ne s'était passé.",
+  "113": "Projecteur de poche 4K est devenu viral après une erreur minuscule que personne n'avait prévue. Depuis, tout le monde essaie de reproduire l'erreur volontairement, sans succès.",
+  "114": "À 2 h 03, Support Smartphone Flex n'intéressait absolument personne. À 2 h 04, quelqu'un a appuyé sur « publier ». L'histoire d'Internet pouvait commencer.",
+  "115": "Lampe Plasma Cyber a commencé par une vidéo tournée à la va-vite. En une soirée, elle avait tellement de vues que le téléphone a commencé à chauffer par principe.",
+  "116": "Quelqu'un a utilisé Enceinte Flottante LED dans une vidéo sans aucune explication. Les commentaires ont inventé 47 théories différentes, dont une impliquait un pigeon espion.",
+  "117": "La tendance autour de Masque LED Personnalisable devait durer deux jours. Elle a finalement survécu assez longtemps pour revenir trois semaines plus tard comme si rien ne s'était passé.",
+  "118": "Bandeau Audio Sommeil est devenu viral après une erreur minuscule que personne n'avait prévue. Depuis, tout le monde essaie de reproduire l'erreur volontairement, sans succès.",
+  "119": "À 2 h 03, Stylo d n'intéressait absolument personne. À 2 h 04, quelqu'un a appuyé sur « publier ». L'histoire d'Internet pouvait commencer.",
+  "120": "Distributeur de Bonbons Sensor a commencé par une vidéo tournée à la va-vite. En une soirée, elle avait tellement de vues que le téléphone a commencé à chauffer par principe.",
+  "121": "Quelqu'un a utilisé Réveil Vague Rétro dans une vidéo sans aucune explication. Les commentaires ont inventé 47 théories différentes, dont une impliquait un pigeon espion.",
+  "122": "La tendance autour de Cadre Photo Numérique HD devait durer deux jours. Elle a finalement survécu assez longtemps pour revenir trois semaines plus tard comme si rien ne s'était passé.",
+  "123": "Kit Ring Light Pro Max est devenu viral après une erreur minuscule que personne n'avait prévue. Depuis, tout le monde essaie de reproduire l'erreur volontairement, sans succès.",
+  "124": "À 2 h 03, Mini Drone Follow-Me n'intéressait absolument personne. À 2 h 04, quelqu'un a appuyé sur « publier ». L'histoire d'Internet pouvait commencer.",
+  "125": "Tapis de Danse Lumineux a commencé par une vidéo tournée à la va-vite. En une soirée, elle avait tellement de vues que le téléphone a commencé à chauffer par principe.",
+  "201": "La première photo de Lunettes Thug Life 8-Bit avait une qualité catastrophique. C'est précisément ce qui l'a rendue célèbre.",
+  "202": "Personne n'avait prévu que Statue Moaï Moaï deviendrait un mème. Encore moins Statue Moaï Moaï lui-même, qui n'avait pourtant rien demandé.",
+  "203": "Un utilisateur a posté Peluches Pieuvre Reversible avec une phrase incompréhensible. Deux heures plus tard, des milliers de personnes faisaient exactement la même chose.",
+  "204": "Casquette Cap No Cap possède désormais son propre dossier dans les archives des mèmes. Le dossier commence par « pourquoi ? » et ne contient aucune réponse.",
+  "205": "Badge Meme Doge Gold n'était qu'un objet parfaitement normal jusqu'au jour où quelqu'un a décidé de lui ajouter une légende absurde. Internet n'a jamais regardé en arrière.",
+  "206": "La première photo de Masque Shrek 3D avait une qualité catastrophique. C'est précisément ce qui l'a rendue célèbre.",
+  "207": "Personne n'avait prévu que Carte Uno Reverse Silver deviendrait un mème. Encore moins Carte Uno Reverse Silver lui-même, qui n'avait pourtant rien demandé.",
+  "208": "Un utilisateur a posté Statue Pop Cat avec une phrase incompréhensible. Deux heures plus tard, des milliers de personnes faisaient exactement la même chose.",
+  "209": "Coussin Geant Cheetos possède désormais son propre dossier dans les archives des mèmes. Le dossier commence par « pourquoi ? » et ne contient aucune réponse.",
+  "210": "Figurine Gigachad n'était qu'un objet parfaitement normal jusqu'au jour où quelqu'un a décidé de lui ajouter une légende absurde. Internet n'a jamais regardé en arrière.",
+  "211": "La première photo de Tapis Froggy Peepo avait une qualité catastrophique. C'est précisément ce qui l'a rendue célèbre.",
+  "212": "Personne n'avait prévu que Mug  deviendrait un mème. Encore moins Mug  lui-même, qui n'avait pourtant rien demandé.",
+  "213": "Un utilisateur a posté Trompette Doot Doot avec une phrase incompréhensible. Deux heures plus tard, des milliers de personnes faisaient exactement la même chose.",
+  "214": "Costume Inflatable Alien possède désormais son propre dossier dans les archives des mèmes. Le dossier commence par « pourquoi ? » et ne contient aucune réponse.",
+  "215": "Bouton Noice Sound n'était qu'un objet parfaitement normal jusqu'au jour où quelqu'un a décidé de lui ajouter une légende absurde. Internet n'a jamais regardé en arrière.",
+  "216": "La première photo de Canard en Caoutchouc Géant avait une qualité catastrophique. C'est précisément ce qui l'a rendue célèbre.",
+  "217": "Personne n'avait prévu que Affiche Nyan Cat Gold deviendrait un mème. Encore moins Affiche Nyan Cat Gold lui-même, qui n'avait pourtant rien demandé.",
+  "218": "Un utilisateur a posté Horloge Meme  avec une phrase incompréhensible. Deux heures plus tard, des milliers de personnes faisaient exactement la même chose.",
+  "219": "Marteau de Juge  possède désormais son propre dossier dans les archives des mèmes. Le dossier commence par « pourquoi ? » et ne contient aucune réponse.",
+  "220": "Figurine Stonks Up n'était qu'un objet parfaitement normal jusqu'au jour où quelqu'un a décidé de lui ajouter une légende absurde. Internet n'a jamais regardé en arrière.",
+  "221": "La première photo de Plaque d avait une qualité catastrophique. C'est précisément ce qui l'a rendue célèbre.",
+  "222": "Personne n'avait prévu que Trophée NPC Officiel deviendrait un mème. Encore moins Trophée NPC Officiel lui-même, qui n'avait pourtant rien demandé.",
+  "223": "Un utilisateur a posté Sifflet Emotional Damage avec une phrase incompréhensible. Deux heures plus tard, des milliers de personnes faisaient exactement la même chose.",
+  "224": "Panneau  possède désormais son propre dossier dans les archives des mèmes. Le dossier commence par « pourquoi ? » et ne contient aucune réponse.",
+  "225": "Costume T-Rex Gonflable n'était qu'un objet parfaitement normal jusqu'au jour où quelqu'un a décidé de lui ajouter une légende absurde. Internet n'a jamais regardé en arrière.",
+  "301": "Une partie avec Manette Pro Translucide devait durer dix minutes. Elle s'est terminée beaucoup plus tard, après que tout le monde eut oublié l'objectif initial.",
+  "302": "Casque Audio Cyberpunk a survécu à un bug qui aurait dû l'effacer. Depuis, les joueurs le considèrent comme un porte-bonheur numérique.",
+  "303": "Le classement officiel ne sait pas où placer Clavier Mécanique Custom. Il existe maintenant une ligne spéciale juste pour lui : « cas compliqué ».",
+  "304": "Quelqu'un a découvert que Console Rétro Portable fonctionnait dans une situation où il ne devait absolument pas fonctionner. Personne n'a corrigé le bug, par peur de voir ce qui se passerait ensuite.",
+  "305": "Le système a signalé Masque VR Next-Gen comme objet impossible à obtenir. Un joueur l'a quand même trouvé en cliquant au mauvais endroit. Le développeur responsable a quitté la pièce cinq minutes.",
+  "306": "Une partie avec Support Casque RGB devait durer dix minutes. Elle s'est terminée beaucoup plus tard, après que tout le monde eut oublié l'objectif initial.",
+  "307": "Tapis de Souris XXL Neon a survécu à un bug qui aurait dû l'effacer. Depuis, les joueurs le considèrent comme un porte-bonheur numérique.",
+  "308": "Le classement officiel ne sait pas où placer Carte Graphique Rétro. Il existe maintenant une ligne spéciale juste pour lui : « cas compliqué ».",
+  "309": "Quelqu'un a découvert que Mini Borne Arcade fonctionnait dans une situation où il ne devait absolument pas fonctionner. Personne n'a corrigé le bug, par peur de voir ce qui se passerait ensuite.",
+  "310": "Le système a signalé Stream Deck Mini comme objet impossible à obtenir. Un joueur l'a quand même trouvé en cliquant au mauvais endroit. Le développeur responsable a quitté la pièce cinq minutes.",
+  "311": "Une partie avec Câble Lumineux Fast Charge devait durer dix minutes. Elle s'est terminée beaucoup plus tard, après que tout le monde eut oublié l'objectif initial.",
+  "312": "Finger Sleeves Pro a survécu à un bug qui aurait dû l'effacer. Depuis, les joueurs le considèrent comme un porte-bonheur numérique.",
+  "313": "Le classement officiel ne sait pas où placer Chaise Gaming Quantum. Il existe maintenant une ligne spéciale juste pour lui : « cas compliqué ».",
+  "314": "Quelqu'un a découvert que Microphone Studio Pro fonctionnait dans une situation où il ne devait absolument pas fonctionner. Personne n'a corrigé le bug, par peur de voir ce qui se passerait ensuite.",
+  "315": "Le système a signalé Souris de Jeu Ultra-Légère comme objet impossible à obtenir. Un joueur l'a quand même trouvé en cliquant au mauvais endroit. Le développeur responsable a quitté la pièce cinq minutes.",
+  "316": "Une partie avec Gants Retrogaming Tactiles devait durer dix minutes. Elle s'est terminée beaucoup plus tard, après que tout le monde eut oublié l'objectif initial.",
+  "317": "Support Écran Triple Bras a survécu à un bug qui aurait dû l'effacer. Depuis, les joueurs le considèrent comme un porte-bonheur numérique.",
+  "318": "Le classement officiel ne sait pas où placer Coussin Ergonomique Gamer. Il existe maintenant une ligne spéciale juste pour lui : « cas compliqué ».",
+  "319": "Quelqu'un a découvert que Boîtier PC Verre Trempé RGB fonctionnait dans une situation où il ne devait absolument pas fonctionner. Personne n'a corrigé le bug, par peur de voir ce qui se passerait ensuite.",
+  "320": "Le système a signalé Carte d comme objet impossible à obtenir. Un joueur l'a quand même trouvé en cliquant au mauvais endroit. Le développeur responsable a quitté la pièce cinq minutes.",
+  "321": "Une partie avec Eclairage Ambilight Écran devait durer dix minutes. Elle s'est terminée beaucoup plus tard, après que tout le monde eut oublié l'objectif initial.",
+  "322": "Lunettes Anti-Lumière Bleue Pro a survécu à un bug qui aurait dû l'effacer. Depuis, les joueurs le considèrent comme un porte-bonheur numérique.",
+  "323": "Le classement officiel ne sait pas où placer Volant Retour de Force GT. Il existe maintenant une ligne spéciale juste pour lui : « cas compliqué ».",
+  "324": "Quelqu'un a découvert que Siège Simulation Dynamique fonctionnait dans une situation où il ne devait absolument pas fonctionner. Personne n'a corrigé le bug, par peur de voir ce qui se passerait ensuite.",
+  "501": "L'entraîneur avait préparé une stratégie compliquée. Puis Ballon Doré Vintage est arrivé et a réduit le plan à une seule consigne : « Faisons comme si on savait ce qu'on faisait. »",
+  "502": "À la 89e minute, Crampons à Réacteurs a été au cœur d'une action si improbable que le commentateur a préféré ne rien expliquer.",
+  "503": "Le vestiaire conserve encore une photo de Sifflet d. Personne ne sait qui l'a prise, mais tous les joueurs jurent qu'elle porte chance avant les gros matchs.",
+  "504": "Le règlement ne mentionne absolument pas Maillot Retro Kylian Mbappou. L'arbitre l'a lu trois fois, a soupiré, puis a décidé que pour aujourd'hui, on ferait avec.",
+  "505": "Le match venait de commencer quand Figurine Lionel Messsi a mystérieusement disparu du vestiaire. On l'a retrouvé dans les tribunes, parfaitement installé, comme s'il avait payé sa place.",
+  "506": "L'entraîneur avait préparé une stratégie compliquée. Puis Statue Cristiano Ronaldoo est arrivé et a réduit le plan à une seule consigne : « Faisons comme si on savait ce qu'on faisait. »",
+  "507": "À la 89e minute, Carte Legend Erling Braland a été au cœur d'une action si improbable que le commentateur a préféré ne rien expliquer.",
+  "508": "Le vestiaire conserve encore une photo de Gants de Zinedine Zidano. Personne ne sait qui l'a prise, mais tous les joueurs jurent qu'elle porte chance avant les gros matchs.",
+  "509": "Le règlement ne mentionne absolument pas Casquette Karim Benzemouche. L'arbitre l'a lu trois fois, a soupiré, puis a décidé que pour aujourd'hui, on ferait avec.",
+  "510": "Le match venait de commencer quand Gourde Tactique Neymar Jr a mystérieusement disparu du vestiaire. On l'a retrouvé dans les tribunes, parfaitement installé, comme s'il avait payé sa place.",
+  "511": "L'entraîneur avait préparé une stratégie compliquée. Puis Carton Rouge Laser Inviolable est arrivé et a réduit le plan à une seule consigne : « Faisons comme si on savait ce qu'on faisait. »",
+  "512": "À la 89e minute, Filet de Cage Infrissonnable a été au cœur d'une action si improbable que le commentateur a préféré ne rien expliquer.",
+  "513": "Le vestiaire conserve encore une photo de Trophée Coupe du Monde (Officiel). Personne ne sait qui l'a prise, mais tous les joueurs jurent qu'elle porte chance avant les gros matchs.",
+  "1001": "Formulaire Cerfa Inutile a attendu trois semaines dans une pile intitulée « urgent ». Quand quelqu'un l'a enfin ouvert, il manquait simplement une date.",
+  "1002": "Le dossier de Tampon OFFICIEL du Rien a changé de bureau sept fois. À la huitième, quelqu'un a demandé : « On faisait quoi déjà ? »",
+  "1003": "Une administration a officiellement reconnu Ticket pour Faire la Queue. Une autre a officiellement déclaré qu'il n'existait pas. Les deux documents portent le même tampon.",
+  "1004": "Dossier Classé Très Important possède un numéro de référence plus long que son propre intitulé. Personne ne s'en plaint, parce que personne ne veut recommencer la procédure.",
+  "1005": "Pour obtenir Signature Illisible, il fallait un formulaire, une signature et une autre signature confirmant la première. Personne ne sait pourquoi, mais le dossier a été validé.",
+  "1006": "Rendez-vous en 2047 a attendu trois semaines dans une pile intitulée « urgent ». Quand quelqu'un l'a enfin ouvert, il manquait simplement une date.",
+  "1007": "Le dossier de Photocopie de la Photocopie a changé de bureau sept fois. À la huitième, quelqu'un a demandé : « On faisait quoi déjà ? »",
+  "1008": "Une administration a officiellement reconnu Tampon du Grand Ministère. Une autre a officiellement déclaré qu'il n'existait pas. Les deux documents portent le même tampon.",
+  "1009": "Passe-Droit Cosmique possède un numéro de référence plus long que son propre intitulé. Personne ne s'en plaint, parce que personne ne veut recommencer la procédure.",
+  "1010": "Pour obtenir Le Papier Qui Fait Tout, il fallait un formulaire, une signature et une autre signature confirmant la première. Personne ne sait pourquoi, mais le dossier a été validé.",
+  "1011": "Un inventeur a créé Pierre Très Moyenne sans savoir à quoi il servirait. Des années plus tard, personne ne sait toujours pas, mais il est devenu collector.",
+  "1012": "Bâton Sans Fonction a été retrouvé dans une boîte marquée « important ». Personne n'a osé demander pourquoi.",
+  "1013": "Une étude très sérieuse a conclu que Télécommande Sans Télé ne servait à rien. Une deuxième étude, moins sérieuse, affirme qu'il sert à impressionner les visiteurs.",
+  "1014": "Boîte Vide Premium a passé six ans dans un tiroir. Le jour où on l'a jeté, quelqu'un en a eu besoin exactement trente secondes plus tard.",
+  "1015": "Chaussure Pour Une Seule Chaussure n'a aucune fonction connue. Pourtant, chaque personne qui le voit veut immédiatement le toucher.",
+  "1016": "Un inventeur a créé Cuillère de Collection sans savoir à quoi il servirait. Des années plus tard, personne ne sait toujours pas, mais il est devenu collector.",
+  "1017": "Brique en Édition Limitée a été retrouvé dans une boîte marquée « important ». Personne n'a osé demander pourquoi.",
+  "1018": "Une étude très sérieuse a conclu que Air en Bocal ne servait à rien. Une deuxième étude, moins sérieuse, affirme qu'il sert à impressionner les visiteurs.",
+  "1019": "Invisible Invisible a passé six ans dans un tiroir. Le jour où on l'a jeté, quelqu'un en a eu besoin exactement trente secondes plus tard.",
+  "1020": "Rien Absolument Rien n'a aucune fonction connue. Pourtant, chaque personne qui le voit veut immédiatement le toucher.",
+  "1021": "Valise Qui Ne Ferme Pas devait rester dans la valise. Il a pourtant réussi à devenir le personnage principal du voyage.",
+  "1022": "La photo officielle des vacances montre Sandale Perdue sur la Plage au premier plan et toute la famille derrière, visiblement en train de regretter quelque chose.",
+  "1023": "Personne ne sait comment Photo Floue du Monument est arrivé dans la chambre d'hôtel. Tout le monde sait en revanche qu'il fallait repartir le lendemain matin.",
+  "1024": "Le voyage aurait été oublié depuis longtemps sans GPS Qui Dit Demi-Tour. Malheureusement, il est impossible de raconter l'histoire sans recommencer à rire.",
+  "1025": "Les vacances devaient être tranquilles jusqu'à l'apparition de Serviette Jamais Sèche. À partir de là, chaque journée a gagné un nouveau problème totalement inutile.",
+  "1026": "Mouette Voleuse de Sandwich devait rester dans la valise. Il a pourtant réussi à devenir le personnage principal du voyage.",
+  "1027": "La photo officielle des vacances montre Chambre d au premier plan et toute la famille derrière, visiblement en train de regretter quelque chose.",
+  "1028": "Personne ne sait comment Vol Retardé de 14 Heures est arrivé dans la chambre d'hôtel. Tout le monde sait en revanche qu'il fallait repartir le lendemain matin.",
+  "1029": "Le voyage aurait été oublié depuis longtemps sans Passeport Tamponné par Erreur. Malheureusement, il est impossible de raconter l'histoire sans recommencer à rire.",
+  "1030": "Les vacances devaient être tranquilles jusqu'à l'apparition de Vacances Qui Ont Survécu. À partir de là, chaque journée a gagné un nouveau problème totalement inutile.",
+  "1031": "Commentaire  est apparu sur une page que personne n'avait cherchée. Le lendemain, tout le monde connaissait son nom et personne ne savait comment.",
+  "1032": "Un lien vers Like de 2018 a circulé pendant des heures. Ceux qui l'ont ouvert ont tous raconté une version différente de ce qu'ils avaient vu.",
+  "1033": "GIF Beaucoup Trop Lent est devenu célèbre pour une raison inconnue, puis a disparu sans prévenir. Internet a immédiatement créé un forum pour en discuter.",
+  "1034": "L'algorithme a recommandé Captcha Qui Refuse Tout à absolument tout le monde. Même aux personnes qui n'avaient jamais rien demandé de similaire.",
+  "1035": "À 3 h 17, quelqu'un a publié Mot de Passe Oublié. À 3 h 18, les commentaires avaient déjà inventé une explication beaucoup plus étrange que la réalité.",
+  "1036": "Notification à 3h17 est apparu sur une page que personne n'avait cherchée. Le lendemain, tout le monde connaissait son nom et personne ne savait comment.",
+  "1037": "Un lien vers Mème Vu 14 Millions de Fois a circulé pendant des heures. Ceux qui l'ont ouvert ont tous raconté une version différente de ce qu'ils avaient vu.",
+  "1038": "Lien Suspect Mais Tentant est devenu célèbre pour une raison inconnue, puis a disparu sans prévenir. Internet a immédiatement créé un forum pour en discuter.",
+  "1039": "L'algorithme a recommandé Algorithme Tout-Puissant à absolument tout le monde. Même aux personnes qui n'avaient jamais rien demandé de similaire.",
+  "1040": "À 3 h 17, quelqu'un a publié Internet de l. À 3 h 18, les commentaires avaient déjà inventé une explication beaucoup plus étrange que la réalité.",
+  "1041": "Frites Mystère devait être une portion normale. Quelqu'un a visiblement oublié de prévenir la cuisine qu'il y avait des humains à nourrir.",
+  "1042": "Un élève a trouvé Compote en Poche au fond de son plateau. Depuis, il refuse de manger sans vérifier chaque compartiment.",
+  "1043": "La recette de Yaourt Qui Se Défend n'apparaît dans aucun menu officiel. Pourtant, trois personnes jurent l'avoir vue un vendredi.",
+  "1044": "Fourchette en Plastique Légendaire a déclenché une discussion si longue à la cantine que les frites ont refroidi avant qu'un verdict soit trouvé.",
+  "1045": "Le jour où Dessert Disparu est arrivé à la cantine, même les habitués ont pris une photo du plateau avant de manger.",
+  "1046": "Plateau Qui Glisse devait être une portion normale. Quelqu'un a visiblement oublié de prévenir la cuisine qu'il y avait des humains à nourrir.",
+  "1047": "Un élève a trouvé Pain Mystique de 12h au fond de son plateau. Depuis, il refuse de manger sans vérifier chaque compartiment.",
+  "1048": "La recette de Chef de Cantine Final Boss n'apparaît dans aucun menu officiel. Pourtant, trois personnes jurent l'avoir vue un vendredi.",
+  "1049": "Menu Secret du Vendredi a déclenché une discussion si longue à la cantine que les frites ont refroidi avant qu'un verdict soit trouvé.",
+  "1050": "Le jour où Frite Dorée du Destin est arrivé à la cantine, même les habitués ont pris une photo du plateau avant de manger.",
+  "401": "Le fichier de Carte VIP Gold Access est verrouillé par trois systèmes différents. Le premier a été ouvert par erreur. Les deux autres ont immédiatement regretté.",
+  "402": "Trophée Créateur Diamant a été aperçu une seule fois avant de disparaître. Cette carte prétend pourtant avoir toujours été là.",
+  "403": "Une alerte concernant Lingot Pur Métal DROP s'est affichée pendant moins d'une seconde. C'était largement suffisant pour comprendre qu'il valait mieux ne pas poser de questions.",
+  "404": "Pass Backstage 2027 possède une valeur si étrange que le système a préféré ne pas commenter. Même les chiffres semblent hésiter.",
+  "405": "Clé USB Holo-Cryptée n'apparaît dans aucun inventaire normal. Pourtant, son nom est bien présent dans une ligne que personne ne devrait pouvoir lire.",
+  "406": "Le fichier de Bague Néon Collector est verrouillé par trois systèmes différents. Le premier a été ouvert par erreur. Les deux autres ont immédiatement regretté.",
+  "407": "Badge Fondateur Édition 1 a été aperçu une seule fois avant de disparaître. Cette carte prétend pourtant avoir toujours été là.",
+  "408": "Une alerte concernant Disque d s'est affichée pendant moins d'une seconde. C'était largement suffisant pour comprendre qu'il valait mieux ne pas poser de questions.",
+  "409": "Puce Cyber-Augmentée possède une valeur si étrange que le système a préféré ne pas commenter. Même les chiffres semblent hésiter.",
+  "410": "Couronne Holographique n'apparaît dans aucun inventaire normal. Pourtant, son nom est bien présent dans une ligne que personne ne devrait pouvoir lire.",
+  "411": "Le fichier de Trophée Rubis Exclusif est verrouillé par trois systèmes différents. Le premier a été ouvert par erreur. Les deux autres ont immédiatement regretté.",
+  "412": "Orbe d a été aperçu une seule fois avant de disparaître. Cette carte prétend pourtant avoir toujours été là.",
+  "413": "Une alerte concernant Sceptre du Créateur s'est affichée pendant moins d'une seconde. C'était largement suffisant pour comprendre qu'il valait mieux ne pas poser de questions.",
+  "414": "Carte de Crédit Obsidienne possède une valeur si étrange que le système a préféré ne pas commenter. Même les chiffres semblent hésiter.",
+  "415": "Sceau Absolu de l n'apparaît dans aucun inventaire normal. Pourtant, son nom est bien présent dans une ligne que personne ne devrait pouvoir lire.",
+  "416": "Le fichier de Passeport Cosmique 2027 est verrouillé par trois systèmes différents. Le premier a été ouvert par erreur. Les deux autres ont immédiatement regretté.",
+  "2000": "⚡ DROP Administrateur n'apparaît dans aucun inventaire normal. Pourtant, son nom est bien présent dans une ligne que personne ne devrait pouvoir lire.",
+  "1501": "Idée Géniale à 3h du Matin a commencé par un « vas-y, ça peut marcher ». C'est généralement la phrase qui précède une histoire que l'on raconte pendant des années.",
+  "1502": "Personne n'avait prévu Plan Sans Aucun Plan. C'est probablement pour ça que personne n'avait prévu les conséquences non plus.",
+  "1503": "Le plan autour de Projet Commencé Jamais Fini tenait sur une feuille. La feuille a été perdue, mais l'idée, malheureusement, a survécu.",
+  "1504": "“Ça Prendra 5 Minutes” a été validé à l'unanimité par un groupe de personnes qui n'avait clairement pas réfléchi assez longtemps.",
+  "1505": "À 3 h du matin, Motivation de 7 Minutes paraissait brillant. À 8 h, le cerveau responsable avait demandé une réunion de crise.",
+  "1506": "Décision Prise Sans Réfléchir a commencé par un « vas-y, ça peut marcher ». C'est généralement la phrase qui précède une histoire que l'on raconte pendant des années.",
+  "1507": "Personne n'avait prévu Plan B Qui N’existe Pas. C'est probablement pour ça que personne n'avait prévu les conséquences non plus.",
+  "1508": "Le plan autour de Génie Incompris Certifié tenait sur une feuille. La feuille a été perdue, mais l'idée, malheureusement, a survécu.",
+  "1601": "Dès que “Range Ta Chambre” apparaît, le silence dans la maison change de texture. Personne ne sait expliquer comment, mais tout le monde le reconnaît.",
+  "1602": "Question à Laquelle Tu Réponds “Je Sais Pas” est officiellement une phrase, officieusement un événement majeur dans la vie quotidienne.",
+  "1603": "Une fois, quelqu'un a répondu à “On Part Dans 5 Minutes” par « oui oui ». Cette personne a immédiatement compris qu'il fallait développer davantage.",
+  "1604": "Le Regard Silencieux a été prononcé un dimanche matin. Le petit-déjeuner s'est terminé beaucoup plus tard que prévu.",
+  "1605": "Téléphone Confisqué Imaginaire a commencé par une phrase parfaitement normale. Cinq minutes plus tard, tout le monde connaissait l'histoire familiale depuis 1998.",
+  "1606": "Dès que “T’as Fini Tes Devoirs ?” apparaît, le silence dans la maison change de texture. Personne ne sait expliquer comment, mais tout le monde le reconnaît.",
+  "1607": "Le Grand Soupir est officiellement une phrase, officieusement un événement majeur dans la vie quotidienne.",
+  "1608": "Une fois, quelqu'un a répondu à Pouvoir Parental Absolu par « oui oui ». Cette personne a immédiatement compris qu'il fallait développer davantage.",
+  "1701": "Le panneau disait une chose, l'application en disait une autre et Bus Qui Arrive Dès Que Tu Pars semblait avoir sa propre opinion. Les voyageurs ont choisi la troisième option : improviser.",
+  "1702": "Une personne a réussi à photographier Feu Rouge Sans Fin au moment exact où tout le monde disait que cela n'arriverait jamais.",
+  "1703": "Place de Parking Mystique a transformé un trajet de douze minutes en aventure complète. Le ticket, lui, n'a rien compris à ce qui se passait.",
+  "1704": "Les transports locaux ont officiellement classé Vélo Qui Couine dans la catégorie « événement imprévisible ». C'est probablement le meilleur résumé possible.",
+  "1705": "GPS Qui Change d’Avis est devenu célèbre après avoir ruiné un timing calculé à la seconde près.",
+  "1706": "Le panneau disait une chose, l'application en disait une autre et Train Sur Le Quai D’à Côté semblait avoir sa propre opinion. Les voyageurs ont choisi la troisième option : improviser.",
+  "1707": "Une personne a réussi à photographier Correspondance de 47 Secondes au moment exact où tout le monde disait que cela n'arriverait jamais.",
+  "1708": "Téléportation Urbaine a transformé un trajet de douze minutes en aventure complète. Le ticket, lui, n'a rien compris à ce qui se passait.",
+  "1801": "La réunion autour de “On Va Faire Rapide” a commencé à l'heure. Elle s'est terminée à une heure que personne n'a osé inscrire dans le compte rendu.",
+  "1802": "Personne n'avait lu le document lié à Personne N’a Lu Le Document. Cela n'a empêché personne d'en parler pendant quarante minutes.",
+  "1803": "Micro Qui Ne Marche Pas a été suivi de la phrase « juste une petite question ». C'était la première de dix-sept.",
+  "1804": "Un participant a quitté la réunion après “Tu M’Entends ?”. Son absence a été remarquée vingt minutes plus tard.",
+  "1805": "Partage d’Écran Involontaire devait être réglé en deux minutes. Quelqu'un a demandé un avis, puis un autre, puis soudain tout le monde partageait son écran.",
+  "1806": "La réunion autour de Quelqu’un Dit “Pour Moi C’est Bon” a commencé à l'heure. Elle s'est terminée à une heure que personne n'a osé inscrire dans le compte rendu.",
+  "1807": "Personne n'avait lu le document lié à Réunion Qui Aurait Pu Être Un Message. Cela n'a empêché personne d'en parler pendant quarante minutes.",
+  "1808": "La Réunion Sans Fin a été suivi de la phrase « juste une petite question ». C'était la première de dix-sept.",
+  "1": "Personne ne savait où DROP — Première Carte mènerait l'aventure. Une chose était sûre : il fallait bien commencer quelque part.",
+  "2": "Ticket de Départ n'est pas la carte la plus impressionnante du classeur, mais toutes les grandes collections ont un premier chapitre.",
+  "3": "Le système a enregistré Mini Cristal comme ton premier signe officiel dans l'univers DROP. Les archives ont rarement vu un début aussi prometteur.",
+  "4": "Badge Nouveau Joueur a été discrètement rangé dans le classeur. Quelques minutes plus tard, l'aventure était officiellement lancée.",
+  "5": "Pixel DROP est la première petite pièce d'une collection qui ne demande qu'à devenir complètement déraisonnable.",
+  "6": "Personne ne savait où Jeton Basique mènerait l'aventure. Une chose était sûre : il fallait bien commencer quelque part.",
+  "7": "Étoile de Départ n'est pas la carte la plus impressionnante du classeur, mais toutes les grandes collections ont un premier chapitre.",
+  "8": "Le système a enregistré Carte Test comme ton premier signe officiel dans l'univers DROP. Les archives ont rarement vu un début aussi prometteur.",
+  "601": "Le réalisateur avait demandé une seule prise avec Clap de Tournage. La première a été parfaite, la deuxième légendaire, et la troisième n'a jamais été retrouvée dans les rushes.",
+  "602": "Projecteur 35mm a été retrouvé dans la loge technique à 6 h 12, couvert de poussière de plateau et accompagné d'un post-it : « Ne surtout pas demander pourquoi. »",
+  "603": "Un stagiaire a posé Caméra de Plateau sur une table pendant trente secondes. Trente secondes plus tard, toute l'équipe croyait que c'était un accessoire capital du film.",
+  "604": "Dans les archives du plateau, Bobine Collector apparaît sur une photo où personne ne se souvient l'avoir vu. Le plus étrange : il est exactement au centre de chaque prise.",
+  "605": "Sur le tournage, Fauteuil Réalisateur devait rester tranquillement à sa place. Il a finalement déclenché une improvisation si convaincante que même le clap a semblé applaudir.",
+  "606": "Le réalisateur avait demandé une seule prise avec Badge Premier Rôle. La première a été parfaite, la deuxième légendaire, et la troisième n'a jamais été retrouvée dans les rushes.",
+  "607": "Script Original a été retrouvé dans la loge technique à 6 h 12, couvert de poussière de plateau et accompagné d'un post-it : « Ne surtout pas demander pourquoi. »",
+  "608": "Un stagiaire a posé Lumière de Plateau sur une table pendant trente secondes. Trente secondes plus tard, toute l'équipe croyait que c'était un accessoire capital du film.",
+  "609": "Dans les archives du plateau, Micro Perche apparaît sur une photo où personne ne se souvient l'avoir vu. Le plus étrange : il est exactement au centre de chaque prise.",
+  "610": "Sur le tournage, Bande Démo Platinum devait rester tranquillement à sa place. Il a finalement déclenché une improvisation si convaincante que même le clap a semblé applaudir.",
+  "611": "Le réalisateur avait demandé une seule prise avec Pass Festival de Cannes. La première a été parfaite, la deuxième légendaire, et la troisième n'a jamais été retrouvée dans les rushes.",
+  "612": "Caméra Fantôme a été retrouvé dans la loge technique à 6 h 12, couvert de poussière de plateau et accompagné d'un post-it : « Ne surtout pas demander pourquoi. »",
+  "613": "Un stagiaire a posé Projecteur des Étoiles sur une table pendant trente secondes. Trente secondes plus tard, toute l'équipe croyait que c'était un accessoire capital du film.",
+  "614": "Dans les archives du plateau, Clap Légendaire 2027 apparaît sur une photo où personne ne se souvient l'avoir vu. Le plus étrange : il est exactement au centre de chaque prise.",
+  "615": "Sur le tournage, Palme Cosmique devait rester tranquillement à sa place. Il a finalement déclenché une improvisation si convaincante que même le clap a semblé applaudir.",
+  "701": "Mini Fusée a été enregistré par trois satellites différents. Aucun n'a donné exactement la même mesure, ce qui est la façon cosmique de dire « débrouillez-vous ».",
+  "702": "Une mission a emporté Satellite Pocket par erreur. Au retour, l'équipage a affirmé que tout s'était bien passé, sauf la partie où Satellite Pocket a demandé une photo souvenir.",
+  "703": "La trajectoire de Combinaison Lunaire défie les calculs habituels. Les chercheurs ont ajouté une nouvelle note au dossier : « ne pas perdre de vue cet objet ».",
+  "704": "Rover Rouge est si étrange qu'un télescope lui a donné un surnom avant même que les scientifiques ne s'accordent sur son nom officiel.",
+  "705": "Les instruments ont repéré Météorite Numérique là où il ne devait rien y avoir. Après quatre vérifications et beaucoup de café, les scientifiques ont conclu que le problème venait probablement de l'univers.",
+  "706": "Anneau de Saturne a été enregistré par trois satellites différents. Aucun n'a donné exactement la même mesure, ce qui est la façon cosmique de dire « débrouillez-vous ».",
+  "707": "Une mission a emporté Lune Miniature par erreur. Au retour, l'équipage a affirmé que tout s'était bien passé, sauf la partie où Lune Miniature a demandé une photo souvenir.",
+  "708": "La trajectoire de Galaxie en Capsule défie les calculs habituels. Les chercheurs ont ajouté une nouvelle note au dossier : « ne pas perdre de vue cet objet ».",
+  "709": "Trou Noir est si étrange qu'un télescope lui a donné un surnom avant même que les scientifiques ne s'accordent sur son nom officiel.",
+  "710": "Les instruments ont repéré Portail Interstellaire là où il ne devait rien y avoir. Après quatre vérifications et beaucoup de café, les scientifiques ont conclu que le problème venait probablement de l'univers.",
+  "711": "Comète Royale a été enregistré par trois satellites différents. Aucun n'a donné exactement la même mesure, ce qui est la façon cosmique de dire « débrouillez-vous ».",
+  "712": "Une mission a emporté Étoile à Neutrons par erreur. Au retour, l'équipage a affirmé que tout s'était bien passé, sauf la partie où Étoile à Neutrons a demandé une photo souvenir.",
+  "713": "La trajectoire de Station DROP défie les calculs habituels. Les chercheurs ont ajouté une nouvelle note au dossier : « ne pas perdre de vue cet objet ».",
+  "714": "Univers Poche est si étrange qu'un télescope lui a donné un surnom avant même que les scientifiques ne s'accordent sur son nom officiel.",
+  "715": "Les instruments ont repéré Cosmos Absolu là où il ne devait rien y avoir. Après quatre vérifications et beaucoup de café, les scientifiques ont conclu que le problème venait probablement de l'univers.",
+  "801": "Chat Pixel a été observé pendant 17 minutes. Pendant 16 minutes, il n'a absolument rien fait. La dix-septième minute a nécessité un rapport de six pages.",
+  "802": "Un animal a adopté Renard Néon comme si c'était son trésor personnel. Toute tentative de récupération s'est soldée par un regard beaucoup trop convaincant pour être ignoré.",
+  "803": "Panda Turbo possède un talent que personne n'avait prévu. Il suffit de le regarder assez longtemps pour se demander pourquoi on le regarde encore.",
+  "804": "Les animaux du quartier ont établi une règle simple concernant Axolotl Royal : ne jamais le laisser sans surveillance après minuit.",
+  "805": "Les soigneurs pensaient connaître tous les talents liés à Loup Holographique. Ils ont changé d'avis après avoir retrouvé la carte posée exactement à l'endroit où personne ne pouvait l'atteindre.",
+  "806": "Poulpe Cosmique a été observé pendant 17 minutes. Pendant 16 minutes, il n'a absolument rien fait. La dix-septième minute a nécessité un rapport de six pages.",
+  "807": "Un animal a adopté Tigre Galactique comme si c'était son trésor personnel. Toute tentative de récupération s'est soldée par un regard beaucoup trop convaincant pour être ignoré.",
+  "808": "Aigle de Foudre possède un talent que personne n'avait prévu. Il suffit de le regarder assez longtemps pour se demander pourquoi on le regarde encore.",
+  "809": "Les animaux du quartier ont établi une règle simple concernant Dragon Pixel : ne jamais le laisser sans surveillance après minuit.",
+  "810": "Les soigneurs pensaient connaître tous les talents liés à Licorne Chromée. Ils ont changé d'avis après avoir retrouvé la carte posée exactement à l'endroit où personne ne pouvait l'atteindre.",
+  "811": "Phénix Néon a été observé pendant 17 minutes. Pendant 16 minutes, il n'a absolument rien fait. La dix-septième minute a nécessité un rapport de six pages.",
+  "812": "Un animal a adopté Baleine Stellaire comme si c'était son trésor personnel. Toute tentative de récupération s'est soldée par un regard beaucoup trop convaincant pour être ignoré.",
+  "813": "Cerf Astral possède un talent que personne n'avait prévu. Il suffit de le regarder assez longtemps pour se demander pourquoi on le regarde encore.",
+  "814": "Les animaux du quartier ont établi une règle simple concernant Tigre du Néant : ne jamais le laisser sans surveillance après minuit.",
+  "815": "Les soigneurs pensaient connaître tous les talents liés à Bête Mythique DROP. Ils ont changé d'avis après avoir retrouvé la carte posée exactement à l'endroit où personne ne pouvait l'atteindre.",
+  "901": "Pizza Pixel a été servi par erreur à une table voisine. Les clients ont tellement aimé l'erreur que le restaurant l'a ajoutée au menu le lendemain.",
+  "902": "Un chef a juré que Burger Néon était impossible à rater. Dix minutes plus tard, il a changé d'avis et commandé une pizza.",
+  "903": "La légende raconte que Sushi Laser disparaît toujours avant qu'on puisse en reprendre. Les preuves sont nombreuses, les témoins très gourmands.",
+  "904": "Taco Galactique devait être le dessert. Personne ne sait comment il s'est retrouvé en entrée, mais tout le monde a décidé que c'était probablement mieux ainsi.",
+  "905": "La première recette contenant Donut Hologramme devait être simple. Quelqu'un a ajouté une épice « juste pour tester ». Une heure plus tard, la cuisine ressemblait à un laboratoire.",
+  "906": "Ramen Infini a été servi par erreur à une table voisine. Les clients ont tellement aimé l'erreur que le restaurant l'a ajoutée au menu le lendemain.",
+  "907": "Un chef a juré que Gâteau Diamant était impossible à rater. Dix minutes plus tard, il a changé d'avis et commandé une pizza.",
+  "908": "La légende raconte que Glace Cosmique disparaît toujours avant qu'on puisse en reprendre. Les preuves sont nombreuses, les témoins très gourmands.",
+  "909": "Jus du Futur devait être le dessert. Personne ne sait comment il s'est retrouvé en entrée, mais tout le monde a décidé que c'était probablement mieux ainsi.",
+  "910": "La première recette contenant Burger Royal devait être simple. Quelqu'un a ajouté une épice « juste pour tester ». Une heure plus tard, la cuisine ressemblait à un laboratoire.",
+  "911": "Pomme d a été servi par erreur à une table voisine. Les clients ont tellement aimé l'erreur que le restaurant l'a ajoutée au menu le lendemain.",
+  "912": "Un chef a juré que Sushi Galactique était impossible à rater. Dix minutes plus tard, il a changé d'avis et commandé une pizza.",
+  "913": "La légende raconte que Pizza Multivers disparaît toujours avant qu'on puisse en reprendre. Les preuves sont nombreuses, les témoins très gourmands.",
+  "914": "Nectar Absolu devait être le dessert. Personne ne sait comment il s'est retrouvé en entrée, mais tout le monde a décidé que c'était probablement mieux ainsi.",
+  "915": "La première recette contenant Le Dernier Jus devait être simple. Quelqu'un a ajouté une épice « juste pour tester ». Une heure plus tard, la cuisine ressemblait à un laboratoire.",
+  "1101": "Le professeur avait prévu un cours normal. Puis Interro Surprise a fait son apparition et le programme a discrètement abandonné la salle.",
+  "1102": "Mot dans le Carnet a été retrouvé dans un carnet entre deux devoirs. Son propriétaire affirme ne pas l'avoir dessiné, ce qui n'aide absolument pas l'enquête.",
+  "1103": "Une classe entière connaît l'histoire de Retard de 1 Seconde, mais personne ne se souvient de la première personne qui l'a racontée.",
+  "1104": "Stylo Qui Disparaît est devenu une légende après un événement qui n'a duré que huit secondes. Huit secondes très efficaces.",
+  "1105": "Place au Fond est apparu juste avant la sonnerie. Personne ne savait pourquoi, mais tout le monde a immédiatement compris que quelque chose allait arriver.",
+  "1106": "Le professeur avait prévu un cours normal. Puis Contrôle Annulé a fait son apparition et le programme a discrètement abandonné la salle.",
+  "1107": "Prof en Réunion a été retrouvé dans un carnet entre deux devoirs. Son propriétaire affirme ne pas l'avoir dessiné, ce qui n'aide absolument pas l'enquête.",
+  "1108": "Une classe entière connaît l'histoire de Week-end de 3 Jours, mais personne ne se souvient de la première personne qui l'a racontée.",
+  "1201": "Tout le monde a vu Téléphone à 1%. Personne n'a su quoi dire. C'est ainsi que le silence est devenu légendaire.",
+  "1202": "Chaussure Mal Lacée est le genre de moment où l'on sourit pour faire croire que tout va bien avant de repenser à la scène pendant trois jours.",
+  "1203": "La scène avec Marche dans une Porte aurait pu être oubliée. Malheureusement, quelqu'un a dit « personne n'a vu » alors que tout le monde avait vu.",
+  "1204": "Message Envoyé au Mauvais Groupe a commencé par une petite erreur et s'est terminé par un regard collectif vers le sol. Une vraie œuvre d'art social.",
+  "1205": "Micro Ouvert par Accident devait être un moment banal. Il a duré trois secondes de trop et s'est transformé en souvenir permanent.",
+  "1206": "Tout le monde a vu Répondre “Toi aussi”. Personne n'a su quoi dire. C'est ainsi que le silence est devenu légendaire.",
+  "1207": "Vu à 03:17 est le genre de moment où l'on sourit pour faire croire que tout va bien avant de repenser à la scène pendant trois jours.",
+  "1208": "La scène avec Le Grand Malaise aurait pu être oubliée. Malheureusement, quelqu'un a dit « personne n'a vu » alors que tout le monde avait vu.",
+  "1301": "La première règle autour de Télécommande Sans Piles est simple : ne pas dire « ça ne peut pas être pire ». Personne n'a jamais apprécié le résultat.",
+  "1302": "Câble Trop Court a été enfermé dans une boîte pendant un mois. À son ouverture, tout était exactement comme avant, sauf la boîte elle-même.",
+  "1303": "Un avertissement accompagne Chaussette Solitaire. Il est très court et ne donne aucune explication, ce qui le rend beaucoup plus inquiétant qu'il ne devrait l'être.",
+  "1304": "Les personnes qui ont utilisé Chargeur Mystérieux racontent toutes une histoire différente. Elles ont pourtant toutes le même regard quand on prononce son nom.",
+  "1305": "Depuis qu'il a croisé Tiroir Qui Coince, un objet parfaitement innocent a commencé à disparaître au mauvais moment. Coïncidence, évidemment.",
+  "1306": "La première règle autour de Bouteille Impossible à Ouvrir est simple : ne pas dire « ça ne peut pas être pire ». Personne n'a jamais apprécié le résultat.",
+  "1307": "Clé Dont Personne Ne Connaît La Porte a été enfermé dans une boîte pendant un mois. À son ouverture, tout était exactement comme avant, sauf la boîte elle-même.",
+  "1308": "Un avertissement accompagne Objet Qui Était Là Hier. Il est très court et ne donne aucune explication, ce qui le rend beaucoup plus inquiétant qu'il ne devrait l'être.",
+  "1401": "Tout le monde a vu Dire “Bonjour” à Quelqu’un Qui Ne Parlait Pas à Toi. Personne n'a su quoi dire. C'est ainsi que le silence est devenu légendaire.",
+  "1402": "Rire Trop Fort est le genre de moment où l'on sourit pour faire croire que tout va bien avant de repenser à la scène pendant trois jours.",
+  "1403": "La scène avec Oublier Pourquoi Tu Es Entré aurait pu être oubliée. Malheureusement, quelqu'un a dit « personne n'a vu » alors que tout le monde avait vu.",
+  "1404": "Regarder l’Heure 7 Fois a commencé par une petite erreur et s'est terminé par un regard collectif vers le sol. Une vraie œuvre d'art social.",
+  "1405": "Faire Semblant d’Avoir Compris devait être un moment banal. Il a duré trois secondes de trop et s'est transformé en souvenir permanent.",
+  "1406": "Tout le monde a vu Appeler Quelqu’un Par Le Mauvais Prénom. Personne n'a su quoi dire. C'est ainsi que le silence est devenu légendaire.",
+  "1407": "Silence Après Une Blague est le genre de moment où l'on sourit pour faire croire que tout va bien avant de repenser à la scène pendant trois jours.",
+  "1408": "La scène avec Cringe Légendaire aurait pu être oubliée. Malheureusement, quelqu'un a dit « personne n'a vu » alors que tout le monde avait vu."
+};
 function getCardStory(card, categoryKey){
- const special={
-  1701:'Le bus qui arrive dès que tu pars a été observé pour la première fois à 7h42. Depuis, il a développé une technique imparable : attendre que tu regardes l’heure, que tu soupirs, puis apparaître au bout de la rue. Des scientifiques ont tenté de l’interroger. Il a répondu en ouvrant ses portes… puis les a refermées immédiatement.',
-  1501:'Cette mauvaise idée semblait excellente à 23h47. Le lendemain matin, absolument personne ne savait pourquoi elle avait paru géniale. La carte est depuis classée dans la catégorie « on verra demain ». Demain n’est jamais venu.',
-  1601:'Cette carte représente le fameux « JE DESCENDS DANS 5 MINUTES ». Les archives indiquent que ces cinq minutes peuvent durer entre 30 secondes et trois heures, selon l’humeur du parent concerné.',
-  1801:'La réunion devait durer dix minutes. Elle a duré une éternité, puis quelqu’un a dit « vous m’entendez ? ». Depuis, cette phrase est gravée dans les monuments officiels de DROP 2027.'
- };
- if(special[card.id]) return special[card.id];
- const templates={
-  tiktok:`Tout a commencé avec une idée brillante : faire ${card.name.toLowerCase()} « juste cinq minutes ». Quatre heures plus tard, la carte était devenue une légende de TikTok. Personne ne sait exactement ce qui s’est passé entre les deux. Même le téléphone refuse de témoigner.`,
-  memes:`Un jour, ${card.name} a été aperçu au mauvais endroit, au pire moment possible. Quelqu’un a pris une photo. Internet a fait le reste. Depuis, la carte refuse catégoriquement de reconnaître son passé.`,
-  gaming:`Le système DROP a détecté ${card.name} dans une partie où il n’avait absolument rien à faire. Il a gagné quand même. Les développeurs ont appelé ça « un comportement inattendu ». Les joueurs ont appelé ça « normal ».`,
-  football:`Le match était presque terminé quand ${card.name} est apparu. Le stade a retenu son souffle. L’arbitre a regardé sa montre. Puis tout le monde a fait semblant de comprendre la situation.`,
-  cinema:`Cette carte devait être un simple figurant. Puis elle a volé la scène, improvisé trois répliques et demandé son propre générique. Le réalisateur a finalement accepté.`,
-  space:`Les radars ont détecté ${card.name} à une distance officiellement décrite comme « beaucoup trop loin ». Après trois calculs, deux cafés et une crise existentielle, les scientifiques ont conclu : oui, c’est bien réel.`,
-  animals:`Personne ne sait comment ${card.name} a obtenu cette carte. Les animaux du quartier, eux, savent. Ils ont signé un accord de confidentialité.`,
-  food:`La recette originale de ${card.name} prévoyait une seule étape. Quelqu’un a ajouté dix-sept ingrédients « pour voir ». Le résultat a obtenu une médaille et une interdiction temporaire de cuisine.`,
-  bureaucratie:`Le dossier de ${card.name} comporte 42 pages, 8 signatures et une case mystérieuse intitulée « autre ». Après trois semaines, l’administration a validé le dossier sans le lire. Victoire absolue.`,
-  objetsinutiles:`On ne sait toujours pas à quoi sert ${card.name}. Et c’est précisément pour ça qu’il est devenu indispensable.`,
-  vacancescatastrophe:`Les vacances étaient censées être reposantes. Puis ${card.name} est arrivé. Depuis, la famille raconte cette histoire comme une aventure. La famille appelle ça aussi « la pire semaine de l’année ».`,
-  internetbizarre:`Quelqu’un a posté ${card.name} à 03h12. À 03h13, c’était viral. À 03h14, personne ne comprenait pourquoi. À 03h15, il existait déjà trois théories complètement absurdes.`,
-  cantine:`Le jour où ${card.name} est apparu à la cantine, même les frites ont demandé une explication. Le menu officiel parle encore d’un « incident technique ».`,
-  lycee:`${card.name} est né dans un couloir, entre une sonnerie et un contrôle surprise. Depuis, il est transmis de classe en classe comme une légende scolaire.`,
-  grosfail:`Tout était parfaitement préparé. Puis ${card.name} est arrivé. Le plan a tenu exactement 2,7 secondes.`,
-  objetsmaudits:`La première personne qui a touché ${card.name} a dit « ça va aller ». Elle avait tort. Depuis, la carte est accompagnée d’un avertissement que personne ne lit.`,
-  situations:`Le moment gênant devait durer cinq secondes. Il a duré suffisamment longtemps pour devenir une carte officielle de DROP 2027.`,
-  mauvaisesidees:`Sur le papier, ${card.name} était une idée incroyable. Dans la réalité, le papier a demandé à être brûlé.`,
-  parents:`Cette carte contient une règle familiale universelle : quand un parent dit « viens deux secondes », prévois toujours une heure.`,
-  transports:`Le réseau de transport affirme que ${card.name} n’existe pas. Les voyageurs, eux, ont 87 témoignages, 14 vidéos et zéro explication.`,
-  reunion:`La réunion autour de ${card.name} aurait pu être un simple message. Elle a finalement nécessité un lien, un mot de passe, deux micros et quelqu’un qui demande « qui partage son écran ? ».`,
-  starter:`Une petite carte, une grande destinée. ${card.name} est l’une des premières traces laissées par ton aventure dans l’univers DROP.`,
-  secret:`Cette carte n’aurait jamais dû être trouvée. Le système prétend qu’elle n’existe pas. La carte, elle, vient de mettre un petit « vu » à cette déclaration.`
- };
- return templates[categoryKey] || `Personne ne sait exactement comment ${card.name} est devenu une carte DROP. Une chose est sûre : l’histoire est beaucoup trop étrange pour être racontée sérieusement.`;
+ return CARD_STORIES[String(card.id)] || `Personne ne sait exactement comment ${card.name} est devenu une carte DROP. Une chose est sûre : cette carte possède sa propre histoire.`;
 }
+
 function openCardStory(card, categoryKey){
  if(!card || !card.unlocked)return;
  const rarity=card.rarity||'common';
@@ -1409,34 +1669,53 @@ function openCardStory(card, categoryKey){
  const hero=document.getElementById('storyCardHero'); hero.className='story-card-hero rarity-'+rarity; hero.innerHTML='<span style="position:relative;z-index:1;">'+(card.emoji||'🃏')+'</span>';
  const r=document.getElementById('storyRarity'); r.textContent=labels[rarity]||'BASIQUE'; r.style.color=colors[rarity]||'#a1a1aa';
  document.getElementById('storyCardTitle').textContent=card.name;
- document.getElementById('storyCardCategory').textContent=CATEGORY_LABELS[categoryKey]||'Collection DROP';
+ document.getElementById('storyCardCategory').textContent=CATEGORY_LABELS[categoryKey]||'💎 Mes cartes';
  document.getElementById('storyCardText').textContent=getCardStory(card,categoryKey);
- document.getElementById('storyCardStats').innerHTML='<span class="story-stat">🆔 #'+card.id+'</span><span class="story-stat">'+(card.tradeable===false?'🔒 NON ÉCHANGEABLE':'🔄 ÉCHANGEABLE')+'</span><span class="story-stat">✓ DANS TON CLASSEUR</span>';
+ document.getElementById('storyCardStats').innerHTML='<span class="story-stat">🆔 #'+card.id+'</span><span class="story-stat">💰 '+(card.price===0?'GRATUITE':card.price+' 🪙')+'</span><span class="story-stat">'+(card.tradeable===false?'🔒 NON ÉCHANGEABLE':'🔄 ÉCHANGEABLE')+'</span><span class="story-stat">✓ DANS TON CLASSEUR</span>';
  box.className='card-story-box rarity-'+rarity; modal.classList.add('active'); modal.setAttribute('aria-hidden','false');
 }
 function closeCardStory(){ const modal=document.getElementById('cardStoryModal'); if(!modal)return; modal.classList.remove('active'); modal.setAttribute('aria-hidden','true'); }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCardStory();});
 
 function renderCatalogGrid() {
-const grid = document.getElementById('catalogGrid');
-grid.innerHTML = '';
-if (activeCategory === 'football') {
-const bgPattern = document.createElement('div'); bgPattern.className = 'football-bg-pattern'; bgPattern.innerHTML = '⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽'; grid.appendChild(bgPattern);
+ const grid = document.getElementById('catalogGrid');
+ grid.innerHTML = '';
+ let currentItems=[];
+ let displayCategory=activeCategory;
+ if(activeCategory === '__owned'){
+   Object.keys(appData.catalogs||{}).forEach(cat=>(appData.catalogs[cat]||[]).forEach(card=>{if(card.unlocked) currentItems.push({...card,__category:cat});}));
+   currentItems.sort((a,b)=>{
+     const order={ultra:0,legendary:1,epic:2,rare:3,common:4};
+     return (order[a.rarity||'common']-order[b.rarity||'common']) || String(a.name).localeCompare(String(b.name),'fr');
+   });
+   const header=document.createElement('div');
+   header.style.cssText='grid-column:1/-1;text-align:center;margin:4px 0 12px;padding:10px;border:1px solid rgba(217,70,239,.25);border-radius:14px;background:rgba(217,70,239,.06);font-size:.72rem;font-weight:900;letter-spacing:1px;';
+   header.innerHTML='💎 MES CARTES <span style="color:var(--text-muted);font-weight:700;letter-spacing:0;">• '+currentItems.length+' carte'+(currentItems.length>1?'s':'')+' obtenue'+(currentItems.length>1?'s':'')+'</span>';
+   grid.appendChild(header);
+ } else {
+   if (activeCategory === 'football') {
+     const bgPattern = document.createElement('div'); bgPattern.className = 'football-bg-pattern'; bgPattern.innerHTML = '⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽⚽'; grid.appendChild(bgPattern);
+   }
+   currentItems = appData.catalogs[activeCategory] || [];
+ }
+ if(currentItems.length===0){
+   const empty=document.createElement('div'); empty.style.cssText='grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);';
+   empty.innerHTML='<div style="font-size:3rem;margin-bottom:10px;">🃏</div><b>Aucune carte obtenue pour le moment</b><div style="font-size:.7rem;margin-top:6px;">Le classeur attend encore quelques exploits. Ou quelques clics. L’humanité repose parfois sur moins.</div>';
+   grid.appendChild(empty); return;
+ }
+ currentItems.forEach((item,index) => {
+   const categoryKey=item.__category||activeCategory;
+   const div=document.createElement('div'); const rarity=item.rarity||'common';
+   const rarityLabel={common:'BASIQUE',rare:'RARE',epic:'ÉPIQUE',legendary:'LÉGENDAIRE',ultra:'ULTRA RARE'}[rarity]||'BASIQUE';
+   const unlocked=!!item.unlocked;
+   div.className='catalog-card '+(unlocked?'owned':'locked')+' rarity-'+rarity; div.style.animationDelay=(Math.min(index,11)*45)+'ms';
+   if(unlocked){div.setAttribute('role','button');div.tabIndex=0;div.onclick=()=>openCardStory(item,categoryKey);div.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openCardStory(item,categoryKey);}};}
+   const displayName=item.name; const displayEmoji=item.emoji;
+   div.innerHTML='<div class="emoji">'+displayEmoji+'</div><div class="item-name">'+displayName+'</div><div style="font-size:.55rem;color:var(--text-muted);font-weight:800;letter-spacing:1px;">'+rarityLabel+(item.tradeable?' • ÉCHANGEABLE':' • NON ÉCHANGEABLE')+'</div><div class="item-price">'+(item.price===0?'GRATUITE':item.price+' 🪙')+'</div><button class="btn btn-secondary" style="padding:6px;font-size:0.7rem;margin-top:8px;">📖 Histoire</button>';
+   const btn=div.querySelector('button'); btn.onclick=e=>{e.stopPropagation();openCardStory(item,categoryKey);};
+   grid.appendChild(div);
+ });
 }
-const currentItems = appData.catalogs[activeCategory] || [];
-currentItems.forEach((item,index) => {
- const div=document.createElement('div'); const rarity=item.rarity||'common';
- const rarityLabel={common:'BASIQUE',rare:'RARE',epic:'ÉPIQUE',legendary:'LÉGENDAIRE',ultra:'ULTRA RARE'}[rarity]||'BASIQUE';
- const unlocked=!!item.unlocked; div.className='catalog-card '+(unlocked?'owned':'locked')+' rarity-'+rarity; div.style.animationDelay=(Math.min(index,11)*45)+'ms';
- if(unlocked){div.setAttribute('role','button');div.tabIndex=0;div.onclick=()=>openCardStory(item,activeCategory);div.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openCardStory(item,activeCategory);}};}
- const displayName=item.name; const displayEmoji=item.emoji;
- div.innerHTML='<div class="emoji">'+displayEmoji+'</div><div class="item-name">'+displayName+'</div><div style="font-size:.55rem;color:'+(unlocked?'var(--text-muted)':'#52525b')+';font-weight:800;letter-spacing:1px;">'+(unlocked?rarityLabel+(item.tradeable?' • ÉCHANGEABLE':' • NON ÉCHANGEABLE'):'🔒 CARTE NON OBTENUE')+'</div><div class="item-price">'+(item.price===0?'GRATUITE':item.price+' 🪙')+'</div><button class="btn '+(unlocked?'btn-secondary':'')+'" style="padding:6px;font-size:0.7rem;margin-top:8px;">'+(unlocked?'📖 Histoire':item.tradeable===false?'Départ':'Obtenir')+'</button>';
- const btn=div.querySelector('button');
- if(unlocked){btn.onclick=e=>{e.stopPropagation();openCardStory(item,activeCategory);};}else{btn.disabled=item.tradeable===false;btn.onclick=e=>{e.stopPropagation();buyItemDirect(item.id);};}
- grid.appendChild(div);
-});
-}
-
 function buyItemDirect(id) {
 let found = null;
 Object.keys(appData.catalogs).forEach(cat => {
@@ -1466,9 +1745,15 @@ if (isDropping) return;
 if (!appData.isAdmin && appData.credits < 150) return showToast('150 Crédits requis pour lancer un drop !', 'error');
 ensureStarterCards();
 const roll = Math.random();
-const isUltraRare = roll < 0.06;
-const isLegendary = !isUltraRare && roll < 0.16;
-const wantedRarities = isUltraRare ? ['ultra'] : isLegendary ? ['legendary'] : ['common','rare','epic'];
+// Répartition volontairement très déséquilibrée : les cartes communes tombent souvent,
+// les ultra rares restent réellement exceptionnelles.
+let wantedRarities;
+if (roll < 0.005) wantedRarities = ['ultra'];            // 0,5 %
+else if (roll < 0.025) wantedRarities = ['legendary'];   // 2 %
+else if (roll < 0.095) wantedRarities = ['epic'];        // 7 %
+else if (roll < 0.345) wantedRarities = ['rare'];       // 25 %
+else wantedRarities = ['common'];                       // 65,5 %
+const isUltraRare = wantedRarities[0] === 'ultra';
 let pool = [];
 Object.keys(appData.catalogs).forEach(cat => {
   if (cat === 'starter') return;
@@ -1598,7 +1883,6 @@ if (currentAuthMode === 'register' && pass.length < 6) return showToast('❌ Le 
 authLoading = true;
 submitBtn.disabled = true;
 submitBtn.innerText = currentAuthMode === 'login' ? 'CONNEXION...' : 'CRÉATION...';
-
 try {
 if (currentAuthMode === 'login') {
 // Timeout de sécurité : le bouton ne peut plus rester grisé indéfiniment.
@@ -1661,7 +1945,6 @@ console.error('LOGOUT ERROR:', err);
 showToast('❌ Impossible de se déconnecter : ' + (err.message || err), 'error');
 }
 }
-
 // GESTION CORRIGÉE DES AMIS ET DES DEMANDES
 function sendFriendRequest() {
 if (!appData.currentUser) return showToast('❌ Connectez-vous pour ajouter un ami.', 'error');
@@ -1756,6 +2039,7 @@ if ((appData.friends || []).some(f => f.uid === senderUid)) {
   try { await db.ref('friend_requests/' + myUid + '/' + reqId).remove(); } catch (_) {}
   return showToast('Cet utilisateur est déjà votre ami.', 'error');
 }
+
 const me = {
   uid: myUid,
   username: appData.currentUser.username || 'Joueur',
@@ -1776,6 +2060,7 @@ updates['friend_requests/' + myUid + '/' + reqId] = null;
 
 try {
   await withTimeout(db.ref().update(updates), 10000, 'Firebase ne répond pas pour la validation de la demande.');
+
   appData.friends = Array.isArray(appData.friends) ? appData.friends : [];
   appData.friends.push(them);
   try {
@@ -1827,7 +2112,6 @@ fl.appendChild(div);
 
 let activeTrade = {targetUid:null,targetName:'',offerId:null,wantId:null,offerCard:null,wantCard:null};
 let entryTimerHandle = null, entryMusicHandle = null;
-
 async function openTradePrompt(targetUid, targetName) {
 if (!appData.currentUser || !targetUid) return;
 activeTrade = {targetUid:String(targetUid),targetName:String(targetName || 'ton ami'),offerId:null,wantId:null,offerCard:null,wantCard:null};
@@ -1911,7 +2195,6 @@ if(btn){
 const summary=document.getElementById('tradeSummary');
 if(summary)summary.innerText=ok?'Tu donnes '+o.emoji+' '+o.name+'  ⇄  Tu demandes la carte #'+w:'Sélectionne une carte à donner et une carte à demander.';
 }
-
 function closeTradeModal(){
 const modal=document.getElementById('tradeModal');
 if(modal)modal.classList.remove('active');
@@ -2184,7 +2467,6 @@ activeGameType = gameType;
 if (!appData.dailyGames) appData.dailyGames = {};
 appData.dailyGames[gameType] = getLocalDayKey();
 saveAppData();
-
 document.getElementById('gameArea').classList.add('active');
 startGameMusic();
 const container = document.getElementById('gameCanvasContainer');
@@ -2342,6 +2624,7 @@ let stack = [], currentWidth = 100, currentPos = 0, currentDir = 2, currentLevel
 if(board) {
 stack.push({ left: 50, width: 100 }); renderBlock(50, 100, 0, false); currentLevel = 1; createMovingBlock();
 }
+
 function createMovingBlock() {
 currentPos = 0;
 const movingEl = document.createElement('div'); movingEl.id = 'movingBlock';
@@ -2477,7 +2760,6 @@ function runSafeTileGame(c){
  const grid=document.getElementById('stGrid'),status=document.getElementById('stStatus'),scoreEl=document.getElementById('stScore');let round=0,done=false;
  const next=()=>{grid.innerHTML='';const trap=Math.floor(Math.random()*16);for(let i=0;i<16;i++){const b=document.createElement('button');b.type='button';b.textContent='?';b.style.cssText='height:56px;border-radius:12px;border:1px solid var(--card-border);background:rgba(255,255,255,.06);color:#fff;font-size:1.1rem;';b.onclick=()=>{if(done)return;if(i===trap){done=true;return rewardPlayer(0);}round++;b.textContent='✓';b.disabled=true;scoreEl.textContent=round+' / 12';if(round>=12){done=true;return rewardPlayer(95);}next();};grid.appendChild(b);}};next();
 }
-
 let gameMusicEnabled=true, gameMusicTimer=null, gameMusicStep=0, gameMusicTrack=0;
 const DROP_MUSIC_TRACKS=[
  {name:'NEON DROP',tempo:360,lead:[261.63,329.63,392,493.88,392,329.63,293.66,349.23,440,523.25,440,349.23,392,493.88,587.33,659.25],bass:[130.81,164.81,196,146.83]},
@@ -2540,7 +2822,6 @@ function startEntryAnimation(seconds,first){
   if(elapsed>=seconds){clearInterval(entryTimerHandle);entryTimerHandle=null;stopEntryMusic();overlay.classList.remove('active');overlay.dataset.locked='0';}
  },1000);
 }
-
 function bootEntrySequence(){startEntryAnimation(20,false);}
 window.addEventListener('load',()=>setTimeout(bootEntrySequence,250));
 
