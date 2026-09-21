@@ -396,7 +396,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <section id="scr-games" class="screen">
 <div class="glass-card">
 <div class="card-title"><span>ARCADE — GAIN DE CRÉDITS</span></div>
-<p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:12px;">Coût : 25 🪙 | Gain : 10 à 50 🪙</p>
+<p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:12px;">Coût : 25 🪙 | Chaque jeu est jouable 1 fois par jour | Victoire = récompense, défaite = 0 🪙</p>
 
 <div style="display:flex; flex-direction:column; gap:10px;">
 <div class="game-card"><div class="game-info"><h4>⚡ Réaction Extrême</h4><p>Stoppe le curseur hyper rapide !</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('reaction')">JOUER</button></div>
@@ -438,8 +438,8 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div style="font-size:.68rem;color:var(--text-muted);margin-top:5px;">Cartes possédées : <span id="hubOwned">0</span><br>Cartes échangeables : <span id="hubTradeable">0</span></div>
 </div>
 <div class="glass-card" style="padding:14px;">
-<div style="font-size:1.7rem;">🎯</div><b style="font-size:.8rem;">OBJECTIF DU JOUR</b>
-<div id="hubMission" style="font-size:.68rem;color:var(--text-muted);margin-top:5px;">Ouvre un DROP ou termine un mini-jeu.</div>
+<div style="font-size:1.7rem;">🎯</div><b style="font-size:.8rem;">MISSIONS DU JOUR</b>
+<div id="hubMission" style="font-size:.68rem;color:var(--text-muted);margin-top:7px;"></div>
 </div>
 </div>
 </div>
@@ -925,7 +925,9 @@ currentUser: null,
 friendId: null,
 friends: [],
 isAdmin: false,
-catalogs: JSON.parse(JSON.stringify(CATALOGS))
+catalogs: JSON.parse(JSON.stringify(CATALOGS)),
+dailyGames: {},
+hubTasks: {date:'', done:{}}
 };
 
 let currentAuthMode = 'login';
@@ -969,6 +971,8 @@ appData.friends = [];
 appData.isAdmin = false;
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = [];
+appData.dailyGames = {};
+appData.hubTasks = {date:'', done:{}};
 }
 
 async function loadFirebaseUserProfile(user) {
@@ -1018,9 +1022,10 @@ friendId: fId,
 friends: [],
 isAdmin: isAdminEmail,
 catalogs: freshCatalogs,
-redeemedCodes: []
+redeemedCodes: [],
+dailyGames: {},
+hubTasks: {date:'', done:{}}
 };
-
 // Écriture non bloquante : une panne de Realtime Database ne déconnecte pas le joueur.
 userRef.set(data).catch(err => console.warn('Création profil DB:', err));
 }
@@ -1052,13 +1057,16 @@ appData.isAdmin = data.isAdmin === true || isAdminEmail;
 appData.catalogs = normalizeCatalogs(data.catalogs);
 ensureStarterCards();
 appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes : [];
+appData.dailyGames = (data.dailyGames && typeof data.dailyGames === 'object') ? data.dailyGames : {};
+appData.hubTasks = (data.hubTasks && typeof data.hubTasks === 'object') ? data.hubTasks : {date:'', done:{}};
+// Réindexe immédiatement les cartes échangeables existantes pour les amis.
+syncPublicCollection();
 
 // Migration silencieuse de l'ancien ID court vers le nouvel ID complet.
 if (needsFriendIdMigration) {
   db.ref('users/' + user.uid + '/friendId').set(appData.friendId)
     .catch(err => console.warn('Migration ID ami:', err));
 }
-
 listenToTrades();
 listenToFriendRequests();
 updateUI();
@@ -1068,17 +1076,17 @@ if (!localStorage.getItem(introKey)) {
   localStorage.setItem(introKey, '1');
   setTimeout(() => startEntryAnimation(60, true), 350);
 }
+
 // Cache local pour que l'interface reste utilisable même si Firebase DB tombe
 // momentanément lors de la prochaine connexion.
 try { localStorage.setItem('drop2027_profile_' + user.uid, JSON.stringify({
 username: appData.currentUser.username, credits: appData.credits, friendId: appData.friendId,
-friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, redeemedCodes: appData.redeemedCodes
+friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, redeemedCodes: appData.redeemedCodes, dailyGames: appData.dailyGames, hubTasks: appData.hubTasks
 })); } catch (_) {}
 
 return true;
 } catch (error) {
 console.warn('Realtime Database indisponible pendant la connexion:', error);
-
 // On tente le dernier profil local connu.
 try {
 const cached = JSON.parse(localStorage.getItem('drop2027_profile_' + user.uid) || 'null');
@@ -1091,6 +1099,8 @@ appData.isAdmin = cached.isAdmin === true || isAdminEmail;
 appData.catalogs = normalizeCatalogs(cached.catalogs || appData.catalogs);
 ensureStarterCards();
 appData.redeemedCodes = Array.isArray(cached.redeemedCodes) ? cached.redeemedCodes : [];
+appData.dailyGames = (cached.dailyGames && typeof cached.dailyGames === 'object') ? cached.dailyGames : {};
+appData.hubTasks = (cached.hubTasks && typeof cached.hubTasks === 'object') ? cached.hubTasks : {date:'', done:{}};
 updateUI();
 } } catch (_) {}
 
@@ -1130,6 +1140,20 @@ return String(code || '').trim().replace(/^#/, '');
 }
 
 
+function buildPublicCollection() {
+const publicCards = {};
+Object.keys(appData.catalogs || {}).forEach(cat => (appData.catalogs[cat] || []).forEach(card => {
+  if (card.unlocked && card.tradeable === true) {
+    publicCards[String(card.id)] = {id:card.id,name:card.name,emoji:card.emoji,rarity:card.rarity || 'common',tradeable:true};
+  }
+}));
+return publicCards;
+}
+function syncPublicCollection() {
+if (!appData.currentUser) return;
+const publicCards = buildPublicCollection();
+return db.ref('public_collections/' + appData.currentUser.uid).set(publicCards).catch(err => console.warn('Collection publique:', err));
+}
 function saveAppData() {
 if (appData.currentUser) {
 const userData = {
@@ -1138,14 +1162,12 @@ catalogs: appData.catalogs,
 friends: appData.friends,
 friendId: appData.friendId,
 isAdmin: appData.isAdmin,
-redeemedCodes: appData.redeemedCodes
+redeemedCodes: appData.redeemedCodes,
+dailyGames: appData.dailyGames,
+hubTasks: appData.hubTasks
 };
 db.ref('users/' + appData.currentUser.uid).update(userData).catch(err => console.warn('Sauvegarde profil:', err));
-const publicCards = {};
-Object.keys(appData.catalogs || {}).forEach(cat => (appData.catalogs[cat] || []).forEach(card => {
-  if (card.unlocked && card.tradeable === true) publicCards[String(card.id)] = {id:card.id,name:card.name,emoji:card.emoji,rarity:card.rarity || 'common'};
-}));
-db.ref('public_collections/' + appData.currentUser.uid).set(publicCards).catch(err => console.warn('Collection publique:', err));
+syncPublicCollection();
 }
 updateUI();
 }
@@ -1184,18 +1206,48 @@ renderCatalogGrid();
 renderHub();
 }
 
+function getLocalDayKey(){
+ const d=new Date();
+ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+const HUB_TASKS = [
+ {id:'drop',label:'Ouvrir 1 DROP',icon:'📦'},
+ {id:'game',label:'Terminer 1 mini-jeu',icon:'🎮'},
+ {id:'ad',label:'Regarder 1 pub de 30 secondes',icon:'📺'}
+];
+function ensureDailyHubState(){
+ const today=getLocalDayKey();
+ if(!appData.hubTasks || appData.hubTasks.date!==today) appData.hubTasks={date:today,done:{}};
+ if(!appData.hubTasks.done) appData.hubTasks.done={};
+ return appData.hubTasks;
+}
+function completeHubTask(taskId){
+ if(!appData.currentUser)return;
+ const state=ensureDailyHubState();
+ if(state.done[taskId])return;
+ state.done[taskId]=true;
+ appData.credits+=15;
+ saveAppData();
+ showToast('🎯 Mission HUB accomplie ! +15 🪙', 'success');
+}
 function renderHub(){
  const all=Object.values(appData.catalogs||{}).flat();
  const owned=all.filter(c=>c.unlocked);
  const tradeable=owned.filter(c=>c.tradeable===true);
  const a=document.getElementById('hubOwned'), b=document.getElementById('hubTradeable');
  if(a)a.textContent=owned.length; if(b)b.textContent=tradeable.length;
- const tips=['Les cartes échangeables apparaissent dans le marché entre amis.','Une carte ultra rare mérite probablement une animation dramatique.','Les mini-jeux coûtent 25 🪙 : une défaite ne rapporte rien.','Regarde les pubs de 30 secondes pour récupérer des crédits gratuits.'];
+ const state=ensureDailyHubState();
+ const m=document.getElementById('hubMission');
+ if(m){
+   m.innerHTML=HUB_TASKS.map(t=>{const done=!!state.done[t.id];return '<div style="margin:7px 0;display:flex;justify-content:space-between;gap:8px;align-items:center;"><span>'+t.icon+' '+t.label+'</span><b style="color:'+(done?'var(--glow-cyan)':'var(--text-muted)')+';white-space:nowrap;">'+(done?'✓ +15 🪙':' +15 🪙')+'</b></div>';}).join('');
+ }
+ const tips=['Les cartes échangeables apparaissent dans le marché entre amis.','Une carte ultra rare mérite probablement une animation dramatique.','Chaque mini-jeu est jouable une seule fois par jour.','Chaque mission HUB accomplie rapporte +15 🪙.','Regarde les pubs de 30 secondes pour récupérer des crédits gratuits.'];
  const t=document.getElementById('hubTips'); if(t)t.innerHTML=tips.map(x=>'• '+x).join('<br>');
+ renderGameAvailability();
 }
 function hubDailyBonus(){
  if(!appData.currentUser)return showToast('🔐 Connecte-toi pour récupérer le bonus.','error');
- const key='drop2027_daily_bonus_'+appData.currentUser.uid; const today=new Date().toISOString().slice(0,10);
+ const key='drop2027_daily_bonus_'+appData.currentUser.uid; const today=getLocalDayKey();
  if(localStorage.getItem(key)===today)return showToast('🎁 Bonus déjà récupéré aujourd’hui.','error');
  appData.credits+=75; localStorage.setItem(key,today); saveAppData(); showToast('🎁 +75 🪙 ! Bonus quotidien récupéré.','success');
 }
@@ -1285,6 +1337,7 @@ if (pool.length === 0) return showToast('🎉 Félicitations, tout le classeur �
 if (!appData.isAdmin) appData.credits -= 150;
 const picked = pool[Math.floor(Math.random() * pool.length)];
 picked.unlocked = true;
+completeHubTask('drop');
 const rarity = picked.rarity || (isUltraRare ? 'ultra' : 'rare');
 showCardRewardAnimation(picked, rarity);
 playUnlockSound(rarity);
@@ -1306,7 +1359,6 @@ setTimeout(() => {
   else showToast('💥 CARTE DÉBLOQUÉE : ' + picked.emoji + ' ' + picked.name, 'success');
 }, 2300);
 }
-
 function showCardRewardAnimation(card, rarity) {
 const existing = document.getElementById('rewardFlash');
 if (existing) existing.remove();
@@ -1369,7 +1421,6 @@ document.getElementById('usernameBox').style.display = isRegister ? 'block' : 'n
 document.getElementById('authUsername').required = isRegister;
 document.getElementById('authSubmitBtn').innerText = isRegister ? "S'INSCRIRE" : 'SE CONNECTER';
 }
-
 function firebaseAuthErrorMessage(err) {
 const code = err && err.code ? err.code : '';
 const messages = {
@@ -1424,6 +1475,7 @@ const initialCatalogs = normalizeCatalogs(CATALOGS);
 initialCatalogs.starter.forEach(c => c.unlocked = true);
 const isAdminEmail = email === 'carer.nathan11@gmail.com';
 if (isAdminEmail) Object.keys(initialCatalogs).forEach(cat => initialCatalogs[cat].forEach(i => i.unlocked = true));
+
 // Ne bloque pas l'inscription sur une écriture DB qui pourrait être refusée.
 const initialData = {
 username: username || email.split('@')[0], credits: isAdminEmail ? 999999999 : 0,
@@ -1465,6 +1517,7 @@ showToast('❌ Impossible de se déconnecter : ' + (err.message || err), 'error'
 // GESTION CORRIGÉE DES AMIS ET DES DEMANDES
 function sendFriendRequest() {
 if (!appData.currentUser) return showToast('❌ Connectez-vous pour ajouter un ami.', 'error');
+
 const input = document.getElementById('addFriendInput');
 const raw = input.value.trim();
 const key = friendCodeKey(raw);
@@ -1548,6 +1601,7 @@ if (listEl) listEl.innerHTML = '<i style="color:var(--danger); font-size:0.75rem
 
 async function acceptFriendRequest(reqId, senderUid, senderName, senderFriendId) {
 if (!appData.currentUser || !senderUid) return;
+
 const myUid = appData.currentUser.uid;
 if (senderUid === myUid) return;
 if ((appData.friends || []).some(f => f.uid === senderUid)) {
@@ -1794,6 +1848,7 @@ clearInterval(adInterval); adInterval=null; btn.disabled = false; btn.innerText 
 
 function claimAdReward() {
 appData.credits += 15;
+completeHubTask('ad');
 saveAppData();
 document.getElementById('adModal').classList.remove('active');
 showToast('Pub visionnée avec succès ! +15 Crédits 🪙', 'success');
@@ -1801,11 +1856,32 @@ showToast('Pub visionnée avec succès ! +15 Crédits 🪙', 'success');
 
 /* MINI-JEUX ARCADE */
 let currentGameInterval = null;
+let activeGameType = null;
+function gamePlayedToday(gameType){
+ const today=getLocalDayKey();
+ return !!(appData.dailyGames && appData.dailyGames[gameType]===today);
+}
+function renderGameAvailability(){
+ document.querySelectorAll('button[onclick^="startGame("]').forEach(btn=>{
+   const raw=btn.getAttribute('onclick')||'';
+   const match=raw.match(/startGame\('([^']+)'\)/);
+   if(!match)return;
+   const type=match[1];
+   const played=gamePlayedToday(type);
+   btn.disabled=played;
+   btn.innerText=played?'DÉJÀ JOUÉ AUJOURD’HUI':'JOUER';
+   btn.style.opacity=played?'0.5':'1';
+ });
+}
 function startGame(gameType) {
+if (!appData.currentUser) return showToast('🔐 Connecte-toi pour jouer.', 'error');
+if (gamePlayedToday(gameType)) return showToast('🎮 Tu as déjà joué à ce jeu aujourd’hui. Reviens demain.', 'error');
 if (!appData.isAdmin && appData.credits < 25) return showToast('25 Crédits nécessaires pour jouer !', 'error');
 if (!appData.isAdmin) appData.credits -= 25;
+activeGameType = gameType;
+if (!appData.dailyGames) appData.dailyGames = {};
+appData.dailyGames[gameType] = getLocalDayKey();
 saveAppData();
-
 document.getElementById('gameArea').classList.add('active');
 startGameMusic();
 const container = document.getElementById('gameCanvasContainer');
@@ -1835,7 +1911,7 @@ stopGameMusic();
 document.getElementById('gameArea').classList.remove('active');
 }
 
-function rewardPlayer(amount) { const win=Number(amount)>0; showToast(win?'🎮 Victoire ! Gains : +'+amount+' Crédits 🪙':'💀 Partie perdue. 0 crédit gagné.',win?'success':'error'); if(win) appData.credits+=Number(amount); saveAppData(); closeGame(); }
+function rewardPlayer(amount) { const win=Number(amount)>0; if(win) appData.credits+=Number(amount); completeHubTask('game'); showToast(win?'🎮 Victoire ! Gains : +'+amount+' Crédits 🪙':'💀 Partie perdue. 0 crédit gagné.',win?'success':'error'); saveAppData(); closeGame(); activeGameType=null; }
 
 function runReactionGame(c) {
 document.getElementById('gameTitle').innerText = "Réaction Extrême";
@@ -1889,7 +1965,6 @@ return false;
 }
 draw();
 }
-
 function runSnakeGame(c) {
 document.getElementById('gameTitle').innerText = "Snake Néon 2027";
 c.innerHTML = '<canvas id="sc" width="240" height="240" style="background:#0a0814; border-radius:14px; border:1px solid var(--card-border);"></canvas>';
@@ -1931,7 +2006,6 @@ if(timerEl) timerEl.innerText = timeLeft + 's';
 if(timeLeft <= 0) rewardPlayer(score >= 4 ? Math.min(10 + score * 2, 50) : 0);
 }, 1000);
 }
-
 function runMemoryGame(c) {
 document.getElementById('gameTitle').innerText = "Mémoire Flash";
 c.innerHTML = '<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;"><div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div><div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div><div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div><div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div></div>';
