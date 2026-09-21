@@ -228,6 +228,22 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 .trade-box { width:min(96vw,560px); max-height:90vh; overflow:auto; background:linear-gradient(145deg,rgba(20,13,39,.98),rgba(7,6,15,.98)); border:1px solid var(--card-border-glow); border-radius:24px; padding:18px; box-shadow:0 0 55px rgba(217,70,239,.25); }
 .trade-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
 .trade-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.music-toggle { width:38px;height:38px;border-radius:50%;border:1px solid var(--card-border-glow);background:rgba(139,92,246,.12);color:#fff;font-size:1.05rem;cursor:pointer;box-shadow:0 0 16px rgba(217,70,239,.18);transition:transform .2s,box-shadow .2s; }
+.music-toggle:active{transform:scale(.9)}
+.ad-big-icon{font-size:3rem;filter:drop-shadow(0 0 18px rgba(217,70,239,.5));animation:adFloat 1.4s ease-in-out infinite alternate;}
+.ad-title{font-family:'Space Grotesk';font-weight:900;font-size:1rem;color:var(--glow-cyan);letter-spacing:1px;margin-top:4px;animation:adTextIn .45s ease-out;}
+.ad-body{font-size:.7rem;color:#ddd;line-height:1.5;margin:8px auto;max-width:290px;}
+.ad-steps{display:grid;gap:6px;text-align:left;margin:10px auto;max-width:290px;}
+.ad-step{display:flex;gap:8px;align-items:center;padding:7px 8px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(139,92,246,.16);animation:adStepIn .35s ease-out both;}
+.ad-step b{width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,var(--glow-violet),var(--glow-magenta));font-size:.65rem;}
+.ad-step span{font-size:.61rem;color:#ddd;}
+.ad-time-row{display:flex;justify-content:space-between;align-items:center;font-size:.58rem;color:var(--text-muted);margin-top:10px;}
+.ad-time-row b{font-family:'Space Grotesk';font-size:1rem;color:#fff;}
+@keyframes adFloat{to{transform:translateY(-7px) rotate(3deg)}}
+@keyframes adTextIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes adStepIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.trade-select-card{touch-action:manipulation;-webkit-user-select:none;user-select:none;}
+.trade-select-card:active{transform:scale(.97)!important;}
 .trade-select-card { min-height:105px; border:1px solid var(--card-border); background:rgba(255,255,255,.035); border-radius:14px; padding:8px; text-align:center; cursor:pointer; transition:.2s; }
 .trade-select-card:hover { transform:translateY(-2px); border-color:var(--glow-magenta); }
 .trade-select-card.selected { border-color:var(--glow-cyan); box-shadow:0 0 18px rgba(6,182,212,.3); background:rgba(6,182,212,.08); transform:translateY(-3px) scale(1.02); }
@@ -249,6 +265,17 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 @keyframes ultraCardPulse { from{filter:brightness(1)} to{filter:brightness(1.35) drop-shadow(0 0 12px rgba(240,171,252,.7))} }
 @keyframes rewardPop { 0%{transform:scale(.6) rotate(-5deg);opacity:0} 65%{transform:scale(1.08) rotate(2deg)} 100%{transform:scale(1);opacity:1} }
 .reward-pop { animation:rewardPop .55s cubic-bezier(.2,.8,.2,1); }
+
+
+/* DROP 2027 — couche d'animation supplémentaire */
+.trade-select-card{appearance:none;-webkit-appearance:none;color:#fff;width:100%;font:inherit;}
+.trade-select-card::after{content:"";display:block;position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.16) 50%,transparent 65%);transform:translateX(-70%) rotate(8deg);animation:cardShimmer 3.8s ease-in-out infinite;pointer-events:none;}
+.trade-select-card{position:relative;overflow:hidden;}
+@keyframes cardShimmer{0%,55%{transform:translateX(-80%) rotate(8deg)}75%,100%{transform:translateX(80%) rotate(8deg)}}
+.entry-content{animation:entryBreath 4s ease-in-out infinite;}
+@keyframes entryBreath{50%{transform:scale(1.012)}}
+.catalog-card{animation:cardRise .45s ease both;}
+@keyframes cardRise{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
@@ -291,7 +318,10 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <header class="hud-header">
 <div class="brand-logo"><div class="brand-dot"></div>DROP 2027</div>
+<div style="display:flex;align-items:center;gap:8px;">
+<button id="musicToggle" class="music-toggle" aria-label="Activer ou couper la musique" onclick="toggleGameMusic()">🔊</button>
 <div class="pill"><span>🪙</span><span id="creditVal">0</span></div>
+</div>
 </header>
 
 <main class="screen-container">
@@ -340,6 +370,15 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="binder-tab" onclick="switchCategory('space', this)">🚀 Espace</div>
 <div class="binder-tab" onclick="switchCategory('animals', this)">🐾 Animaux</div>
 <div class="binder-tab" onclick="switchCategory('food', this)">🍕 Food</div>
+<div class="binder-tab" onclick="switchCategory('bureaucratie', this)">📄 Bureaucratie</div>
+<div class="binder-tab" onclick="switchCategory('objetsinutiles', this)">🪨 Objets Inutiles</div>
+<div class="binder-tab" onclick="switchCategory('vacancescatastrophe', this)">🏖️ Vacances Catastrophe</div>
+<div class="binder-tab" onclick="switchCategory('internetbizarre', this)">🌐 Internet Bizarre</div>
+<div class="binder-tab" onclick="switchCategory('cantine', this)">🍟 Cantine</div>
+<div class="binder-tab" onclick="switchCategory('lycee', this)">🏫 Vie au lycée</div>
+<div class="binder-tab" onclick="switchCategory('grosfail', this)">💀 Gros Fails</div>
+<div class="binder-tab" onclick="switchCategory('objetsmaudits', this)">🧿 Objets Maudits</div>
+<div class="binder-tab" onclick="switchCategory('situations', this)">😵 Situations Gênantes</div>
 <div class="binder-tab" onclick="switchCategory('starter', this)">🧩 Départ</div>
 <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
 </div>
@@ -353,6 +392,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="glass-card">
 <div class="card-title"><span>ARCADE — GAIN DE CRÉDITS</span></div>
 <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:12px;">Coût : 25 🪙 | Gain : 10 à 50 🪙</p>
+
 <div style="display:flex; flex-direction:column; gap:10px;">
 <div class="game-card"><div class="game-info"><h4>⚡ Réaction Extrême</h4><p>Stoppe le curseur hyper rapide !</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('reaction')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🔴 Puissance 4</h4><p>VS Robot Tactique</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('connect4')">JOUER</button></div>
@@ -365,6 +405,11 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="game-card"><div class="game-info"><h4>💠 Chasse aux Orbes</h4><p>Attrape les orbes avant la fin — 60 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('orbs')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🧮 Math Panic</h4><p>5 calculs sans erreur — 90 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('math')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>☄️ Laser Escape</h4><p>Évite les lasers — 100 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('laser')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🧿 Glitch Dodge</h4><p>Évite les anomalies — 120 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('glitch')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🧠 Mémoire Chaos</h4><p>Une séquence de plus en plus longue — 130 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('chaos')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>⚡ Charge Parfaite</h4><p>Arrête l'énergie au bon moment — 110 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('charge')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🧨 Bombes à Mémoire</h4><p>Repère la mauvaise case — 140 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('bombmemory')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>🎯 Precision DROP</h4><p>Vise la zone parfaite — 150 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('precision')">JOUER</button></div>
 </div>
 </div>
 </section>
@@ -414,7 +459,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--glow-magenta);">📬 DEMANDES D'AMIS REÇUES</h4>
 <div id="friendRequestsList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucune demande en attente.</i></div>
-
 <h4 style="font-size:0.8rem; margin:15px 0 6px; color:var(--text-muted);">👥 MES AMIS</h4>
 <div id="friendsList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucun ami ajouté.</i></div>
 
@@ -450,12 +494,14 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <div class="ad-modal" id="adModal">
 <div class="ad-box">
-<h3 style="font-family: 'Space Grotesk'; color: #fff; font-size: 1.1rem;">📺 Publicité Sponsorisée</h3>
-<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Regarde la vidéo pour obtenir tes crédits !</p>
+<h3 style="font-family: 'Space Grotesk'; color: #fff; font-size: 1.1rem;">📺 PUB DROP 2027</h3>
+<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Une mini-pub aléatoire de 30 secondes, avec une astuce à découvrir.</p>
 <div class="ad-screen">
-<div style="font-size: 2.5rem; margin-bottom: 8px;">🎬</div>
-<div style="font-family: 'Space Grotesk'; font-size: 1.4rem; font-weight: 800; color: var(--glow-cyan);" id="adTimer">30s</div>
-<p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">Visionnage en cours...</p>
+<div id="adIcon" class="ad-big-icon">📺</div>
+<div id="adTitle" class="ad-title">LE SAVIEZ-VOUS ?</div>
+<p id="adBody" class="ad-body">Découvre une astuce DROP 2027.</p>
+<div id="adSteps" class="ad-steps"></div>
+<div class="ad-time-row"><span>VISIONNAGE</span><b id="adTimer">30s</b></div>
 <div class="ad-progress" id="adProgressBar"></div>
 </div>
 <button class="btn" id="adClaimBtn" disabled onclick="claimAdReward()">PATIENTEZ (30s)...</button>
@@ -580,6 +626,66 @@ football: [
 { id: 512, name: "Filet de Cage Infrissonnable", emoji: "🕸️", price: 1100, unlocked: false },
 { id: 513, name: "Trophée Coupe du Monde (Officiel)", emoji: "🏆", price: 500000, unlocked: false }
 ],
+bureaucratie: [
+{ id: 1001, name: "Formulaire Cerfa Inutile", emoji: "📄", price: 180, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1002, name: "Tampon OFFICIEL du Rien", emoji: "🔴", price: 240, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1003, name: "Ticket pour Faire la Queue", emoji: "🎫", price: 320, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1004, name: "Dossier Classé Très Important", emoji: "🗃️", price: 500, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1005, name: "Signature Illisible", emoji: "✍️", price: 750, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1006, name: "Rendez-vous en 2047", emoji: "📅", price: 1100, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1007, name: "Photocopie de la Photocopie", emoji: "🖨️", price: 1600, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1008, name: "Tampon du Grand Ministère", emoji: "🏛️", price: 2600, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1009, name: "Passe-Droit Cosmique", emoji: "🪪", price: 6000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 1010, name: "Le Papier Qui Fait Tout", emoji: "📜", price: 12000, unlocked: false, tradeable: true, rarity: "ultra" }
+],
+objetsinutiles: [
+{ id: 1011, name: "Pierre Très Moyenne", emoji: "🪨", price: 120, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1012, name: "Bâton Sans Fonction", emoji: "🪵", price: 160, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1013, name: "Télécommande Sans Télé", emoji: "📺", price: 260, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1014, name: "Boîte Vide Premium", emoji: "📦", price: 390, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1015, name: "Chaussure Pour Une Seule Chaussure", emoji: "👟", price: 520, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1016, name: "Cuillère de Collection", emoji: "🥄", price: 700, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1017, name: "Brique en Édition Limitée", emoji: "🧱", price: 1200, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1018, name: "Air en Bocal", emoji: "🫙", price: 2500, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1019, name: "Invisible Invisible", emoji: "👻", price: 5500, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 1020, name: "Rien Absolument Rien", emoji: "🕳️", price: 15000, unlocked: false, tradeable: true, rarity: "ultra" }
+],
+vacancescatastrophe: [
+{ id: 1021, name: "Valise Qui Ne Ferme Pas", emoji: "🧳", price: 180, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1022, name: "Sandale Perdue sur la Plage", emoji: "🩴", price: 220, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1023, name: "Photo Floue du Monument", emoji: "📸", price: 340, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1024, name: "GPS Qui Dit Demi-Tour", emoji: "🗺️", price: 480, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1025, name: "Serviette Jamais Sèche", emoji: "🏖️", price: 650, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1026, name: "Mouette Voleuse de Sandwich", emoji: "🐦", price: 900, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1027, name: "Chambre d'Hôtel avec Vue sur Mur", emoji: "🏨", price: 1400, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1028, name: "Vol Retardé de 14 Heures", emoji: "✈️", price: 2400, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1029, name: "Passeport Tamponné par Erreur", emoji: "🛂", price: 6000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 1030, name: "Vacances Qui Ont Survécu", emoji: "🏝️", price: 14000, unlocked: false, tradeable: true, rarity: "ultra" }
+],
+internetbizarre: [
+{ id: 1031, name: "Commentaire 'Premier'", emoji: "💬", price: 150, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1032, name: "Like de 2018", emoji: "👍", price: 210, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1033, name: "GIF Beaucoup Trop Lent", emoji: "🌀", price: 300, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1034, name: "Captcha Qui Refuse Tout", emoji: "🤖", price: 420, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1035, name: "Mot de Passe Oublié", emoji: "🔑", price: 600, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1036, name: "Notification à 3h17", emoji: "📳", price: 850, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1037, name: "Mème Vu 14 Millions de Fois", emoji: "😂", price: 1300, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1038, name: "Lien Suspect Mais Tentant", emoji: "🔗", price: 2200, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1039, name: "Algorithme Tout-Puissant", emoji: "🧠", price: 6000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 1040, name: "Internet de l'An 9000", emoji: "🌐", price: 16000, unlocked: false, tradeable: true, rarity: "ultra" }
+],
+cantine: [
+{ id: 1041, name: "Frites Mystère", emoji: "🍟", price: 140, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1042, name: "Compote en Poche", emoji: "🍎", price: 180, unlocked: false, tradeable: true, rarity: "common" },
+{ id: 1043, name: "Yaourt Qui Se Défend", emoji: "🥛", price: 280, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1044, name: "Fourchette en Plastique Légendaire", emoji: "🍴", price: 390, unlocked: false, tradeable: true, rarity: "rare" },
+{ id: 1045, name: "Dessert Disparu", emoji: "🍮", price: 600, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1046, name: "Plateau Qui Glisse", emoji: "🍽️", price: 800, unlocked: false, tradeable: true, rarity: "epic" },
+{ id: 1047, name: "Pain Mystique de 12h", emoji: "🥖", price: 1300, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1048, name: "Chef de Cantine Final Boss", emoji: "👨‍🍳", price: 2400, unlocked: false, tradeable: true, rarity: "legendary" },
+{ id: 1049, name: "Menu Secret du Vendredi", emoji: "📜", price: 6500, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 1050, name: "Frite Dorée du Destin", emoji: "🍟", price: 18000, unlocked: false, tradeable: true, rarity: "ultra" }
+],
 secret: [
 { id: 401, name: "Carte VIP Gold Access", emoji: "💳", price: 5000, unlocked: false },
 { id: 402, name: "Trophée Créateur Diamant", emoji: "🏆", price: 10000, unlocked: false },
@@ -677,11 +783,51 @@ food: [
 { id: 914, name: "Nectar Absolu", emoji: "🍯", price: 24000, unlocked: false, tradeable: true, rarity: "ultra" },
 { id: 915, name: "Le Dernier Jus", emoji: "🧃", price: 40000, unlocked: false, tradeable: true, rarity: "ultra" }
 ]
+,lycee: [
+{id:1101,name:'Interro Surprise',emoji:'📚',price:180,unlocked:false,tradeable:true,rarity:'common'},
+{id:1102,name:'Mot dans le Carnet',emoji:'📓',price:240,unlocked:false,tradeable:true,rarity:'common'},
+{id:1103,name:'Retard de 1 Seconde',emoji:'⏰',price:320,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1104,name:'Stylo Qui Disparaît',emoji:'🖊️',price:450,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1105,name:'Place au Fond',emoji:'🪑',price:600,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1106,name:'Contrôle Annulé',emoji:'🎉',price:900,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1107,name:'Prof en Réunion',emoji:'🚪',price:1300,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1108,name:'Week-end de 3 Jours',emoji:'🛌',price:2500,unlocked:false,tradeable:true,rarity:'ultra'}
+],
+grosfail: [
+{id:1201,name:'Téléphone à 1%',emoji:'📱',price:160,unlocked:false,tradeable:true,rarity:'common'},
+{id:1202,name:'Chaussure Mal Lacée',emoji:'👟',price:220,unlocked:false,tradeable:true,rarity:'common'},
+{id:1203,name:'Marche dans une Porte',emoji:'🚪',price:380,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1204,name:'Message Envoyé au Mauvais Groupe',emoji:'💬',price:700,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1205,name:'Micro Ouvert par Accident',emoji:'🎙️',price:1200,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1206,name:'Répondre “Toi aussi”',emoji:'🫠',price:1800,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1207,name:'Vu à 03:17',emoji:'👀',price:3000,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1208,name:'Le Grand Malaise',emoji:'🫥',price:7000,unlocked:false,tradeable:true,rarity:'ultra'}
+],
+objetsmaudits: [
+{id:1301,name:'Télécommande Sans Piles',emoji:'📺',price:180,unlocked:false,tradeable:true,rarity:'common'},
+{id:1302,name:'Câble Trop Court',emoji:'🔌',price:260,unlocked:false,tradeable:true,rarity:'common'},
+{id:1303,name:'Chaussette Solitaire',emoji:'🧦',price:420,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1304,name:'Chargeur Mystérieux',emoji:'🔋',price:650,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1305,name:'Tiroir Qui Coince',emoji:'🗄️',price:900,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1306,name:'Bouteille Impossible à Ouvrir',emoji:'🧴',price:1400,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1307,name:'Clé Dont Personne Ne Connaît La Porte',emoji:'🗝️',price:2800,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1308,name:'Objet Qui Était Là Hier',emoji:'❓',price:6000,unlocked:false,tradeable:true,rarity:'ultra'}
+],
+situations: [
+{id:1401,name:'Dire “Bonjour” à Quelqu’un Qui Ne Parlait Pas à Toi',emoji:'😳',price:150,unlocked:false,tradeable:true,rarity:'common'},
+{id:1402,name:'Rire Trop Fort',emoji:'😂',price:230,unlocked:false,tradeable:true,rarity:'common'},
+{id:1403,name:'Oublier Pourquoi Tu Es Entré',emoji:'🚶',price:360,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1404,name:'Regarder l’Heure 7 Fois',emoji:'⌚',price:520,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1405,name:'Faire Semblant d’Avoir Compris',emoji:'🙂',price:850,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1406,name:'Appeler Quelqu’un Par Le Mauvais Prénom',emoji:'🫣',price:1300,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1407,name:'Silence Après Une Blague',emoji:'🦗',price:2400,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1408,name:'Cringe Légendaire',emoji:'💀',price:6500,unlocked:false,tradeable:true,rarity:'ultra'}
+]
 };
 
 let activeCategory = 'tiktok';
-const NEW_CARD_IDS = new Set([601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915]);
-const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
+const NEW_CARD_IDS = new Set([601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408]);
+const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
 function normalizeCatalogs(raw) {
   const base = JSON.parse(JSON.stringify(CATALOGS));
   Object.keys(base).forEach(cat => {
@@ -711,7 +857,6 @@ catalogs: JSON.parse(JSON.stringify(CATALOGS))
 
 let currentAuthMode = 'login';
 let isDropping = false;
-
 function showToast(message, type = 'success') {
 const toast = document.getElementById('appToast');
 const msgEl = document.getElementById('toastMsg');
@@ -730,6 +875,7 @@ toast.classList.remove('show');
 // AUTHENTIFICATION ROBUSTE : l'authentification ne doit JAMAIS être bloquée par la base de données.
 let authLoading = false;
 let profileLoadToken = 0;
+
 function withTimeout(promise, ms, label) {
 return Promise.race([
 promise,
@@ -750,6 +896,7 @@ appData.isAdmin = false;
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = [];
 }
+
 async function loadFirebaseUserProfile(user) {
 if (!user) {
 resetLocalUserState();
@@ -854,6 +1001,7 @@ try { localStorage.setItem('drop2027_profile_' + user.uid, JSON.stringify({
 username: appData.currentUser.username, credits: appData.credits, friendId: appData.friendId,
 friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, redeemedCodes: appData.redeemedCodes
 })); } catch (_) {}
+
 return true;
 } catch (error) {
 console.warn('Realtime Database indisponible pendant la connexion:', error);
@@ -958,6 +1106,7 @@ authSec.style.display = 'block';
 profSec.style.display = 'none';
 friendsSec.style.display = 'none';
 }
+
 renderCatalogGrid();
 }
 
@@ -978,6 +1127,7 @@ renderCatalogGrid();
 function renderCatalogGrid() {
 const grid = document.getElementById('catalogGrid');
 grid.innerHTML = '';
+
 if (activeCategory === 'football') {
 const bgPattern = document.createElement('div');
 bgPattern.className = 'football-bg-pattern';
@@ -998,6 +1148,7 @@ div.innerHTML = `<div class="emoji">${item.emoji}</div>
 grid.appendChild(div);
 });
 }
+
 function buyItemDirect(id) {
 let found = null;
 Object.keys(appData.catalogs).forEach(cat => {
@@ -1146,7 +1297,6 @@ return messages[code] || (err && err.message) || 'Une erreur inconnue est surven
 async function handleAuth(e) {
 e.preventDefault();
 if (authLoading) return;
-
 const submitBtn = document.getElementById('authSubmitBtn');
 const email = document.getElementById('authEmail').value.trim().toLowerCase();
 const pass = document.getElementById('authPass').value;
@@ -1167,7 +1317,6 @@ auth.signInWithEmailAndPassword(email, pass),
 12000,
 'Firebase Authentication ne répond pas. Vérifie ta connexion Internet.'
 );
-
 // Connexion Firebase réussie : on ne dépend PAS de la Realtime Database.
 await loadFirebaseUserProfile(credential.user);
 showToast('👋 Connexion réussie !', 'success');
@@ -1209,7 +1358,6 @@ submitBtn.disabled = false;
 submitBtn.innerText = currentAuthMode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE";
 }
 }
-
 async function logoutUser() {
 try {
 await auth.signOut();
@@ -1230,7 +1378,6 @@ const input = document.getElementById('addFriendInput');
 const raw = input.value.trim();
 const key = friendCodeKey(raw);
 const targetUid = /^DROP-/i.test(key) ? key.slice(5).trim() : '';
-
 if (!targetUid || targetUid.length < 20) {
 return showToast('❌ ID invalide. Utilisez le nouvel ID affiché dans le profil.', 'error');
 }
@@ -1270,6 +1417,7 @@ showToast('❌ ' + (err.message || 'Impossible d’envoyer la demande.'), 'error
 if (btn) { btn.disabled = false; btn.innerText = 'AJOUTER'; }
 });
 }
+
 function listenToFriendRequests() {
 if (!appData.currentUser) return;
 db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
@@ -1406,14 +1554,36 @@ try {
 updateTradeSummary();
 }
 function renderTradeChoices(container, cards, kind) {
-container.innerHTML='';
-if(!cards.length){container.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;padding:10px;">Aucune carte échangeable disponible.</div>';return;}
-cards.forEach(card=>{ const el=document.createElement('div'); el.className='trade-select-card rarity-'+(card.rarity||'common'); el.dataset.id=card.id; el.innerHTML=`<div class="big">${card.emoji||'🃏'}</div><b style="font-size:.62rem;">${card.name||('Carte #'+card.id)}</b><small>${(card.rarity||'common').toUpperCase()}</small>`; el.onclick=()=>selectTradeCard(kind,Number(card.id),el); container.appendChild(el); });
+  container.innerHTML='';
+  const cleanCards=(Array.isArray(cards)?cards:[]).filter(card=>card&&Number.isInteger(Number(card.id))&&card.tradeable===true);
+  if(!cleanCards.length){container.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;padding:14px;">Aucune carte échangeable disponible.</div>';return;}
+  cleanCards.forEach(card=>{
+    const el=document.createElement('button');
+    el.type='button';
+    el.className='trade-select-card rarity-'+(card.rarity||'common');
+    el.dataset.id=String(card.id);
+    el.dataset.kind=kind;
+    el.innerHTML='<div class="big">'+(card.emoji||'🃏')+'</div><b style="font-size:.62rem;display:block;">'+(card.name||('Carte #'+card.id))+'</b><small>'+((card.rarity||'common').toUpperCase())+' • CLIQUE POUR SÉLECTIONNER</small>';
+    el.onclick=(ev)=>{ev.preventDefault();ev.stopPropagation();selectTradeCard(kind,Number(card.id),el);};
+    container.appendChild(el);
+  });
 }
+
 function selectTradeCard(kind,id,el){
-if(kind==='offer') { activeTrade.offerId=id; document.querySelectorAll('#tradeOfferGrid .trade-select-card').forEach(x=>x.classList.remove('selected')); }
-else { activeTrade.wantId=id; document.querySelectorAll('#tradeRequestGrid .trade-select-card').forEach(x=>x.classList.remove('selected')); }
-el.classList.add('selected'); updateTradeSummary();
+  id=Number(id);
+  if(!Number.isInteger(id))return;
+  if(kind==='offer'){
+    const card=findCardById(id);
+    if(!card||!card.unlocked||card.tradeable!==true)return showToast('❌ Cette carte n’est pas échangeable.','error');
+    activeTrade.offerId=id;
+    document.querySelectorAll('#tradeOfferGrid .trade-select-card').forEach(x=>x.classList.remove('selected'));
+  }else{
+    activeTrade.wantId=id;
+    document.querySelectorAll('#tradeRequestGrid .trade-select-card').forEach(x=>x.classList.remove('selected'));
+  }
+  if(el){el.classList.add('selected');}
+  updateTradeSummary();
+  showToast(kind==='offer'?'🃏 Carte à donner sélectionnée !':'🎯 Carte demandée sélectionnée !','success');
 }
 function updateTradeSummary(){
 const o=findCardById(activeTrade.offerId), w=activeTrade.wantId?{id:activeTrade.wantId}:null;
@@ -1422,8 +1592,9 @@ document.getElementById('tradeSummary').innerText=ok?'Tu donnes '+o.emoji+' '+o.
 }
 function closeTradeModal(){document.getElementById('tradeModal').classList.remove('active');activeTrade={targetUid:null,targetName:'',offerId:null,wantId:null};}
 function confirmTradeModal(){
-if(!activeTrade.targetUid||!activeTrade.offerId||!activeTrade.wantId)return;
-const offered=findCardById(activeTrade.offerId); if(!offered||!offered.unlocked||offered.tradeable!==true)return showToast('❌ Cette carte n’est pas échangeable.', 'error');
+if(!activeTrade.targetUid || activeTrade.offerId == null || activeTrade.wantId == null)return showToast('❌ Sélectionne une carte à donner ET une carte à recevoir.','error');
+const offered=findCardById(activeTrade.offerId); if(!offered||!offered.unlocked||offered.tradeable!==true)return showToast('❌ Cette carte n’est pas échangeable ou n’est plus disponible.', 'error');
+if(Number(activeTrade.offerId)===Number(activeTrade.wantId))return showToast('❌ Tu ne peux pas demander la même carte que celle que tu donnes.','error');
 const tradeId='trade_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
 db.ref('trades/'+tradeId).set({senderUid:appData.currentUser.uid,senderName:appData.currentUser.username,receiverUid:activeTrade.targetUid,offeredCardId:activeTrade.offerId,wantedCardId:activeTrade.wantId,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP}).then(()=>{closeTradeModal();showToast('📩 Offre d’échange envoyée !','success');}).catch(err=>showToast('❌ Erreur d’envoi : '+err.message,'error'));
 }
@@ -1502,16 +1673,29 @@ showToast('❌ Code promotionnel invalide ou expiré.', 'error');
 }
 /* PUBLICITÉ 30S */
 let adInterval = null, adTimeRemaining = 30;
+const INTERNAL_ADS = [
+ {icon:'🤝',title:'LE SAVIEZ-VOUS ?',body:'Tu peux échanger des cartes avec tes amis dans DROP 2027.',steps:['Ajoute ton ami avec son ID DROP.','Accepte la demande.','Ouvre ÉCHANGER sur sa fiche.','Choisis une carte échangeable.']},
+ {icon:'🎴',title:'ASTUCE COLLECTIONNEUR',body:'Les cartes ultra rares sont faites pour faire exploser ton classeur.',steps:['Fais un DROP.','Observe la rareté révélée.','Une ultra rare déclenche la séquence magique.','Compare ta collection avec tes amis.']},
+ {icon:'🎮',title:'MISSION ARCADE',body:'Les mini-jeux coûtent 25 crédits, mais une victoire peut rapporter beaucoup plus.',steps:['Choisis un jeu.','Paie 25 crédits.','Réussis le défi.','Victoire = récompense. Défaite = 0 crédit.']},
+ {icon:'📁',title:'TON CLASSEUR',body:'Les cartes de départ sont gratuites et restent non échangeables.',steps:['Connecte-toi.','Récupère tes cartes de départ.','Explore les nouvelles catégories.','Complète les séries rares.']},
+ {icon:'🚀',title:'NOUVEAUTÉ DROP 2027',body:'De nouvelles cartes arrivent régulièrement dans des catégories complètement absurdes.',steps:['Bureaucratie.','Objets inutiles.','Vacances catastrophe.','Internet bizarre et cantine.']},
+ {icon:'🪙',title:'COMMENT GAGNER DES CRÉDITS ?',body:'Collection, mini-jeux et visionnage de pub interne te permettent de remplir ta réserve.',steps:['Regarde une pub de 30 secondes.','Gagne des mini-jeux.','Dépense tes crédits avec stratégie.','Et garde quelques pièces pour les gros drops.']}
+];
 function startAdModal() {
 adTimeRemaining = 30;
 const modal = document.getElementById('adModal'), timerEl = document.getElementById('adTimer'), btn = document.getElementById('adClaimBtn'), progressBar = document.getElementById('adProgressBar');
+const ad = INTERNAL_ADS[Math.floor(Math.random()*INTERNAL_ADS.length)];
+document.getElementById('adIcon').innerText=ad.icon;
+document.getElementById('adTitle').innerText=ad.title;
+document.getElementById('adBody').innerText=ad.body;
+document.getElementById('adSteps').innerHTML=ad.steps.map((step,i)=>`<div class="ad-step"><b>${i+1}</b><span>${step}</span></div>`).join('');
 modal.classList.add('active'); btn.disabled = true; btn.innerText = 'PATIENTEZ (' + adTimeRemaining + 's)...'; timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = '0%';
-
+if(adInterval)clearInterval(adInterval);
 adInterval = setInterval(() => {
 adTimeRemaining--;
 timerEl.innerText = adTimeRemaining + 's'; progressBar.style.width = ((30 - adTimeRemaining) / 30) * 100 + '%';
 if (adTimeRemaining <= 0) {
-clearInterval(adInterval); btn.disabled = false; btn.innerText = 'RÉCUPÉRER 15 🪙';
+clearInterval(adInterval); adInterval=null; btn.disabled = false; btn.innerText = 'RÉCUPÉRER 15 🪙';
 }
 }, 1000);
 }
@@ -1531,6 +1715,7 @@ if (!appData.isAdmin) appData.credits -= 25;
 saveAppData();
 
 document.getElementById('gameArea').classList.add('active');
+startGameMusic();
 const container = document.getElementById('gameCanvasContainer');
 container.innerHTML = '';
 
@@ -1545,10 +1730,16 @@ else if (gameType === 'pattern') runPatternGame(container);
 else if (gameType === 'orbs') runOrbGame(container);
 else if (gameType === 'math') runMathGame(container);
 else if (gameType === 'laser') runLaserGame(container);
+else if (gameType === 'glitch') runGlitchGame(container);
+else if (gameType === 'chaos') runChaosMemoryGame(container);
+else if (gameType === 'charge') runChargeGame(container);
+else if (gameType === 'bombmemory') runBombMemoryGame(container);
+else if (gameType === 'precision') runPrecisionGame(container);
 }
 
 function closeGame() {
 if(currentGameInterval) clearInterval(currentGameInterval);
+stopGameMusic();
 document.getElementById('gameArea').classList.remove('active');
 }
 
@@ -1667,6 +1858,7 @@ if(id === seq[step]) { step++; if(step >= seq.length) rewardPlayer(50); }
 else rewardPlayer(0);
 };
 }
+
 function runStackGame(c) {
 document.getElementById('gameTitle').innerText = "Stack Néon";
 c.innerHTML = '<div style="text-align:center;"><div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div><p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p><button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button></div>';
@@ -1687,6 +1879,7 @@ currentPos += currentDir;
 if (currentPos > (BOARD_WIDTH - currentWidth) || currentPos < 0) currentDir *= -1;
 const m = document.getElementById('movingBlock'); if (m) m.style.left = currentPos + 'px';
 }, 16);
+
 function renderBlock(left, width, level, isMoving = false) {
 const b = document.createElement('div');
 b.style.cssText = 'width:' + width + 'px; height:' + BLOCK_HEIGHT + 'px; left:' + left + 'px; bottom:' + (level * BLOCK_HEIGHT) + 'px; position:absolute; background:' + (isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)') + '; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;';
@@ -1743,6 +1936,55 @@ function runLaserGame(c){
    if(life>=20)rewardPlayer(100);
  },500);
 }
+function runGlitchGame(c){
+ document.getElementById('gameTitle').innerText='Glitch Dodge';
+ c.innerHTML='<div style="text-align:center"><div id="glitchArena" style="width:min(88vw,320px);height:300px;position:relative;background:repeating-linear-gradient(135deg,rgba(217,70,239,.05) 0 8px,rgba(6,182,212,.04) 8px 16px);border:1px solid var(--card-border);border-radius:18px;overflow:hidden"><div id="glitchPlayer" style="position:absolute;width:28px;height:28px;border-radius:8px;background:var(--glow-cyan);bottom:14px;left:50%;transform:translateX(-50%);box-shadow:0 0 22px var(--glow-cyan)"></div></div><p style="font-size:.7rem">Glisse pour éviter 12 anomalies. Chaque erreur = défaite.</p></div>';
+ const arena=document.getElementById('glitchArena'),p=document.getElementById('glitchPlayer'); let x=50, ticks=0, hazards=[];
+ const move=e=>{const r=arena.getBoundingClientRect(),cx=e.touches?e.touches[0].clientX:e.clientX;x=Math.max(5,Math.min(95,(cx-r.left)/r.width*100));p.style.left=x+'%';if(e.preventDefault)e.preventDefault();};
+ arena.ontouchmove=move; arena.onmousemove=e=>{if(e.buttons)move(e);};
+ currentGameInterval=setInterval(()=>{ticks++;const h=document.createElement('div');const left=Math.random()*90;h.style.cssText='position:absolute;top:-35px;width:28px;height:28px;border-radius:7px;background:var(--glow-magenta);box-shadow:0 0 18px var(--glow-magenta);left:'+left+'%;transition:top 1.4s linear';arena.appendChild(h);hazards.push({el:h,left});requestAnimationFrame(()=>h.style.top='320px');setTimeout(()=>{if(!h.isConnected)return;const px=x,center=left+4;if(Math.abs(center-px)<7){clearInterval(currentGameInterval);return rewardPlayer(0);}h.remove();},1350);if(ticks>=12){clearInterval(currentGameInterval);setTimeout(()=>rewardPlayer(120),400);}},700);
+}
+function runChaosMemoryGame(c){
+ document.getElementById('gameTitle').innerText='Mémoire Chaos';
+ const colors=['#d946ef','#06b6d4','#8b5cf6','#f59e0b']; let seq=[],input=[],round=0,busy=false;
+ c.innerHTML='<div style="text-align:center;max-width:340px;width:100%"><p id="chaosStatus" style="font-size:.72rem;color:var(--text-muted);margin-bottom:12px">Mémorise la séquence...</p><div id="chaosGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"></div></div>';
+ const grid=document.getElementById('chaosGrid'),status=document.getElementById('chaosStatus');
+ colors.forEach((col,i)=>{const b=document.createElement('button');b.style.cssText='height:90px;border-radius:18px;border:1px solid var(--card-border);background:'+col+';opacity:.45;box-shadow:0 0 18px '+col+'33';b.dataset.i=i;b.onclick=()=>{if(busy)return;input.push(i);b.animate([{transform:'scale(.9)'},{transform:'scale(1)'}],{duration:180});const pos=input.length-1;if(input[pos]!==seq[pos])return rewardPlayer(0);if(input.length===seq.length){round++;if(round>=5)return rewardPlayer(130);input=[];busy=true;status.innerText='Round '+(round+1)+' — regarde bien';setTimeout(next,500);}};grid.appendChild(b);});
+ function flash(i){const b=grid.children[i];b.style.opacity='1';b.style.transform='scale(1.08)';setTimeout(()=>{b.style.opacity='.45';b.style.transform='scale(1)';},320);}
+ function next(){seq.push(Math.floor(Math.random()*4));input=[];busy=true;let i=0;const timer=setInterval(()=>{flash(seq[i++]);if(i>=seq.length){clearInterval(timer);busy=false;status.innerText='À toi !';}},520);}
+ next();
+}
+function runChargeGame(c){
+ document.getElementById('gameTitle').innerText='Charge Parfaite';
+ c.innerHTML='<div style="text-align:center;width:100%;max-width:340px"><p style="font-size:.72rem;color:var(--text-muted)">Arrête la charge dans la zone parfaite. 3 réussites pour gagner.</p><div style="height:34px;border:1px solid var(--card-border);border-radius:17px;position:relative;overflow:hidden;background:#090711;margin:24px 0"><div style="position:absolute;left:42%;width:16%;height:100%;background:var(--glow-cyan);box-shadow:0 0 20px var(--glow-cyan)"></div><div id="chargeCursor" style="position:absolute;left:0;width:6px;height:100%;background:#fff;box-shadow:0 0 14px #fff"></div></div><button id="chargeBtn" class="btn">CHARGER / STOP</button><p id="chargeScore" style="font-size:.75rem;margin-top:10px">0 / 3</p></div>';
+ let pos=0,dir=3.7,score=0;const cursor=document.getElementById('chargeCursor'),btn=document.getElementById('chargeBtn'),scoreEl=document.getElementById('chargeScore');currentGameInterval=setInterval(()=>{pos+=dir;if(pos>98||pos<0)dir*=-1;cursor.style.left=pos+'%';},16);
+ btn.onclick=()=>{if(pos>=42&&pos<=58){score++;scoreEl.innerText=score+' / 3';if(score>=3)return rewardPlayer(110);}else{return rewardPlayer(0);}};
+}
+
+function runBombMemoryGame(c){
+ document.getElementById('gameTitle').innerText='Bombes à Mémoire';
+ c.innerHTML='<div style="text-align:center;width:100%;max-width:340px"><p style="font-size:.72rem;color:var(--text-muted)">Mémorise les cases sûres. Une mauvaise case = 0 crédit.</p><div id="bombGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px auto;max-width:280px"></div><p id="bombStatus" style="font-size:.72rem">Observe...</p></div>';
+ const grid=document.getElementById('bombGrid'),status=document.getElementById('bombStatus');let safe=new Set(),clicked=new Set(),ready=false;
+ for(let i=0;i<16;i++){const b=document.createElement('button');b.type='button';b.style.cssText='height:58px;border-radius:12px;border:1px solid var(--card-border);background:rgba(255,255,255,.06);font-size:1.2rem;';b.dataset.i=i;b.onclick=()=>{if(!ready||clicked.has(i))return;clicked.add(i);if(!safe.has(i))return rewardPlayer(0);b.innerText='OK';b.style.background='rgba(34,197,94,.25)';if(clicked.size===safe.size)rewardPlayer(140);};grid.appendChild(b);}
+ while(safe.size<6)safe.add(Math.floor(Math.random()*16));
+ grid.querySelectorAll('button').forEach(function(b,i){ if(safe.has(i)){ b.innerText='OK'; b.style.opacity='.9'; } });
+ setTimeout(()=>{[...grid.children].forEach(b=>{b.innerText='';b.style.opacity='1';});ready=true;status.innerText='A toi. Trouve les 6 cases sures !';},1700);
+}
+function runPrecisionGame(c){
+ document.getElementById('gameTitle').innerText='Precision DROP';
+ c.innerHTML='<div style="text-align:center;width:100%;max-width:340px"><p style="font-size:.72rem;color:var(--text-muted)">Tape quand la cible passe dans la zone parfaite. 4 réussites.</p><div id="precisionTrack" style="height:42px;border:1px solid var(--card-border);border-radius:21px;position:relative;overflow:hidden;background:#090711;margin:26px 0"><div style="position:absolute;left:43%;width:14%;height:100%;background:var(--glow-cyan);box-shadow:0 0 25px var(--glow-cyan)"></div><div id="precisionCursor" style="position:absolute;left:0;width:7px;height:100%;background:#fff;box-shadow:0 0 16px #fff"></div></div><button id="precisionBtn" class="btn">TAPER !</button><p id="precisionScore" style="font-size:.75rem;margin-top:10px">0 / 4</p></div>';
+ let pos=0,dir=4.8,score=0;const cur=document.getElementById('precisionCursor'),btn=document.getElementById('precisionBtn'),sc=document.getElementById('precisionScore');currentGameInterval=setInterval(()=>{pos+=dir;if(pos>98||pos<0)dir*=-1;cur.style.left=pos+'%';},16);
+ btn.onclick=()=>{if(pos>=43&&pos<=57){score++;sc.innerText=score+' / 4';if(score>=4)return rewardPlayer(150);}else return rewardPlayer(0);};
+}
+
+let gameMusicEnabled=true, gameMusicTimer=null, gameMusicStep=0;
+function ensureAudio(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();return ctx;}
+function musicVoice(ctx,freq,dur,type,gain,when){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,when);g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(gain,when+.03);g.gain.exponentialRampToValueAtTime(.0001,when+dur);o.connect(g);g.connect(ctx.destination);o.start(when);o.stop(when+dur+.04);}
+function playGameMusicNote(){try{if(!gameMusicEnabled)return;const ctx=ensureAudio();if(!ctx)return;const now=ctx.currentTime,master=ctx.createGain();master.gain.value=.065;master.connect(ctx.destination);const lead=[261.63,329.63,392,523.25,392,329.63,293.66,349.23,440,587.33,440,349.23,329.63,392,493.88,659.25];const bass=[130.81,146.83,164.81,196,174.61,146.83,130.81,196];const f=lead[gameMusicStep%lead.length],b=bass[Math.floor(gameMusicStep/2)%bass.length];musicVoice(ctx,f,.48,'triangle',.13,now);musicVoice(ctx,f*2,.28,'sine',.045,now+.12);musicVoice(ctx,b,.72,'sine',.095,now);if(gameMusicStep%4===0){musicVoice(ctx,82.41,.18,'square',.025,now);musicVoice(ctx,123.47,.12,'square',.02,now+.28);}gameMusicStep++;}catch(e){}}
+function startGameMusic(){if(!gameMusicEnabled)return;stopGameMusic();gameMusicStep=0;playGameMusicNote();gameMusicTimer=setInterval(playGameMusicNote,520);const btn=document.getElementById('musicToggle');if(btn)btn.innerText='🔊';}
+function stopGameMusic(){if(gameMusicTimer){clearInterval(gameMusicTimer);gameMusicTimer=null;}}
+function toggleGameMusic(){gameMusicEnabled=!gameMusicEnabled;const btn=document.getElementById('musicToggle');if(btn)btn.innerText=gameMusicEnabled?'🔊':'🔇';if(gameMusicEnabled)startGameMusic();else stopGameMusic();}
+window.addEventListener('pointerdown',()=>{if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();},{once:true});
 function playEntrySound(kind){
  try{
   const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();
