@@ -1680,118 +1680,194 @@ fl.appendChild(div);
 
 let activeTrade = {targetUid:null,targetName:'',offerId:null,wantId:null};
 let entryTimerHandle = null, entryMusicHandle = null;
+
 async function openTradePrompt(targetUid, targetName) {
-if (!appData.currentUser) return;
-activeTrade = {targetUid,targetName,offerId:null,wantId:null};
-document.getElementById('tradeTargetName').innerText = 'Avec ' + targetName;
-document.getElementById('tradeModal').classList.add('active');
-const offerGrid=document.getElementById('tradeOfferGrid'), requestGrid=document.getElementById('tradeRequestGrid');
-offerGrid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;">Chargement de ton classeur…</div>';
-requestGrid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;">Chargement des cartes de ton ami…</div>';
-const mine=[]; Object.keys(appData.catalogs).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>{if(c.unlocked&&c.tradeable===true)mine.push(c);}));
+if (!appData.currentUser || !targetUid) return;
+activeTrade = {targetUid:String(targetUid),targetName:String(targetName || 'ton ami'),offerId:null,wantId:null};
+const modal=document.getElementById('tradeModal');
+const title=document.getElementById('tradeTargetName');
+const offerGrid=document.getElementById('tradeOfferGrid');
+const requestGrid=document.getElementById('tradeRequestGrid');
+if(title) title.innerText='Avec '+activeTrade.targetName;
+if(modal) modal.classList.add('active');
+if(offerGrid) offerGrid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;padding:14px;">Chargement de ton classeur…</div>';
+if(requestGrid) requestGrid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;padding:14px;">Chargement des cartes de ton ami…</div>';
+const mine=[];
+Object.keys(appData.catalogs||{}).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>{
+if(c && c.unlocked && c.tradeable===true) mine.push(c);
+}));
 renderTradeChoices(offerGrid,mine,'offer');
 try {
  const snap=await withTimeout(db.ref('public_collections/'+targetUid).once('value'),6000,'Impossible de charger le classeur de votre ami.');
- const vals=snap.val()||{}; const theirs=Object.values(vals);
+ const vals=snap.val()||{};
+ const theirs=Object.values(vals).filter(c=>c&&c.tradeable===true);
  renderTradeChoices(requestGrid,theirs,'want');
-} catch(e) { requestGrid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--danger);font-size:.7rem;">Le classeur échangeable de cet ami est indisponible.</div>'; }
+} catch(e) {
+ if(requestGrid) requestGrid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--danger);font-size:.7rem;padding:14px;">Impossible de charger les cartes échangeables de ton ami.</div>';
+}
 updateTradeSummary();
 }
+
 function renderTradeChoices(container, cards, kind) {
-  container.innerHTML='';
-  const cleanCards=(Array.isArray(cards)?cards:[]).filter(card=>card&&Number.isInteger(Number(card.id))&&card.tradeable===true);
-  if(!cleanCards.length){container.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;padding:14px;">Aucune carte échangeable disponible.</div>';return;}
-  cleanCards.forEach(card=>{
-    const el=document.createElement('button');
-    el.type='button';
-    el.className='trade-select-card rarity-'+(card.rarity||'common');
-    el.dataset.id=String(card.id);
-    el.dataset.kind=kind;
-    el.innerHTML='<div class="big">'+(card.emoji||'🃏')+'</div><b style="font-size:.62rem;display:block;">'+(card.name||('Carte #'+card.id))+'</b><small>'+((card.rarity||'common').toUpperCase())+' • CLIQUE POUR SÉLECTIONNER</small>';
-    el.onclick=(ev)=>{ev.preventDefault();ev.stopPropagation();selectTradeCard(kind,Number(card.id),el);};
-    container.appendChild(el);
-  });
+if(!container)return;
+container.innerHTML='';
+const cleanCards=(Array.isArray(cards)?cards:[]).filter(card=>card&&Number.isInteger(Number(card.id))&&card.tradeable===true);
+if(!cleanCards.length){
+container.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:.7rem;padding:14px;">Aucune carte échangeable disponible.</div>';
+return;
 }
+cleanCards.forEach(card=>{
+const el=document.createElement('button');
+el.type='button';
+el.className='trade-select-card rarity-'+(card.rarity||'common');
+el.dataset.id=String(card.id);
+el.dataset.kind=kind;
+el.innerHTML='<div class="big">'+(card.emoji||'🃏')+'</div><b style="font-size:.62rem;display:block;">'+(card.name||('Carte #'+card.id))+'</b><small>'+((card.rarity||'common').toUpperCase())+' • CLIQUE POUR SÉLECTIONNER</small>';
+el.addEventListener('click',function(ev){
+ ev.preventDefault();
+ ev.stopPropagation();
+ selectTradeCard(kind,Number(card.id),el);
+},false);
+container.appendChild(el);
+});
+}
+
 function selectTradeCard(kind,id,el){
-  id=Number(id);
-  if(!Number.isInteger(id))return;
-  if(kind==='offer'){
-    const card=findCardById(id);
-    if(!card||!card.unlocked||card.tradeable!==true)return showToast('❌ Cette carte n’est pas échangeable.','error');
-    activeTrade.offerId=id;
-    document.querySelectorAll('#tradeOfferGrid .trade-select-card').forEach(x=>x.classList.remove('selected'));
-  }else{
-    activeTrade.wantId=id;
-    document.querySelectorAll('#tradeRequestGrid .trade-select-card').forEach(x=>x.classList.remove('selected'));
-  }
-  if(el){el.classList.add('selected');}
-  updateTradeSummary();
-  showToast(kind==='offer'?'🃏 Carte à donner sélectionnée !':'🎯 Carte demandée sélectionnée !','success');
+const num=Number(id);
+if(!Number.isInteger(num))return;
+if(kind==='offer'){
+ const card=findCardById(num);
+ if(!card||!card.unlocked||card.tradeable!==true)return showToast('❌ Cette carte n’est pas échangeable.','error');
+ activeTrade.offerId=num;
+ document.querySelectorAll('#tradeOfferGrid .trade-select-card').forEach(x=>x.classList.remove('selected'));
+}else if(kind==='want'){
+ activeTrade.wantId=num;
+ document.querySelectorAll('#tradeRequestGrid .trade-select-card').forEach(x=>x.classList.remove('selected'));
+}else return;
+if(el)el.classList.add('selected');
+updateTradeSummary();
 }
+
 function updateTradeSummary(){
-const o=findCardById(activeTrade.offerId), w=activeTrade.wantId?{id:activeTrade.wantId}:null;
-const ok=!!o&&!!w; const btn=document.getElementById('tradeConfirmBtn'); btn.disabled=!ok;
-document.getElementById('tradeSummary').innerText=ok?'Tu donnes '+o.emoji+' '+o.name+'  ⇄  Tu demandes la carte #'+w.id:'Sélectionne une carte à donner et une carte à demander.';
+const o=activeTrade.offerId!=null?findCardById(Number(activeTrade.offerId)):null;
+const w=activeTrade.wantId!=null?Number(activeTrade.wantId):null;
+const ok=!!o&&Number.isInteger(w);
+const btn=document.getElementById('tradeConfirmBtn');
+if(btn){
+ btn.disabled=!ok;
+ btn.style.opacity=ok?'1':'.55';
+ btn.style.pointerEvents='auto';
 }
-function closeTradeModal(){document.getElementById('tradeModal').classList.remove('active');activeTrade={targetUid:null,targetName:'',offerId:null,wantId:null};}
+const summary=document.getElementById('tradeSummary');
+if(summary)summary.innerText=ok?'Tu donnes '+o.emoji+' '+o.name+'  ⇄  Tu demandes la carte #'+w:'Sélectionne une carte à donner et une carte à demander.';
+}
+
+function closeTradeModal(){
+const modal=document.getElementById('tradeModal');
+if(modal)modal.classList.remove('active');
+activeTrade={targetUid:null,targetName:'',offerId:null,wantId:null};
+}
+
 let tradeInboxCache = {};
 let tradeOutboxCache = {};
+
 function renderTradePanel(){
  const tl=document.getElementById('tradesList'); if(!tl)return;
  tl.innerHTML=''; let count=0;
- Object.keys(tradeInboxCache||{}).forEach(tid=>{const t=tradeInboxCache[tid];if(!t||t.status!=='pending')return;count++;const div=document.createElement('div');div.className='trade-card-box';div.dataset.tradeId=tid;div.innerHTML=`<p style="font-size:.75rem;">📩 <b>${t.senderName}</b> propose un échange.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Donne #${t.offeredCardId} • Demande #${t.wantedCardId}</p><div style="display:flex;gap:6px;margin-top:8px;"><button class="btn btn-success" style="padding:6px;font-size:.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button><button class="btn btn-danger" style="padding:6px;font-size:.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button></div>`;tl.appendChild(div);});
- Object.keys(tradeOutboxCache||{}).forEach(tid=>{const t=tradeOutboxCache[tid];if(!t||t.status!=='pending')return;count++;const div=document.createElement('div');div.className='trade-card-box';div.dataset.tradeId=tid;div.innerHTML=`<p style="font-size:.75rem;color:var(--text-muted);">⏳ Offre envoyée à <b>${t.receiverUid}</b>.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Tu donnes #${t.offeredCardId} • Tu demandes #${t.wantedCardId}</p>`;tl.appendChild(div);});
+ Object.keys(tradeInboxCache||{}).forEach(tid=>{
+  const t=tradeInboxCache[tid]; if(!t||t.status!=='pending')return;
+  count++;
+  const div=document.createElement('div'); div.className='trade-card-box'; div.dataset.tradeId=tid;
+  div.innerHTML=`<p style="font-size:.75rem;">📩 <b>${t.senderName||'Un joueur'}</b> propose un échange.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Donne #${t.offeredCardId} • Demande #${t.wantedCardId}</p><div style="display:flex;gap:6px;margin-top:8px;"><button class="btn btn-success" style="padding:6px;font-size:.7rem;" onclick="acceptTrade('${tid}')">ACCEPTER</button><button class="btn btn-danger" style="padding:6px;font-size:.7rem;" onclick="refuseTrade('${tid}')">REFUSER</button></div>`;
+  tl.appendChild(div);
+ });
+ Object.keys(tradeOutboxCache||{}).forEach(tid=>{
+  const t=tradeOutboxCache[tid]; if(!t||t.status!=='pending')return;
+  count++;
+  const div=document.createElement('div'); div.className='trade-card-box'; div.dataset.tradeId=tid;
+  div.innerHTML=`<p style="font-size:.75rem;color:var(--text-muted);">⏳ Offre envoyée à <b>${t.receiverName||t.receiverUid||'ton ami'}</b>.</p><p style="font-size:.7rem;color:var(--glow-cyan);">Tu donnes #${t.offeredCardId} • Tu demandes #${t.wantedCardId}</p>`;
+  tl.appendChild(div);
+ });
  if(!count)tl.innerHTML='<i style="color:var(--text-muted);font-size:.75rem;">Aucune offre en cours.</i>';
 }
-function confirmTradeModal(){
-if(!activeTrade.targetUid || activeTrade.offerId == null || activeTrade.wantId == null)return showToast('❌ Sélectionne une carte à donner ET une carte à recevoir.','error');
-const offered=findCardById(activeTrade.offerId); if(!offered||!offered.unlocked||offered.tradeable!==true)return showToast('❌ Cette carte n’est pas échangeable ou n’est plus disponible.', 'error');
+
+async function confirmTradeModal(){
+if(!appData.currentUser)return showToast('❌ Connecte-toi pour envoyer une offre.','error');
+if(!activeTrade.targetUid || activeTrade.offerId==null || activeTrade.wantId==null){
+ return showToast('❌ Sélectionne une carte à donner ET une carte à recevoir.','error');
+}
+const offered=findCardById(Number(activeTrade.offerId));
+if(!offered||!offered.unlocked||offered.tradeable!==true)return showToast('❌ Cette carte n’est plus disponible pour un échange.','error');
 if(Number(activeTrade.offerId)===Number(activeTrade.wantId))return showToast('❌ Tu ne peux pas demander la même carte que celle que tu donnes.','error');
+const btn=document.getElementById('tradeConfirmBtn');
+if(btn){btn.disabled=true;btn.innerText='ENVOI…';}
 const tradeId='trade_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-const trade={senderUid:appData.currentUser.uid,senderName:appData.currentUser.username,receiverUid:activeTrade.targetUid,offeredCardId:activeTrade.offerId,wantedCardId:activeTrade.wantId,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
-const updates={};
-updates['trades/'+tradeId]=trade;
-updates['trade_inbox/'+activeTrade.targetUid+'/'+tradeId]=trade;
-updates['trade_outbox/'+appData.currentUser.uid+'/'+tradeId]=trade;
-db.ref().update(updates).then(()=>{closeTradeModal();showToast('📩 Offre d’échange envoyée !','success');}).catch(err=>showToast('❌ Erreur d’envoi : '+err.message,'error'));
+const trade={
+ senderUid:appData.currentUser.uid,
+ senderName:appData.currentUser.username,
+ receiverUid:activeTrade.targetUid,
+ receiverName:activeTrade.targetName,
+ offeredCardId:Number(activeTrade.offerId),
+ wantedCardId:Number(activeTrade.wantId),
+ status:'pending',
+ createdAt:firebase.database.ServerValue.TIMESTAMP
+};
+try {
+ // On utilise les deux boîtes dédiées. Le chemin /trades n'est plus nécessaire pour envoyer une offre.
+ await withTimeout(db.ref('trade_inbox/'+activeTrade.targetUid+'/'+tradeId).set(trade),8000,'Firebase ne répond pas pour la boîte de réception.');
+ await withTimeout(db.ref('trade_outbox/'+appData.currentUser.uid+'/'+tradeId).set(trade),8000,'Firebase ne répond pas pour ta boîte d’envoi.');
+ closeTradeModal();
+ showToast('📩 Offre d’échange envoyée !','success');
+} catch(err) {
+ console.error('Envoi échange:',err);
+ try { await db.ref('trade_inbox/'+activeTrade.targetUid+'/'+tradeId).remove(); } catch(_){}
+ if(btn){btn.disabled=false;btn.innerText="ENVOYER L'OFFRE";}
+ showToast('❌ Offre non envoyée : '+(err&&err.message?err.message:'erreur Firebase'),'error');
+}
 }
 
 function listenToTrades() {
-if(!appData.currentUser) return;
+if(!appData.currentUser)return;
 const uid=appData.currentUser.uid;
 tradeInboxCache={}; tradeOutboxCache={};
 const inboxRef=db.ref('trade_inbox/'+uid);
 const outboxRef=db.ref('trade_outbox/'+uid);
+inboxRef.off(); outboxRef.off();
 inboxRef.on('value',snap=>{
- const next=snap.val()||{}; const hadPending=Object.values(tradeInboxCache).some(t=>t&&t.status==='pending');
+ const next=snap.val()||{};
+ const hadPending=Object.values(tradeInboxCache).some(t=>t&&t.status==='pending');
  tradeInboxCache=next; renderTradePanel();
  const newPending=Object.values(next).some(t=>t&&t.status==='pending');
  if(newPending&&!hadPending)showToast('📩 Nouvelle offre d’échange reçue !','success');
 });
 outboxRef.on('value',snap=>{
  const vals=snap.val()||{}; tradeOutboxCache=vals; renderTradePanel();
- Object.keys(vals).forEach(tid=>{const t=vals[tid];if(t&&t.status==='accepted')processAcceptedTradeForSender(tid,t);});
+ Object.keys(vals).forEach(tid=>{
+  const t=vals[tid];
+  if(t&&t.status==='accepted')processAcceptedTradeForSender(tid,t);
+ });
 });
 }
 
-function acceptTrade(tradeId) {
-db.ref('trades/'+tradeId).once('value').then(async snap=>{
- const t=snap.val(); if(!t||t.status!=='pending'||!appData.currentUser||t.receiverUid!==appData.currentUser.uid)return;
- const wanted=findCardById(Number(t.wantedCardId)); if(!wanted||!wanted.unlocked||wanted.tradeable!==true)throw new Error('La carte demandée n’est plus disponible dans votre classeur.');
- const offeredMeta={id:Number(t.offeredCardId),name:'Carte #'+t.offeredCardId,emoji:'🃏',rarity:'common'};
- try { const ps=await db.ref('public_collections/'+t.senderUid+'/'+t.offeredCardId).once('value'); const pv=ps.val(); if(pv) Object.assign(offeredMeta,pv); } catch(_){ }
- wanted.unlocked=false;
+async function acceptTrade(tradeId) {
+try {
+ const snap=await withTimeout(db.ref('trade_inbox/'+appData.currentUser.uid+'/'+tradeId).once('value'),8000,'Impossible de charger cette offre.');
+ const t=snap.val();
+ if(!t||t.status!=='pending'||!appData.currentUser||t.receiverUid!==appData.currentUser.uid)throw new Error('Cette offre n’est plus disponible.');
+ const wanted=findCardById(Number(t.wantedCardId));
+ if(!wanted||!wanted.unlocked||wanted.tradeable!==true)throw new Error('La carte demandée n’est plus disponible dans ton classeur.');
  const offered=findCardById(Number(t.offeredCardId));
- if(offered) offered.unlocked=true;
- await withTimeout(db.ref('users/'+appData.currentUser.uid+'/catalogs').set(appData.catalogs),8000,'Firebase ne répond pas pour la synchronisation de votre classeur.');
+ if(offered)offered.unlocked=true;
+ wanted.unlocked=false;
+ await withTimeout(db.ref('users/'+appData.currentUser.uid+'/catalogs').set(appData.catalogs),8000,'Firebase ne répond pas pour ton classeur.');
  const acceptedPatch={status:'accepted',receiverApplied:true,acceptedAt:firebase.database.ServerValue.TIMESTAMP};
- await withTimeout(db.ref('trades/'+tradeId).update(acceptedPatch),8000,'Firebase ne répond pas pour la validation de l’échange.');
- await withTimeout(db.ref('trade_inbox/'+appData.currentUser.uid+'/'+tradeId).update(acceptedPatch),8000,'Firebase ne répond pas pour la synchronisation de l’offre.');
+ await withTimeout(db.ref('trade_inbox/'+appData.currentUser.uid+'/'+tradeId).update(acceptedPatch),8000,'Firebase ne répond pas pour la validation.');
  await withTimeout(db.ref('trade_outbox/'+t.senderUid+'/'+tradeId).update(acceptedPatch),8000,'Firebase ne répond pas pour prévenir l’expéditeur.');
  tradeInboxCache[tradeId]=Object.assign({},tradeInboxCache[tradeId]||t,acceptedPatch);
  renderTradePanel();
- saveAppData(); showToast('🎉 Échange accepté ! Votre carte est maintenant dans le classeur.','success');
-}).catch(err=>{console.error(err);showToast('❌ Impossible de finaliser l’échange : '+err.message,'error');});
+ saveAppData();
+ showToast('🎉 Échange accepté ! Ta nouvelle carte est dans ton classeur.','success');
+} catch(err){console.error('Acceptation échange:',err);showToast('❌ Impossible de finaliser l’échange : '+(err&&err.message?err.message:'erreur'),'error');}
 }
 
 function processAcceptedTradeForSender(tid,t){
@@ -1800,19 +1876,30 @@ const offered=findCardById(Number(t.offeredCardId));
 const wanted=findCardById(Number(t.wantedCardId));
 if(!offered||!offered.unlocked||offered.tradeable!==true||!wanted)return;
 offered.unlocked=false; wanted.unlocked=true;
-db.ref('users/'+appData.currentUser.uid+'/catalogs').set(appData.catalogs).then(()=>db.ref('trades/'+tid).update({senderApplied:true})).then(()=>{saveAppData();showToast('🔄 Échange synchronisé ! Tu as reçu ta nouvelle carte.','success');}).catch(err=>console.warn('Synchronisation échange:',err));
+db.ref('users/'+appData.currentUser.uid+'/catalogs').set(appData.catalogs)
+.then(()=>db.ref('trade_outbox/'+appData.currentUser.uid+'/'+tid).update({senderApplied:true,status:'completed'}))
+.then(()=>{saveAppData();showToast('🔄 Échange synchronisé ! Tu as reçu ta nouvelle carte.','success');})
+.catch(err=>console.warn('Synchronisation échange:',err));
 }
 
 function findCardById(id) {
-let result = null;
-Object.keys(appData.catalogs).forEach(cat => {
-const item = appData.catalogs[cat].find(i => i.id === Number(id));
-if (item) result = item;
+let result=null;
+Object.keys(appData.catalogs||{}).forEach(cat=>{
+const item=(appData.catalogs[cat]||[]).find(i=>Number(i.id)===Number(id));
+if(item)result=item;
 });
 return result;
 }
 
-function refuseTrade(tradeId) { const patch={status:'refused'}; db.ref('trades/' + tradeId).update(patch).then(()=>db.ref('trade_inbox/'+appData.currentUser.uid+'/'+tradeId).update(patch)).then(()=>{delete tradeInboxCache[tradeId];renderTradePanel();showToast("Offre d’échange refusée.",'success');}).catch(err=>showToast('❌ '+err.message,'error')); }
+async function refuseTrade(tradeId){
+try {
+ const patch={status:'refused'};
+ await withTimeout(db.ref('trade_inbox/'+appData.currentUser.uid+'/'+tradeId).update(patch),8000,'Firebase ne répond pas.');
+ const t=tradeInboxCache[tradeId];
+ if(t&&t.senderUid)await withTimeout(db.ref('trade_outbox/'+t.senderUid+'/'+tradeId).update(patch),8000,'Impossible de prévenir l’expéditeur.');
+ delete tradeInboxCache[tradeId]; renderTradePanel(); showToast('Offre d’échange refusée.','success');
+} catch(err){showToast('❌ Impossible de refuser l’offre : '+(err&&err.message?err.message:'erreur'),'error');}
+}
 
 function unlockCardById(id) {
 Object.keys(appData.catalogs).forEach(cat => {
@@ -2047,6 +2134,7 @@ if(id === seq[step]) { step++; if(step >= seq.length) rewardPlayer(50); }
 else rewardPlayer(0);
 };
 }
+
 function runStackGame(c) {
 document.getElementById('gameTitle').innerText = "Stack Néon";
 c.innerHTML = '<div style="text-align:center;"><div id="sboard" style="width:200px; height:260px; background:#0a0814; border:1px solid var(--card-border); position:relative; overflow:hidden; border-radius:14px; margin:0 auto;"></div><p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">Empilés : <b id="stackCount">0</b> / 8</p><button class="btn" style="margin-top:10px;" onclick="stackDrop()">EMPILER</button></div>';
@@ -2067,6 +2155,7 @@ currentPos += currentDir;
 if (currentPos > (BOARD_WIDTH - currentWidth) || currentPos < 0) currentDir *= -1;
 const m = document.getElementById('movingBlock'); if (m) m.style.left = currentPos + 'px';
 }, 16);
+
 function renderBlock(left, width, level, isMoving = false) {
 const b = document.createElement('div');
 b.style.cssText = 'width:' + width + 'px; height:' + BLOCK_HEIGHT + 'px; left:' + left + 'px; bottom:' + (level * BLOCK_HEIGHT) + 'px; position:absolute; background:' + (isMoving ? 'var(--glow-violet)' : 'var(--glow-magenta)') + '; box-shadow:0 0 8px var(--glow-magenta); border-radius:4px;';
@@ -2236,4 +2325,4 @@ window.addEventListener('load',()=>setTimeout(bootEntrySequence,250));
 
 </script>
 </body>
-  </html>
+                                                                                                                       </html>
