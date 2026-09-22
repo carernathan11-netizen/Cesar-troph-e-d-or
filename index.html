@@ -95,7 +95,24 @@ color: var(--glow-cyan); margin-bottom: 12px; display: flex; justify-content: sp
 .wheel-shell{overflow:hidden;position:relative;background:radial-gradient(circle at 50% 42%,rgba(139,92,246,.18),transparent 48%),var(--card-bg)}
 .wheel-sub{font-size:.72rem;color:var(--text-muted);line-height:1.55}
 .wheel-wrap{display:flex;justify-content:center;align-items:center;padding:18px 0 20px;position:relative}
-.wheel-stage{position:relative;width:min(88vw,390px);height:min(88vw,390px);display:flex;align-items:center;justify-content:center}
+.wheel-stage{position:relative;width:min(88vw,390px);aspect-ratio:1/1;height:auto;flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+.wheel-stage,.wheel{min-width:0;min-height:0}
+#deviceModeModal{position:fixed;inset:0;z-index:30000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,2,7,.96);backdrop-filter:blur(20px)}
+#deviceModeModal.active{display:flex}
+.device-mode-box{width:min(520px,94vw);padding:24px;border:1px solid rgba(217,70,239,.48);border-radius:28px;background:radial-gradient(circle at 50% 0,rgba(139,92,246,.2),transparent 42%),linear-gradient(145deg,#120d24,#07060f);box-shadow:0 0 70px rgba(139,92,246,.25);text-align:center}
+.device-mode-title{font-family:'Space Grotesk';font-weight:900;font-size:1.35rem;color:#fff;letter-spacing:.5px}
+.device-mode-sub{font-size:.72rem;color:var(--text-muted);line-height:1.55;margin:8px auto 18px;max-width:410px}
+.device-mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.device-mode-btn{border:1px solid rgba(139,92,246,.3);border-radius:18px;padding:16px 8px;background:rgba(255,255,255,.035);color:#fff;cursor:pointer;transition:.2s;font:inherit}
+.device-mode-btn:hover,.device-mode-btn:active{transform:translateY(-2px);border-color:var(--glow-magenta);background:rgba(217,70,239,.09);box-shadow:0 0 20px rgba(217,70,239,.18)}
+.device-mode-btn b{display:block;font-size:.7rem;margin-top:7px}.device-mode-btn span{font-size:2rem}
+.shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.shop-item{position:relative;padding:15px;border:1px solid rgba(139,92,246,.25);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(139,92,246,.045));overflow:hidden;transition:.2s}
+.shop-item:hover{transform:translateY(-3px);border-color:rgba(217,70,239,.55);box-shadow:0 0 24px rgba(217,70,239,.14)}
+.shop-item .shop-icon{font-size:2.6rem;filter:drop-shadow(0 0 12px rgba(217,70,239,.35))}.shop-item h4{font-family:'Space Grotesk';font-size:.78rem;margin:7px 0 5px;color:#fff}.shop-item p{font-size:.62rem;color:var(--text-muted);line-height:1.45;min-height:42px}.shop-price{font-size:.8rem;font-weight:900;color:var(--glow-cyan);margin:10px 0}.shop-bought{opacity:.65;filter:saturate(.55)}
+@media (max-width:600px){.device-mode-grid{grid-template-columns:1fr}.device-mode-btn{display:flex;align-items:center;gap:12px;text-align:left}.device-mode-btn span{font-size:1.7rem}.shop-grid{grid-template-columns:1fr}.wheel-stage{width:min(78vw,320px);aspect-ratio:1/1}.wheel{width:100%;height:100%;aspect-ratio:1/1}.wheel-label{width:84px;margin-left:-42px;font-size:.49rem}.wheel-center{width:68px;height:68px;font-size:1.25rem}.wheel-pointer{font-size:2rem}}
+@media (min-width:601px) and (max-width:1100px){.wheel-stage{width:min(68vw,440px)}}
+@media (min-width:1101px){.wheel-stage{width:min(42vw,520px)}}
 .wheel-pointer{position:absolute;top:-2px;left:50%;transform:translateX(-50%);z-index:8;font-size:2.35rem;filter:drop-shadow(0 0 9px rgba(255,255,255,.8)) drop-shadow(0 0 18px rgba(217,70,239,.65));animation:pointerPulse 1.2s ease-in-out infinite alternate}
 .wheel{width:100%;height:100%;border-radius:50%;border:9px solid rgba(255,255,255,.12);box-sizing:border-box;position:relative;overflow:hidden;background:#17112a;box-shadow:0 0 0 3px rgba(217,70,239,.12),0 0 28px rgba(139,92,246,.38),0 0 70px rgba(217,70,239,.16),inset 0 0 35px rgba(0,0,0,.55);transition:transform 5.4s cubic-bezier(.08,.72,.12,1);will-change:transform}
 .wheel::before{content:'';position:absolute;inset:5%;border-radius:50%;border:2px solid rgba(255,255,255,.22);box-shadow:inset 0 0 22px rgba(0,0,0,.55),0 0 14px rgba(255,255,255,.08);pointer-events:none;z-index:2}
@@ -123,6 +140,7 @@ transition: transform 0.2s, box-shadow 0.2s;
 .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); box-shadow: none; }
 .btn-danger { background: linear-gradient(135deg, #ef4444, #991b1b); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
 .btn-success { background: linear-gradient(135deg, #22c55e, #15803d); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+
 .input-field {
 width: 100%; padding: 14px; background: rgba(15, 12, 29, 0.8);
 border: 1px solid var(--card-border); border-radius: 14px; color: #fff; font-family: inherit; margin-bottom: 10px; outline: none;
@@ -147,7 +165,6 @@ padding: 8px 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.04);
 border: 1px solid var(--card-border); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); whitespace: nowrap; cursor: pointer;
 }
 .binder-tab.active { background: rgba(139, 92, 246, 0.25); border-color: var(--glow-magenta); color: #fff; box-shadow: 0 0 12px rgba(217, 70, 239, 0.3); }
-
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; position: relative; }
 .catalog-card {
 background: rgba(20, 16, 38, 0.6); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px;
@@ -409,6 +426,19 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <div class="app-viewport" id="viewport">
 
+<div id="deviceModeModal" aria-hidden="true">
+  <div class="device-mode-box">
+    <div style="font-size:2.6rem;margin-bottom:6px;">📱</div>
+    <div class="device-mode-title">SUR QUEL APPAREIL JOUES-TU ?</div>
+    <div class="device-mode-sub">Choisis ton format. DROP 2027 ajustera l’interface, notamment la roue, pour éviter le légendaire effet « patate sur téléphone ».</div>
+    <div class="device-mode-grid">
+      <button class="device-mode-btn" onclick="selectDeviceMode('phone')"><span>📱</span><b>TÉLÉPHONE</b></button>
+      <button class="device-mode-btn" onclick="selectDeviceMode('tablet')"><span>📲</span><b>TABLETTE</b></button>
+      <button class="device-mode-btn" onclick="selectDeviceMode('desktop')"><span>💻</span><b>ORDINATEUR</b></button>
+    </div>
+  </div>
+</div>
+
 <div id="appToast" class="app-toast">
 <span id="toastIcon">ℹ️</span>
 <span id="toastMsg">Message</span>
@@ -470,7 +500,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <section id="scr-home" class="screen active">
 <div class="glass-card" style="text-align:center; padding:20px 12px;">
 <div class="card-title"><span>DROP MYSTÈRE ULTIME</span></div>
-
 <div class="drop-stage">
 <div class="particle-burst" id="particleBurst"></div>
 <div class="drop-card-3d" id="dropCard">
@@ -595,10 +624,10 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <!-- 4. BOUTIQUE -->
 <section id="scr-shop" class="screen">
-<div class="glass-card" style="text-align: center; padding: 30px 15px;">
-<div style="font-size: 3rem; margin-bottom: 10px;">🛠️</div>
-<h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; color: #fff; margin-bottom: 8px;">BOUTIQUE TEMPORAIREMENT FERMÉE</h3>
-<p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">La boutique d'achats de crédits est actuellement en maintenance. Elle sera de nouveau disponible très prochainement.</p>
+<div class="glass-card">
+  <div class="card-title"><span>🛍️ BOUTIQUE DROP</span><span>OBJETS EXCLUSIFS</span></div>
+  <p class="wheel-sub" style="margin-bottom:14px;">Ici, les crédits servent à acheter des objets précis. Pas de tirage caché, pas de roulette déguisée en facture, juste ce que tu achètes. Les prix vont volontairement de <b>200 à 10 000 🪙</b>.</p>
+  <div id="shopGrid" class="shop-grid"></div>
 </div>
 </section>
 
@@ -659,7 +688,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <p style="font-size:0.8rem; color:var(--glow-cyan); margin-top:8px;" id="userFriendId">ID Ami : Chargement...</p>
 <button class="btn btn-danger" style="margin-top:15px;" onclick="logoutUser()">SE DÉCONNECTER</button>
 </div>
-
 <!-- SECTION AMIS ET DEMANDES -->
 <div id="friendsSection" class="glass-card" style="display:none;">
 <div class="card-title"><span>🤝 CENTRE D'AMIS & DEMANDES</span></div>
@@ -701,7 +729,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="btn" onclick="redeemSecretCode()">VALIDER LE CODE</button>
 </div>
 </section>
-
 </main>
 
 <nav class="nav-dock">
@@ -752,6 +779,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="btn" id="adClaimBtn" disabled onclick="claimAdReward()">PATIENTEZ (30s)...</button>
 </div>
 </div>
+
 </div>
 
 <script>
@@ -1136,12 +1164,22 @@ mecsrelous: [
 {id:1930,name:'Sacha “On Fait Ça Après”',emoji:'🛋️',price:3000,unlocked:false,tradeable:true,rarity:'legendary'},
 {id:1931,name:'Yanis “J’Peux Voir ?”',emoji:'👁️',price:4300,unlocked:false,tradeable:true,rarity:'ultra'},
 {id:1932,name:'Max “Le Bruit de Fond”',emoji:'🔊',price:6800,unlocked:false,tradeable:true,rarity:'ultra'}
+],
+boutique: [
+{id:3001,name:'Badge VIP DROP',emoji:'🏅',price:200,unlocked:false,tradeable:false,rarity:'rare'},
+{id:3002,name:'Carte Collectionneur',emoji:'🗂️',price:500,unlocked:false,tradeable:false,rarity:'rare'},
+{id:3003,name:'Carte Architecte Néon',emoji:'🏗️',price:1000,unlocked:false,tradeable:false,rarity:'epic'},
+{id:3004,name:'Carte Maître du DROP',emoji:'👑',price:2000,unlocked:false,tradeable:false,rarity:'epic'},
+{id:3005,name:'Carte Légende Absolue',emoji:'🔥',price:3500,unlocked:false,tradeable:false,rarity:'legendary'},
+{id:3006,name:'Cadre Profil Diamant',emoji:'💎',price:5000,unlocked:false,tradeable:false,rarity:'legendary'},
+{id:3007,name:'Titre Fondateur 2027',emoji:'🏆',price:7500,unlocked:false,tradeable:false,rarity:'ultra'},
+{id:3008,name:'DROP 2027 — Édition Ultime',emoji:'🌌',price:10000,unlocked:false,tradeable:false,rarity:'ultra'}
 ]
 };
 
 let activeCategory = 'starter';
 const NEW_CARD_IDS = new Set([1900,1901,1902,1903,1904,1905,1906,1907,1908,1909,1910,1911,1912,1921,1922,1923,1924,1925,1926,1927,1928,1929,1930,1931,1932,601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408,1501,1502,1503,1504,1505,1506,1507,1508,1601,1602,1603,1604,1605,1606,1607,1608,1701,1702,1703,1704,1705,1706,1707,1708,1801,1802,1803,1804,1805,1806,1807,1808]);
-const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',fillesreloues:'👩‍🎓 Filles Inoubliables',mecsrelous:'👨‍🎓 Mecs Inoubliables',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
+const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',fillesreloues:'👩‍🎓 Filles Inoubliables',mecsrelous:'👨‍🎓 Mecs Inoubliables',boutique:'🛍️ Boutique',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
 function canonicalCardRarity(cat, item) {
   // Les cartes de la catégorie Ultra Rares sont toujours ultra rares,
   // même si une ancienne sauvegarde les avait enregistrées comme common.
@@ -1194,7 +1232,6 @@ function showToast(message, type = 'success') {
 const toast = document.getElementById('appToast');
 const msgEl = document.getElementById('toastMsg');
 const iconEl = document.getElementById('toastIcon');
-
 toast.className = 'app-toast ' + type;
 msgEl.innerText = message;
 iconEl.innerText = type === 'success' ? '✅' : '❌';
@@ -1257,7 +1294,6 @@ appData.isAdmin = isAdminEmail;
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = [];
 updateUI();
-
 try {
 const userRef = db.ref('users/' + user.uid);
 const snapshot = await withTimeout(userRef.once('value'), 5000, 'La base de données Firebase ne répond pas.');
@@ -1908,7 +1944,15 @@ const CARD_STORIES = {
 "1929": "Ethan n'avait pas révisé. Il a quand même ouvert le contrôle avec une confiance digne d'un héros de film. La première question a immédiatement détruit cette confiance.",
 "1930": "Sacha a proposé de faire le travail après. Personne n'a su quand « après » commençait exactement. Le devoir, lui, a continué d'attendre sur la table.",
 "1931": "Yanis a demandé « j'peux voir ? » juste après que quelqu'un a fini. Il a regardé une seconde, a hoché la tête et a rendu le cahier comme s'il venait d'obtenir une information classifiée.",
-"1932": "Max n'a pas besoin de parler pour être remarqué. Il lui suffit d'être le bruit de fond officiel de la salle : stylo, chaise, rire, commentaire, puis retour au calme. Dans cet ordre précis."
+"1932": "Max n'a pas besoin de parler pour être remarqué. Il lui suffit d'être le bruit de fond officiel de la salle : stylo, chaise, rire, commentaire, puis retour au calme. Dans cet ordre précis.",
+3001:'Ce badge ne donne pas de pouvoir magique. Il donne simplement le droit de regarder son profil et de penser très fort « j’ai dépensé 200 crédits pour ça ». DROP 2027 respecte les priorités humaines.',
+3002:'Le Collectionneur est la carte qui apparaît quand quelqu’un commence à compter ses cartes plus souvent que ses heures de sommeil. Elle ne juge pas. Elle classe.',
+3003:'L’Architecte Néon aurait conçu l’interface de DROP 2027 avec trois règles : plus de lumière, plus de violet, et surtout aucune fenêtre blanche. Les architectes modernes peuvent enfin respirer.',
+3004:'Le Maître du DROP connaît tous les menus, tous les raccourcis et probablement l’emplacement exact du bouton que tu cherches depuis cinq minutes. Personne ne sait comment.',
+3005:'La Légende Absolue est entrée dans les archives avec une seule annotation : « beaucoup trop de crédits ont été dépensés ici ». Les archives refusent de préciser combien.',
+3006:'Le Cadre Diamant encadre symboliquement ton profil comme si tu venais de gagner un trophée intergalactique. Ce qui, vu le prix, est probablement la seule réaction raisonnable.',
+3007:'Le Titre Fondateur 2027 est réservé aux joueurs capables de regarder 7 500 crédits disparaître sans demander où ils sont passés. Une forme très particulière de courage.',
+3008:'L’Édition Ultime porte le numéro 3008 et n’a été conçue que pour une raison : être la pièce la plus chère de la boutique. Elle ne fait rien de secret. Elle existe. Et elle coûte 10 000 crédits. L’humanité avait besoin de cette information.',
 };
 function getCardStory(card, categoryKey){
  return CARD_STORIES[String(card.id)] || `Personne ne sait exactement comment ${card.name} est devenu une carte DROP. Une chose est sûre : cette carte possède sa propre histoire.`;
@@ -1984,7 +2028,6 @@ if (found.unlocked) return showToast('Article déjà débloqué !', 'error');
 if (!appData.isAdmin && appData.credits < found.price) {
 return showToast('Crédits insuffisants ! Il faut ' + found.price + ' 🪙', 'error');
 }
-
 if (!appData.isAdmin) appData.credits -= found.price;
 found.unlocked = true;
 playUnlockSound(found.rarity || 'rare');
@@ -1993,6 +2036,7 @@ showCardRewardAnimation(found, found.rarity || 'rare');
 if (found.id === 2000) triggerAnnihilation();
 else showToast('🎉 FÉLICITATIONS ! Objet obtenu : ' + found.emoji + ' ' + found.name, 'success');
 saveAppData();
+renderShop();
 }
 
 function openRandomDrop(isFree = false) {
@@ -2046,7 +2090,6 @@ setTimeout(() => {
   else showToast('💥 CARTE DÉBLOQUÉE : ' + picked.emoji + ' ' + picked.name, 'success');
 }, 2300);
 }
-
 function showCardRewardAnimation(card, rarity) {
 const existing = document.getElementById('rewardFlash');
 if (existing) existing.remove();
@@ -2109,7 +2152,6 @@ document.getElementById('usernameBox').style.display = isRegister ? 'block' : 'n
 document.getElementById('authUsername').required = isRegister;
 document.getElementById('authSubmitBtn').innerText = isRegister ? "S'INSCRIRE" : 'SE CONNECTER';
 }
-
 function firebaseAuthErrorMessage(err) {
 const code = err && err.code ? err.code : '';
 const messages = {
@@ -2221,6 +2263,7 @@ return showToast('❌ Vous ne pouvez pas vous ajouter vous-même.', 'error');
 
 const btn = input.nextElementSibling;
 if (btn) { btn.disabled = true; btn.innerText = 'ENVOI...'; }
+
 // Plus besoin de friend_codes : l'ID contient directement le UID Firebase.
 // La demande est écrite sous le compte du destinataire, avec le UID de
 // l'expéditeur comme clé. Cela évite les lectures croisées interdites.
@@ -2682,6 +2725,7 @@ Object.keys(appData.catalogs).forEach(cat => {
 appData.catalogs[cat].forEach(i => { if(i.id === id) i.unlocked = true; });
 });
 }
+
 function redeemSecretCode() {
 const code = document.getElementById('secretCodeInput').value.trim().toUpperCase();
 if (!code) return;
@@ -2756,6 +2800,54 @@ function renderGameAvailability(){
    btn.style.opacity=played?'0.5':'1';
  });
 }
+
+/* FORMAT APPAREIL + BOUTIQUE */
+function applyDeviceMode(mode){
+ const vp=document.getElementById('viewport');
+ if(!vp)return;
+ vp.classList.remove('device-phone','device-tablet','device-desktop');
+ vp.classList.add('device-'+mode);
+}
+function selectDeviceMode(mode){
+ const valid=['phone','tablet','desktop'];
+ if(!valid.includes(mode))return;
+ localStorage.setItem('drop2027_device_mode',mode);
+ applyDeviceMode(mode);
+ const modal=document.getElementById('deviceModeModal');
+ if(modal){modal.classList.remove('active');modal.setAttribute('aria-hidden','true');}
+ setTimeout(renderLuckWheel,30);
+}
+function ensureDeviceMode(){
+ const saved=localStorage.getItem('drop2027_device_mode');
+ if(saved){applyDeviceMode(saved);return;}
+ const modal=document.getElementById('deviceModeModal');
+ if(modal){modal.classList.add('active');modal.setAttribute('aria-hidden','false');}
+}
+const SHOP_IDS=[3001,3002,3003,3004,3005,3006,3007,3008];
+function renderShop(){
+ const grid=document.getElementById('shopGrid'); if(!grid)return;
+ const items=(appData.catalogs.boutique||[]).filter(x=>SHOP_IDS.includes(Number(x.id)));
+ grid.innerHTML=items.map(item=>{
+   const bought=!!item.unlocked;
+   return `<div class="shop-item ${bought?'shop-bought':''}">
+     <div class="shop-icon">${item.emoji}</div>
+     <h4>${item.name}</h4>
+     <p>${SHOP_DESCRIPTIONS[item.id]||'Objet exclusif de la boutique DROP 2027.'}</p>
+     <div class="shop-price">${item.price.toLocaleString('fr-FR')} 🪙</div>
+     <button class="btn ${bought?'btn-secondary':''}" style="padding:10px;font-size:.7rem;" ${bought?'disabled':''} onclick="buyItemDirect(${item.id});renderShop();">${bought?'✓ DÉJÀ OBTENU':'ACHETER'}</button>
+   </div>`;
+ }).join('');
+}
+const SHOP_DESCRIPTIONS={
+ 3001:'Badge de profil exclusif pour afficher ton statut VIP dans ton univers DROP.',
+ 3002:'Carte collector exclusive, ajoutée directement à ton classeur.',
+ 3003:'Carte premium sur le thème du design néon de DROP 2027.',
+ 3004:'Carte premium dédiée aux joueurs qui maîtrisent tout le système DROP.',
+ 3005:'Carte boutique de rareté légendaire, uniquement achetable avec des crédits.',
+ 3006:'Objet cosmétique premium pour ton profil, réservé aux gros collectionneurs.',
+ 3007:'Titre collector ultra rare réservé à la boutique et conservé définitivement.',
+ 3008:'La pièce ultime de la boutique : carte collector exclusive à 10 000 crédits.'
+};
 
 /* ROUE DE LA CHANCE */
 const LUCK_WHEEL_PRIZES = [
@@ -3150,7 +3242,7 @@ function startGameMusic(){if(!gameMusicEnabled)return;stopGameMusic();scheduleGa
 function stopGameMusic(){if(gameMusicTimer){clearTimeout(gameMusicTimer);gameMusicTimer=null;}}
 function toggleGameMusic(){gameMusicEnabled=!gameMusicEnabled;const btn=document.getElementById('musicToggle');if(btn)btn.innerText=gameMusicEnabled?'🔊':'🔇';if(gameMusicEnabled)startGameMusic();else stopGameMusic();}
 function bootMusic(){if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();}
-window.addEventListener('load',()=>{setTimeout(bootMusic,80);setTimeout(renderLuckWheel,90);});
+window.addEventListener('load',()=>{setTimeout(ensureDeviceMode,60);setTimeout(bootMusic,80);setTimeout(renderLuckWheel,140);setTimeout(renderShop,160);});
 window.addEventListener('pointerdown',()=>{if(gameMusicEnabled){const ctx=ensureAudio();if(ctx&&ctx.state==='running'&&!gameMusicTimer)startGameMusic();else if(ctx&&ctx.state==='suspended')ctx.resume().then(()=>{if(!gameMusicTimer)startGameMusic();}).catch(()=>{});}}, {passive:true});
 
 function playEntrySound(kind){
@@ -3164,6 +3256,7 @@ function playEntrySound(kind){
  }catch(e){console.warn('Audio intro:',e)}
 }
 function stopEntryMusic(){if(entryMusicHandle){clearInterval(entryMusicHandle);entryMusicHandle=null;}}
+
 function playEntryCrack(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();const now=ctx.currentTime;const b=ctx.createBuffer(1,ctx.sampleRate*.3,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);const s=ctx.createBufferSource(),g=ctx.createGain();g.gain.value=.28;s.buffer=b;s.connect(g);g.connect(ctx.destination);s.start();}catch(e){}}
 function playEntryExplosion(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();const o=ctx.createOscillator(),g=ctx.createGain(),now=ctx.currentTime;o.type='sawtooth';o.frequency.setValueAtTime(180,now);o.frequency.exponentialRampToValueAtTime(45,now+.65);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.28,now+.03);g.gain.exponentialRampToValueAtTime(.0001,now+.8);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+.85);}catch(e){}}
 function getUnlockedCards(){const arr=[];Object.keys(appData.catalogs||{}).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>{if(c.unlocked)arr.push(c);}));return arr;}
@@ -3205,4 +3298,4 @@ window.addEventListener('load',()=>setTimeout(bootEntrySequence,250));
 
 </script>
 </body>
-                                                                                                                   </html>
+  </html>
