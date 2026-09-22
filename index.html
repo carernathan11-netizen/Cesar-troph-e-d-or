@@ -361,6 +361,48 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 .collection-progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--glow-cyan),var(--glow-magenta));border-radius:99px;transition:width .7s cubic-bezier(.2,.8,.2,1);}
 .collection-progress-label{display:flex;justify-content:space-between;font-size:.62rem;color:var(--text-muted);margin-top:5px;}
 
+
+/* ADMINISTRATEUR : thème or exclusif, sans modifier l'expérience des joueurs normaux */
+#viewport.admin-mode{
+  --glow-violet:#d4af37;
+  --glow-magenta:#ffd700;
+  --glow-cyan:#f5d76e;
+  --card-bg:rgba(30,22,5,.72);
+  --card-border:rgba(212,175,55,.28);
+  --card-border-glow:rgba(255,215,0,.65);
+  --text-main:#fff8dc;
+  --text-muted:#c8b98a;
+  --success:#d4af37;
+  background:#070604;
+  background-image:radial-gradient(at 10% 10%,rgba(212,175,55,.25) 0,transparent 50%),radial-gradient(at 90% 20%,rgba(255,215,0,.18) 0,transparent 50%),radial-gradient(at 50% 80%,rgba(245,215,110,.13) 0,transparent 50%);
+}
+#viewport.admin-mode .hud-header,
+#viewport.admin-mode .nav-dock{background:rgba(18,13,3,.88);border-color:rgba(255,215,0,.35);box-shadow:0 4px 30px rgba(212,175,55,.18)}
+#viewport.admin-mode .brand-logo{background:linear-gradient(135deg,#fff8dc,#ffd700,#fff);-webkit-background-clip:text;background-clip:text}
+#viewport.admin-mode .brand-dot{background:#ffd700;box-shadow:0 0 12px #ffd700,0 0 24px #d4af37}
+#viewport.admin-mode .pill{background:rgba(212,175,55,.12);border-color:rgba(255,215,0,.55);box-shadow:0 0 18px rgba(212,175,55,.22)}
+#viewport.admin-mode .glass-card{border-color:rgba(212,175,55,.34);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 22px rgba(212,175,55,.08)}
+#viewport.admin-mode .glass-card::before{background:linear-gradient(90deg,transparent,#ffd700,transparent);opacity:.7}
+#viewport.admin-mode .card-title{color:#ffd700}
+#viewport.admin-mode .btn{background:linear-gradient(135deg,#8a6817,#d4af37,#ffd700,#9b7418);color:#171000;box-shadow:0 4px 22px rgba(212,175,55,.34);text-shadow:none}
+#viewport.admin-mode .btn-secondary{background:rgba(212,175,55,.1);border:1px solid rgba(255,215,0,.35);color:#fff8dc;box-shadow:none}
+#viewport.admin-mode .btn-danger{background:linear-gradient(135deg,#7a1717,#c33);color:#fff}
+#viewport.admin-mode .nav-item.active{color:#ffd700;text-shadow:0 0 12px rgba(255,215,0,.7)}
+#viewport.admin-mode .binder-tab.active{background:rgba(212,175,55,.2);border-color:#ffd700;box-shadow:0 0 14px rgba(212,175,55,.28)}
+#viewport.admin-mode .catalog-card.rarity-common:not(.locked),
+#viewport.admin-mode .catalog-card.rarity-rare:not(.locked),
+#viewport.admin-mode .catalog-card.rarity-epic:not(.locked),
+#viewport.admin-mode .catalog-card.rarity-legendary:not(.locked),
+#viewport.admin-mode .catalog-card.rarity-ultra:not(.locked){background:linear-gradient(145deg,rgba(212,175,55,.24),rgba(30,22,5,.78));border-color:rgba(255,215,0,.58);box-shadow:0 0 26px rgba(212,175,55,.25),inset 0 0 28px rgba(255,215,0,.07)}
+#viewport.admin-mode .catalog-card:not(.locked)::after{color:#ffd700}
+#viewport.admin-mode .item-price{color:#ffd700!important}
+#viewport.admin-mode .admin-panel{border-color:rgba(255,215,0,.7);background:linear-gradient(145deg,rgba(72,50,7,.38),rgba(18,13,3,.82));box-shadow:0 0 35px rgba(212,175,55,.14),inset 0 0 25px rgba(255,215,0,.04)}
+#viewport.admin-mode .admin-crown{animation:adminCrownPulse 1.5s ease-in-out infinite alternate}
+@keyframes adminCrownPulse{from{filter:drop-shadow(0 0 5px rgba(255,215,0,.35));transform:scale(1)}to{filter:drop-shadow(0 0 18px rgba(255,215,0,.95));transform:scale(1.06)}}
+.admin-gift-box{border:1px solid rgba(255,215,0,.25);border-radius:14px;padding:10px;margin-top:9px;background:rgba(255,215,0,.045)}
+.admin-gift-title{font-size:.62rem;font-weight:900;color:#ffd700;letter-spacing:1px;margin-bottom:7px}
+.admin-gift-card{display:flex;align-items:center;gap:8px;font-size:.72rem;padding:8px;border-radius:11px;background:rgba(255,255,255,.035);margin-top:6px}
+
 </style>
 </head>
 <body>
@@ -636,6 +678,23 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div id="tradesList"><i style="color:var(--text-muted); font-size:0.75rem;">Aucune offre en cours.</i></div>
 </div>
 
+<div id="adminPanel" class="glass-card admin-panel" style="display:none;">
+<div class="card-title"><span>👑 CONSOLE ADMINISTRATEUR</span><span class="admin-crown">♛</span></div>
+<div style="font-size:.68rem;color:var(--text-muted);line-height:1.5;margin-bottom:10px;">Bienvenue administrateur. Accès illimité : cartes, crédits et jeux. Les cartes données aux joueurs ne sont pas retirées de ton classeur.</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">🎁 DONNER UNE CARTE À UN JOUEUR</div>
+<input id="adminGiftTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="margin-bottom:7px;">
+<select id="adminGiftCard" class="input-field" style="margin-bottom:7px;"></select>
+<button class="btn" onclick="adminGiftCard()">DONNER LA CARTE</button>
+</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">🪙 DONNER DES CRÉDITS</div>
+<input id="adminCreditTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="margin-bottom:7px;">
+<input id="adminCreditAmount" class="input-field" type="number" min="1" step="1" placeholder="Nombre de crédits" style="margin-bottom:7px;">
+<button class="btn" onclick="adminGiftCredits()">DONNER LES CRÉDITS</button>
+</div>
+</div>
+
 <div class="glass-card">
 <div class="card-title"><span>CODE PROMO ADMINISTRATEUR</span></div>
 <input type="text" id="secretCodeInput" class="input-field" placeholder="Entrez le code..." style="text-transform:uppercase;">
@@ -693,7 +752,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="btn" id="adClaimBtn" disabled onclick="claimAdReward()">PATIENTEZ (30s)...</button>
 </div>
 </div>
-
 </div>
 
 <script>
@@ -1114,6 +1172,7 @@ function ensureStarterCards() {
   if (!appData.catalogs) appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
   appData.catalogs = normalizeCatalogs(appData.catalogs);
   appData.catalogs.starter.forEach(c => c.unlocked = true);
+  if (appData.isAdmin) Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(c => c.unlocked = true));
 }
 let appData = {
 credits: 0,
@@ -1130,6 +1189,7 @@ freeDrops: 0
 
 let currentAuthMode = 'login';
 let isDropping = false;
+
 function showToast(message, type = 'success') {
 const toast = document.getElementById('appToast');
 const msgEl = document.getElementById('toastMsg');
@@ -1171,6 +1231,7 @@ appData.redeemedCodes = [];
 appData.dailyGames = {};
 appData.hubTasks = {date:'', done:{}};
 }
+
 async function loadFirebaseUserProfile(user) {
 if (!user) {
 resetLocalUserState();
@@ -1254,6 +1315,11 @@ try {
 appData.isAdmin = data.isAdmin === true || isAdminEmail;
 appData.catalogs = normalizeCatalogs(data.catalogs);
 ensureStarterCards();
+if (appData.isAdmin) {
+  Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(c => c.unlocked = true));
+  applyAdminMode(true);
+  const entry = document.getElementById('entryCinema'); if (entry) { entry.classList.remove('active'); entry.dataset.locked='0'; }
+}
 appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes : [];
 appData.dailyGames = (data.dailyGames && typeof data.dailyGames === 'object') ? data.dailyGames : {};
 appData.hubTasks = (data.hubTasks && typeof data.hubTasks === 'object') ? data.hubTasks : {date:'', done:{}};
@@ -1272,10 +1338,11 @@ listenToFriendRequests();
 updateUI();
 
 const introKey = 'drop2027_intro_seen_' + user.uid;
-if (!localStorage.getItem(introKey)) {
+if (!isAdminEmail && !appData.isAdmin && !localStorage.getItem(introKey)) {
   localStorage.setItem(introKey, '1');
   setTimeout(() => startEntryAnimation(60, true), 350);
 }
+if (isAdminEmail || appData.isAdmin) showToast('👑 Bienvenue administrateur. Accès illimité activé.','success');
 
 // Cache local pour que l'interface reste utilisable même si Firebase DB tombe
 // momentanément lors de la prochaine connexion.
@@ -1299,6 +1366,7 @@ appData.friends = Array.isArray(cached.friends) ? cached.friends : [];
 appData.isAdmin = cached.isAdmin === true || isAdminEmail;
 appData.catalogs = normalizeCatalogs(cached.catalogs || appData.catalogs);
 ensureStarterCards();
+if (appData.isAdmin) applyAdminMode(true);
 appData.redeemedCodes = Array.isArray(cached.redeemedCodes) ? cached.redeemedCodes : [];
 appData.dailyGames = (cached.dailyGames && typeof cached.dailyGames === 'object') ? cached.dailyGames : {};
 appData.hubTasks = (cached.hubTasks && typeof cached.hubTasks === 'object') ? cached.hubTasks : {date:'', done:{}};
@@ -1374,8 +1442,64 @@ syncPublicCollection();
 updateUI();
 }
 
+function applyAdminMode(active) {
+  const vp=document.getElementById('viewport');
+  if (vp) vp.classList.toggle('admin-mode', !!active);
+  const panel=document.getElementById('adminPanel');
+  if (panel) panel.style.display=active ? 'block' : 'none';
+  if (active) populateAdminGiftCards();
+}
+function populateAdminGiftCards(){
+  const sel=document.getElementById('adminGiftCard'); if(!sel || !appData.isAdmin)return;
+  const all=[];
+  Object.keys(appData.catalogs||{}).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>all.push({c,cat})));
+  all.sort((a,b)=>Number(a.c.id)-Number(b.c.id));
+  sel.innerHTML=all.map(({c,cat})=>'<option value="'+Number(c.id)+'">'+String(c.emoji||'🃏')+' '+String(c.name||('Carte #'+c.id))+' • '+String(c.rarity||'common').toUpperCase()+' • #'+Number(c.id)+'</option>').join('');
+}
+
+function adminTargetUid(raw){
+  const v=String(raw||'').trim().replace(/^#/,'');
+  if(!v.startsWith('DROP-')) return null;
+  const uid=v.slice(5);
+  return uid && uid!==appData.currentUser?.uid ? uid : null;
+}
+
+async function adminGiftCard(){
+  if(!appData.isAdmin || !appData.currentUser)return;
+  const target=adminTargetUid(document.getElementById('adminGiftTarget')?.value);
+  const id=Number(document.getElementById('adminGiftCard')?.value);
+  const card=findCardById(id);
+  if(!target)return showToast('❌ ID joueur invalide. Utilise #DROP-UID.','error');
+  if(!card)return showToast('❌ Carte introuvable.','error');
+  const giftId='gift_card_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const gift={kind:'admin_card_gift',senderUid:appData.currentUser.uid,senderName:'Administrateur',receiverUid:target,receiverName:'Joueur',offeredCardId:Number(card.id),wantedCardId:0,offeredCard:tradeCardSnapshot(card),wantedCard:{id:0,name:'CADEAU ADMINISTRATEUR',emoji:'👑',rarity:'common'},status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
+  try{
+    await withTimeout(db.ref('trade_inbox/'+target+'/'+giftId).set(gift),8000,'Firebase a refusé le cadeau.');
+    await withTimeout(db.ref('trade_outbox/'+appData.currentUser.uid+'/'+giftId).set(gift),8000,'Firebase a refusé la confirmation du cadeau.');
+    document.getElementById('adminGiftTarget').value='';
+    showToast('👑 Carte envoyée au joueur. Elle reste dans ton classeur.','success');
+  }catch(err){showToast('❌ Cadeau non envoyé : '+(err&&err.message?err.message:'erreur Firebase'),'error');}
+}
+
+async function adminGiftCredits(){
+  if(!appData.isAdmin || !appData.currentUser)return;
+  const target=adminTargetUid(document.getElementById('adminCreditTarget')?.value);
+  const amount=Math.floor(Number(document.getElementById('adminCreditAmount')?.value));
+  if(!target)return showToast('❌ ID joueur invalide. Utilise #DROP-UID.','error');
+  if(!Number.isFinite(amount)||amount<1)return showToast('❌ Montant de crédits invalide.','error');
+  const giftId='gift_credits_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const gift={kind:'admin_credit_gift',senderUid:appData.currentUser.uid,senderName:'Administrateur',receiverUid:target,receiverName:'Joueur',offeredCardId:0,wantedCardId:0,offeredCard:{id:0,name:'CRÉDITS ADMINISTRATEUR',emoji:'🪙',rarity:'common'},wantedCard:{id:0,name:'CADEAU ADMINISTRATEUR',emoji:'👑',rarity:'common'},creditAmount:amount,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
+  try{
+    await withTimeout(db.ref('trade_inbox/'+target+'/'+giftId).set(gift),8000,'Firebase a refusé le cadeau.');
+    await withTimeout(db.ref('trade_outbox/'+appData.currentUser.uid+'/'+giftId).set(gift),8000,'Firebase a refusé la confirmation du cadeau.');
+    document.getElementById('adminCreditTarget').value=''; document.getElementById('adminCreditAmount').value='';
+    showToast('👑 Crédits envoyés au joueur.','success');
+  }catch(err){showToast('❌ Cadeau non envoyé : '+(err&&err.message?err.message:'erreur Firebase'),'error');}
+}
+
 function updateUI() {
 ensureStarterCards();
+applyAdminMode(!!appData.isAdmin);
 document.getElementById('creditVal').innerText = appData.isAdmin ? '♾️' : appData.credits.toLocaleString();
 
 const authSec = document.getElementById('authSection');
@@ -2094,9 +2218,9 @@ return showToast('❌ ID invalide. Utilisez le nouvel ID affiché dans le profil
 if (targetUid === appData.currentUser.uid) {
 return showToast('❌ Vous ne pouvez pas vous ajouter vous-même.', 'error');
 }
+
 const btn = input.nextElementSibling;
 if (btn) { btn.disabled = true; btn.innerText = 'ENVOI...'; }
-
 // Plus besoin de friend_codes : l'ID contient directement le UID Firebase.
 // La demande est écrite sous le compte du destinataire, avec le UID de
 // l'expéditeur comme clé. Cela évite les lectures croisées interdites.
@@ -2353,6 +2477,17 @@ function renderTradePanel(){
  tl.innerHTML=''; let count=0;
  Object.keys(tradeInboxCache||{}).forEach(tid=>{
   const t=tradeInboxCache[tid]; if(!t||t.status!=='pending')return;
+  if(t.kind==='admin_card_gift' || t.kind==='admin_credit_gift'){
+    count++;
+    const div=document.createElement('div'); div.className='trade-card-box admin-gift-box'; div.dataset.tradeId=tid;
+    if(t.kind==='admin_card_gift'){
+      const c=t.offeredCard||{emoji:'🃏',name:'Carte',rarity:'common'};
+      div.innerHTML='<p style="font-size:.75rem;">👑 <b>CADEAU DE L’ADMINISTRATEUR</b></p><div class="admin-gift-card"><span style="font-size:2rem;">'+String(c.emoji||'🃏')+'</span><div><b>'+String(c.name||'Carte')+'</b><div style="font-size:.58rem;color:var(--text-muted);">'+String(c.rarity||'common').toUpperCase()+' • Carte offerte gratuitement</div></div></div><button class="btn btn-success" style="margin-top:8px;padding:8px;font-size:.7rem;" onclick="acceptAdminGift(\''+tid+'\')">🎁 RÉCUPÉRER LA CARTE</button>';
+    } else {
+      div.innerHTML='<p style="font-size:.75rem;">👑 <b>CADEAU DE L’ADMINISTRATEUR</b></p><div class="admin-gift-card"><span style="font-size:2rem;">🪙</span><div><b>+'+Number(t.creditAmount||0).toLocaleString()+' crédits</b><div style="font-size:.58rem;color:var(--text-muted);">Crédits offerts gratuitement</div></div></div><button class="btn btn-success" style="margin-top:8px;padding:8px;font-size:.7rem;" onclick="acceptAdminGift(\''+tid+'\')">🎁 RÉCUPÉRER LES CRÉDITS</button>';
+    }
+    tl.appendChild(div); return;
+  }
   count++;
   const offered=t.offeredCard||null, wanted=t.wantedCard||null;
   const div=document.createElement('div'); div.className='trade-card-box'; div.dataset.tradeId=tid;
@@ -2462,6 +2597,34 @@ outboxRef.on('value',snap=>{
 });
 }
 
+async function acceptAdminGift(tradeId){
+ try{
+  if(!appData.currentUser)return;
+  const ref=db.ref('trade_inbox/'+appData.currentUser.uid+'/'+tradeId);
+  const snap=await withTimeout(ref.once('value'),8000,'Impossible de charger le cadeau.');
+  const t=snap.val();
+  if(!t || t.status!=='pending' || !String(t.kind||'').startsWith('admin_')) throw new Error('Ce cadeau n’est plus disponible.');
+  if(t.kind==='admin_card_gift'){
+    const card=findCardById(Number(t.offeredCardId));
+    if(!card)throw new Error('Cette carte n’existe plus dans le catalogue.');
+    card.unlocked=true;
+    await withTimeout(db.ref('users/'+appData.currentUser.uid+'/catalogs').set(appData.catalogs),8000,'Firebase ne répond pas pour ton classeur.');
+    await withTimeout(ref.update({status:'accepted',acceptedAt:firebase.database.ServerValue.TIMESTAMP}),8000,'Firebase ne répond pas pour valider le cadeau.');
+    if(t.senderUid) db.ref('trade_outbox/'+t.senderUid+'/'+tradeId).update({status:'accepted',acceptedAt:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});
+    saveAppData(); showToast('👑 Carte offerte récupérée : '+(card.emoji||'🃏')+' '+card.name,'success');
+  } else {
+    const amount=Math.max(0,Math.floor(Number(t.creditAmount)||0));
+    if(!amount)throw new Error('Montant de crédits invalide.');
+    appData.credits+=amount;
+    await withTimeout(db.ref('users/'+appData.currentUser.uid+'/credits').set(appData.credits),8000,'Firebase ne répond pas pour tes crédits.');
+    await withTimeout(ref.update({status:'accepted',acceptedAt:firebase.database.ServerValue.TIMESTAMP}),8000,'Firebase ne répond pas pour valider le cadeau.');
+    if(t.senderUid) db.ref('trade_outbox/'+t.senderUid+'/'+tradeId).update({status:'accepted',acceptedAt:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});
+    saveAppData(); showToast('👑 Cadeau récupéré : +'+amount.toLocaleString()+' crédits !','success');
+  }
+  delete tradeInboxCache[tradeId]; renderTradePanel();
+ }catch(err){showToast('❌ Impossible de récupérer le cadeau : '+(err&&err.message?err.message:'erreur'),'error');}
+}
+
 async function acceptTrade(tradeId) {
 try {
  const snap=await withTimeout(db.ref('trade_inbox/'+appData.currentUser.uid+'/'+tradeId).once('value'),8000,'Impossible de charger cette offre.');
@@ -2513,12 +2676,12 @@ try {
  delete tradeInboxCache[tradeId]; renderTradePanel(); showToast('Offre d’échange refusée.','success');
 } catch(err){showToast('❌ Impossible de refuser l’offre : '+(err&&err.message?err.message:'erreur'),'error');}
 }
+
 function unlockCardById(id) {
 Object.keys(appData.catalogs).forEach(cat => {
 appData.catalogs[cat].forEach(i => { if(i.id === id) i.unlocked = true; });
 });
 }
-
 function redeemSecretCode() {
 const code = document.getElementById('secretCodeInput').value.trim().toUpperCase();
 if (!code) return;
@@ -2577,6 +2740,7 @@ showToast('Pub visionnée avec succès ! +15 Crédits 🪙', 'success');
 let currentGameInterval = null;
 let activeGameType = null;
 function gamePlayedToday(gameType){
+ if (appData.isAdmin) return false;
  const today=getLocalDayKey();
  return !!(appData.dailyGames && appData.dailyGames[gameType]===today);
 }
@@ -2586,7 +2750,7 @@ function renderGameAvailability(){
    const match=raw.match(/startGame\('([^']+)'\)/);
    if(!match)return;
    const type=match[1];
-   const played=gamePlayedToday(type);
+   const played=!appData.isAdmin && gamePlayedToday(type);
    btn.disabled=played;
    btn.innerText=played?'DÉJÀ JOUÉ AUJOURD’HUI':'JOUER';
    btn.style.opacity=played?'0.5':'1';
@@ -2666,12 +2830,13 @@ function useFreeDrop(){if(!appData.currentUser)return showToast('🔐 Connecte-t
 
 function startGame(gameType) {
 if (!appData.currentUser) return showToast('🔐 Connecte-toi pour jouer.', 'error');
-if (gamePlayedToday(gameType)) return showToast('🎮 Tu as déjà joué à ce jeu aujourd’hui. Reviens demain.', 'error');
+if (!appData.isAdmin && gamePlayedToday(gameType)) return showToast('🎮 Tu as déjà joué à ce jeu aujourd’hui. Reviens demain.', 'error');
 if (!appData.isAdmin && appData.credits < 25) return showToast('25 Crédits nécessaires pour jouer !', 'error');
-if (!appData.isAdmin) appData.credits -= 25;
-activeGameType = gameType;
-if (!appData.dailyGames) appData.dailyGames = {};
-appData.dailyGames[gameType] = getLocalDayKey();
+if (!appData.isAdmin) {
+  appData.credits -= 25;
+  if (!appData.dailyGames) appData.dailyGames = {};
+  appData.dailyGames[gameType] = getLocalDayKey();
+}
 saveAppData();
 
 document.getElementById('gameArea').classList.add('active');
@@ -2700,6 +2865,7 @@ else if (gameType === 'coincatch') runCoinCatchGame(container);
 else if (gameType === 'quicktarget') runQuickTargetGame(container);
 else if (gameType === 'safetile') runSafeTileGame(container);
 }
+
 
 function closeGame() {
 if(currentGameInterval) clearInterval(currentGameInterval);
@@ -2784,6 +2950,7 @@ ctx.fillStyle = "#d946ef"; snake.forEach(s => ctx.fillRect(s.x*10, s.y*10, 9, 9)
 ctx.fillStyle = "#06b6d4"; ctx.fillRect(food.x*10, food.y*10, 9, 9);
 }, 100);
 }
+
 function runTapGame(c) {
 document.getElementById('gameTitle').innerText = "Tap Cible (10s)";
 let score = 0, timeLeft = 10;
@@ -2997,7 +3164,6 @@ function playEntrySound(kind){
  }catch(e){console.warn('Audio intro:',e)}
 }
 function stopEntryMusic(){if(entryMusicHandle){clearInterval(entryMusicHandle);entryMusicHandle=null;}}
-
 function playEntryCrack(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();const now=ctx.currentTime;const b=ctx.createBuffer(1,ctx.sampleRate*.3,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);const s=ctx.createBufferSource(),g=ctx.createGain();g.gain.value=.28;s.buffer=b;s.connect(g);g.connect(ctx.destination);s.start();}catch(e){}}
 function playEntryExplosion(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();const o=ctx.createOscillator(),g=ctx.createGain(),now=ctx.currentTime;o.type='sawtooth';o.frequency.setValueAtTime(180,now);o.frequency.exponentialRampToValueAtTime(45,now+.65);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.28,now+.03);g.gain.exponentialRampToValueAtTime(.0001,now+.8);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+.85);}catch(e){}}
 function getUnlockedCards(){const arr=[];Object.keys(appData.catalogs||{}).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>{if(c.unlocked)arr.push(c);}));return arr;}
@@ -3031,9 +3197,12 @@ function startEntryAnimation(seconds,first){
  },1000);
 }
 
-function bootEntrySequence(){startEntryAnimation(20,false);}
+function bootEntrySequence(){
+ if (appData.isAdmin || (auth.currentUser && String(auth.currentUser.email||'').toLowerCase()==='carer.nathan11@gmail.com')) return;
+ startEntryAnimation(20,false);
+}
 window.addEventListener('load',()=>setTimeout(bootEntrySequence,250));
 
 </script>
 </body>
-  </html>
+                                                                                                                   </html>
