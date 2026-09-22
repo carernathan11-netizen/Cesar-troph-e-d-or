@@ -89,6 +89,27 @@ font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; text-transform: upp
 color: var(--glow-cyan); margin-bottom: 12px; display: flex; justify-content: space-between; font-weight: 700;
 }
 
+
+
+
+.wheel-shell{overflow:hidden;position:relative;background:radial-gradient(circle at 50% 45%,rgba(139,92,246,.13),transparent 48%),var(--card-bg)}
+.wheel-sub{font-size:.72rem;color:var(--text-muted);line-height:1.55}
+.wheel-wrap{display:flex;justify-content:center;align-items:center;padding:10px 0 16px;position:relative}
+.wheel-pointer{position:absolute;top:3px;z-index:5;font-size:2rem;filter:drop-shadow(0 0 10px rgba(255,255,255,.65));transform:rotate(180deg)}
+.wheel{width:min(84vw,360px);height:min(84vw,360px);border-radius:50%;border:8px solid rgba(255,255,255,.1);box-shadow:0 0 25px rgba(139,92,246,.3),inset 0 0 30px rgba(0,0,0,.45);position:relative;transition:transform 5.2s cubic-bezier(.08,.72,.12,1);background:#17112a}
+.wheel::before{content:'';position:absolute;inset:8%;border-radius:50%;border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 0 25px rgba(0,0,0,.45)}
+.wheel-label{position:absolute;left:50%;top:50%;width:42%;transform-origin:0 0;text-align:right;font-size:clamp(.42rem,1.7vw,.62rem);font-weight:900;color:#fff;text-shadow:0 1px 3px #000;pointer-events:none;line-height:1.1}
+.wheel-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;border:3px solid rgba(255,255,255,.35);background:radial-gradient(circle,#28194e,#090711);display:flex;align-items:center;justify-content:center;font-size:1.45rem;z-index:3;box-shadow:0 0 22px rgba(217,70,239,.45)}
+.wheel-spinning{filter:brightness(1.25) saturate(1.25);box-shadow:0 0 55px rgba(217,70,239,.55),0 0 95px rgba(99,102,241,.25)}
+.wheel-prizes{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.wheel-prize{padding:8px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);font-size:.58rem;display:flex;justify-content:space-between;gap:6px}
+.wheel-prize b{color:var(--glow-cyan)}
+.wheel-cost{font-size:.68rem;text-align:center;color:var(--text-muted);margin:4px 0 10px}.wheel-cost strong{color:#fff}
+.wheel-result{min-height:28px;text-align:center;font-size:.75rem;font-weight:900;color:#fff;margin-top:10px;line-height:1.45}
+.wheel-jackpot{animation:wheelJackpot .7s ease-in-out infinite alternate}
+@keyframes wheelJackpot{from{filter:drop-shadow(0 0 5px rgba(217,70,239,.4));transform:scale(1)}to{filter:drop-shadow(0 0 22px rgba(217,70,239,1));transform:scale(1.06)}}
+@media (prefers-reduced-motion:reduce){.wheel{transition:none!important}.wheel-spinning,.wheel-jackpot{animation:none!important}}
+
 .btn {
 width: 100%; padding: 14px; border-radius: 16px; border: none;
 background: linear-gradient(135deg, var(--glow-violet), var(--glow-magenta));
@@ -176,7 +197,7 @@ height: 70px; flex-shrink: 0; background: rgba(10, 8, 20, 0.8); backdrop-filter:
 border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center;
 z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 20%; cursor: pointer; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.65rem; font-weight: 700; background: none; border: none; width: 12.5%; cursor: pointer; }
 .nav-item.active { color: var(--glow-magenta); text-shadow: 0 0 10px rgba(217, 70, 239, 0.5); }
 .nav-item .nav-icon { font-size: 1.3rem; }
 
@@ -243,7 +264,11 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 .trade-box { width:min(96vw,560px); max-height:90vh; overflow:auto; background:linear-gradient(145deg,rgba(20,13,39,.98),rgba(7,6,15,.98)); border:1px solid var(--card-border-glow); border-radius:24px; padding:18px; box-shadow:0 0 55px rgba(217,70,239,.25); }
 .trade-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
 .trade-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-.ambient-sparkles{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}.ambient-sparkles span{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--glow-cyan);box-shadow:0 0 10px var(--glow-cyan);opacity:.25;animation:ambientFloat linear infinite}.ambient-sparkles span:nth-child(1){left:8%;top:82%;animation-duration:9s}.ambient-sparkles span:nth-child(2){left:24%;top:62%;animation-duration:12s}.ambient-sparkles span:nth-child(3){left:47%;top:90%;animation-duration:10s}.ambient-sparkles span:nth-child(4){left:71%;top:70%;animation-duration:13s}.ambient-sparkles span:nth-child(5){left:90%;top:84%;animation-duration:11s}@keyframes ambientFloat{0%{transform:translateY(30px) scale(.7);opacity:0}20%{opacity:.35}100%{transform:translateY(-180px) scale(1.5);opacity:0}}.hud-header{animation:hudIn .6s ease-out}@keyframes hudIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}.screen.active .glass-card{animation:cardIn .45s ease-out both}.screen.active .glass-card:nth-child(2){animation-delay:.04s}.screen.active .glass-card:nth-child(3){animation-delay:.08s}@keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}.nav-item.active .nav-icon{animation:navPulse 1.8s ease-in-out infinite}@keyframes navPulse{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.08)}}
+.ambient-sparkles{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}.ambient-sparkles span{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--glow-cyan);box-shadow:0 0 10px var(--glow-cyan);opacity:.25;animation:ambientFloat linear infinite}.ambient-sparkles span:nth-child(1){left:8%;top:82%;animation-duration:9s}.ambient-sparkles span:nth-child(2){left:24%;top:62%;animation-duration:12s}.ambient-sparkles span:nth-child(3){left:47%;top:90%;animation-duration:10s}.ambient-sparkles span:nth-child(4){left:71%;top:70%;animation-duration:13s}.ambient-sparkles span:nth-child(5){left:90%;top:84%;animation-duration:11s}
+@keyframes runTargetPop{from{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-20deg)}60%{transform:translate(-50%,-50%) scale(1.15) rotate(8deg)}to{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}}
+.run-target{font-family:inherit;appearance:none;-webkit-tap-highlight-color:transparent;}
+.run-target:active{filter:brightness(1.8);}
+@keyframes ambientFloat{0%{transform:translateY(30px) scale(.7);opacity:0}20%{opacity:.35}100%{transform:translateY(-180px) scale(1.5);opacity:0}}.hud-header{animation:hudIn .6s ease-out}@keyframes hudIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}.screen.active .glass-card{animation:cardIn .45s ease-out both}.screen.active .glass-card:nth-child(2){animation-delay:.04s}.screen.active .glass-card:nth-child(3){animation-delay:.08s}@keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}.nav-item.active .nav-icon{animation:navPulse 1.8s ease-in-out infinite}@keyframes navPulse{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.08)}}
 .music-toggle { width:38px;height:38px;border-radius:50%;border:1px solid var(--card-border-glow);background:rgba(139,92,246,.12);color:#fff;font-size:1.05rem;cursor:pointer;box-shadow:0 0 16px rgba(217,70,239,.18);transition:transform .2s,box-shadow .2s; }
 .music-toggle:active{transform:scale(.9)}
 .ad-big-icon{font-size:3rem;filter:drop-shadow(0 0 18px rgba(217,70,239,.5));animation:adFloat 1.4s ease-in-out infinite alternate;}
@@ -374,6 +399,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
     <button id="tradeConfirmBtn" class="btn" disabled onclick="confirmTradeModal()">ENVOYER L'OFFRE</button>
   </div>
 </div>
+
 <div id="tradePreviewModal" class="trade-preview-modal" aria-hidden="true" onclick="if(event.target===this)closeTradePreview()">
   <div class="trade-preview-box">
     <div class="trade-head" style="margin-bottom:12px;">
@@ -394,6 +420,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="pill"><span>🪙</span><span id="creditVal">0</span></div>
 </div>
 </header>
+
 <main class="screen-container">
 
 <!-- 1. ACCUEIL / DROP MYSTÈRE ANIMÉ -->
@@ -418,6 +445,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <p style="font-size:0.75rem; color:var(--text-muted); margin:6px 0 14px;">Chances : <b>9/10</b> Classique & Rare | <b style="color:var(--glow-magenta);">1/10</b> Ultra Rare !</p>
 <button class="btn" id="btnDrop" onclick="openRandomDrop()">DÉBLOQUER (150 🪙)</button>
+<div style="margin-top:8px;font-size:.62rem;color:var(--text-muted);">🎟️ Drops gratuits disponibles : <b id="homeFreeDropCount">0</b></div>
 </div>
 
 <div class="glass-card">
@@ -430,7 +458,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <section id="scr-collection" class="screen">
 <div class="glass-card">
 <div class="card-title"><span>CLASSEUR DE CATALOGUES</span></div>
-
 <div class="binder-tabs">
 <div class="binder-tab active" onclick="switchCategory('starter', this)">🧩 Départ</div>
 <div class="binder-tab" onclick="switchCategory('__owned', this)">💎 Mes cartes</div>
@@ -456,6 +483,8 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="binder-tab" onclick="switchCategory('transports', this)">🚌 Transports Maudits</div>
 <div class="binder-tab" onclick="switchCategory('reunion', this)">💻 Réunions</div>
 
+<div class="binder-tab" onclick="switchCategory('fillesreloues', this)">👩‍🎓 Filles Inoubliables</div>
+<div class="binder-tab" onclick="switchCategory('mecsrelous', this)">👨‍🎓 Mecs Inoubliables</div>
 <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
 </div>
 
@@ -463,7 +492,31 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </div>
 </section>
 
-<!-- 3. MINI-JEUX -->
+
+<!-- 3. ROUE DE LA CHANCE -->
+<section id="scr-wheel" class="screen">
+<div class="glass-card wheel-shell">
+  <div class="card-title"><span>🎡 ROUE DE LA CHANCE</span><span>30 🪙</span></div>
+  <p class="wheel-sub">Mise : <b>30 crédits</b>. Les gros lots sont volontairement extrêmement rares. Perdre est beaucoup plus fréquent que décrocher un jackpot, parce que la roue a manifestement décidé d'être cruelle.</p>
+  <div class="wheel-wrap">
+    <div class="wheel-pointer">🔻</div>
+    <div id="luckWheel" class="wheel"></div>
+    <div class="wheel-center">🎲</div>
+  </div>
+  <div class="wheel-cost">Coût d'un tour : <strong>30 🪙</strong></div>
+  <button id="spinWheelBtn" class="btn" onclick="spinLuckWheel()">🎡 TOURNER LA ROUE — 30 🪙</button>
+  <div id="wheelResult" class="wheel-result">La roue attend son prochain malheureux.</div>
+  <div class="wheel-prizes" id="wheelPrizeList"></div>
+</div>
+<div class="glass-card">
+  <div class="card-title"><span>🎁 TES TOURS GRATUITS</span></div>
+  <p class="wheel-sub">Certains lots donnent des drops gratuits. Ils peuvent être utilisés sans payer les 150 crédits habituels.</p>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;"><b style="font-size:.82rem;">🎟️ Drops gratuits : <span id="freeDropCount">0</span></b><button id="freeDropBtn" class="btn btn-secondary" style="width:auto;padding:9px 13px;" onclick="useFreeDrop()">OUVRIR UN DROP GRATUIT</button></div>
+</div>
+</section>
+
+<!-- 4. MINI-JEUX -->
+
 <section id="scr-games" class="screen">
 <div class="glass-card">
 <div class="card-title"><span>ARCADE — GAIN DE CRÉDITS</span></div>
@@ -592,6 +645,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="nav-item active" onclick="switchTab('scr-home', this)"><span class="nav-icon">🔮</span><span>DROP</span></button>
 <button class="nav-item" onclick="switchTab('scr-collection', this)"><span class="nav-icon">📁</span><span>CLASSEUR</span></button>
 <button class="nav-item" onclick="switchTab('scr-games', this)"><span class="nav-icon">🎮</span><span>JEUX</span></button>
+<button class="nav-item" onclick="switchTab('scr-wheel', this)"><span class="nav-icon">🎡</span><span>ROUE</span></button>
 <button class="nav-item" onclick="switchTab('scr-shop', this)"><span class="nav-icon">💎</span><span>SHOP</span></button>
 <button class="nav-item" onclick="switchTab('scr-hub', this)"><span class="nav-icon">🧠</span><span>HUB</span></button>
 <button class="nav-item" onclick="switchTab('scr-account', this)"><span class="nav-icon">👤</span><span>COMPTE</span></button>
@@ -831,6 +885,8 @@ secret: [
 { id: 414, name: "Carte de Crédit Obsidienne", emoji: "🖤", price: 400000, unlocked: false },
 { id: 415, name: "Sceau Absolu de l'Infiniment Grand", emoji: "🌌", price: 600000, unlocked: false },
 { id: 416, name: "Passeport Cosmique 2027", emoji: "🛸", price: 800000, unlocked: false },
+{ id: 1900, name: "🌀 Carte Fantôme du DROP RUSH", emoji: "🌀", price: 12000, unlocked: false, tradeable: true, rarity: "ultra", modeExclusive: true },
+  { id: 1901, name: "🕳️ L’Agent Fantôme", emoji: "🕳️", price: 18000, unlocked: false, tradeable: true, rarity: "ultra", modeExclusive: true },
 { id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false, tradeable: false, rarity: "ultra" }
 ],
 mauvaisesidees: [
@@ -990,12 +1046,40 @@ situations: [
 {id:1406,name:'Appeler Quelqu’un Par Le Mauvais Prénom',emoji:'🫣',price:1300,unlocked:false,tradeable:true,rarity:'epic'},
 {id:1407,name:'Silence Après Une Blague',emoji:'🦗',price:2400,unlocked:false,tradeable:true,rarity:'legendary'},
 {id:1408,name:'Cringe Légendaire',emoji:'💀',price:6500,unlocked:false,tradeable:true,rarity:'ultra'}
+],
+fillesreloues: [
+{id:1901,name:'Sarah “J’ai Une Question”',emoji:'🙋‍♀️',price:420,unlocked:false,tradeable:true,rarity:'common'},
+{id:1902,name:'Lili “C’est Pas Moi”',emoji:'😇',price:520,unlocked:false,tradeable:true,rarity:'common'},
+{id:1903,name:'Chloé “Attends J’Arrive”',emoji:'🏃‍♀️',price:680,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1904,name:'Emma “J’ai Oublié”',emoji:'🧠',price:760,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1905,name:'Jade “Regarde Ça”',emoji:'👀',price:950,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1906,name:'Inès “Je Sais Déjà”',emoji:'😏',price:1200,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1907,name:'Clara “Tu Peux Me Passer…”',emoji:'🤏',price:1450,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1908,name:'Manon “C’était Pas le Devoir ?”',emoji:'📚',price:1750,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1909,name:'Zoé “J’ai Tout Raconté”',emoji:'📢',price:2400,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1910,name:'Léna “On Rend Quand ?”',emoji:'⏰',price:3100,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1911,name:'Maya “Personne N’a Vu”',emoji:'🕵️‍♀️',price:4200,unlocked:false,tradeable:true,rarity:'ultra'},
+{id:1912,name:'Nina “Conseil Non Demandé”',emoji:'💅',price:6500,unlocked:false,tradeable:true,rarity:'ultra'}
+],
+mecsrelous: [
+{id:1921,name:'Tom “T’as Compris ?”',emoji:'🗣️',price:410,unlocked:false,tradeable:true,rarity:'common'},
+{id:1922,name:'Lucas “J’ai Rien Fait”',emoji:'🙄',price:500,unlocked:false,tradeable:true,rarity:'common'},
+{id:1923,name:'Hugo “Il Reste Combien ?”',emoji:'⏳',price:650,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1924,name:'Noah “Regarde Mon Écran”',emoji:'📱',price:780,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1925,name:'Enzo “J’Arrive Dans 2 Min”',emoji:'🏃',price:920,unlocked:false,tradeable:true,rarity:'rare'},
+{id:1926,name:'Mathis “C’est Facile”',emoji:'🧮',price:1150,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1927,name:'Nathan “Attends J’Explique”',emoji:'🎤',price:1400,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1928,name:'Théo “J’ai Une Théorie”',emoji:'🧠',price:1750,unlocked:false,tradeable:true,rarity:'epic'},
+{id:1929,name:'Ethan “J’ai Pas Révisé”',emoji:'📖',price:2350,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1930,name:'Sacha “On Fait Ça Après”',emoji:'🛋️',price:3000,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:1931,name:'Yanis “J’Peux Voir ?”',emoji:'👁️',price:4300,unlocked:false,tradeable:true,rarity:'ultra'},
+{id:1932,name:'Max “Le Bruit de Fond”',emoji:'🔊',price:6800,unlocked:false,tradeable:true,rarity:'ultra'}
 ]
 };
 
 let activeCategory = 'starter';
-const NEW_CARD_IDS = new Set([601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408,1501,1502,1503,1504,1505,1506,1507,1508,1601,1602,1603,1604,1605,1606,1607,1608,1701,1702,1703,1704,1705,1706,1707,1708,1801,1802,1803,1804,1805,1806,1807,1808]);
-const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
+const NEW_CARD_IDS = new Set([1900,1901,1902,1903,1904,1905,1906,1907,1908,1909,1910,1911,1912,1921,1922,1923,1924,1925,1926,1927,1928,1929,1930,1931,1932,601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408,1501,1502,1503,1504,1505,1506,1507,1508,1601,1602,1603,1604,1605,1606,1607,1608,1701,1702,1703,1704,1705,1706,1707,1708,1801,1802,1803,1804,1805,1806,1807,1808]);
+const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',fillesreloues:'👩‍🎓 Filles Inoubliables',mecsrelous:'👨‍🎓 Mecs Inoubliables',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
 function canonicalCardRarity(cat, item) {
   // Les cartes de la catégorie Ultra Rares sont toujours ultra rares,
   // même si une ancienne sauvegarde les avait enregistrées comme common.
@@ -1036,7 +1120,8 @@ friends: [],
 isAdmin: false,
 catalogs: JSON.parse(JSON.stringify(CATALOGS)),
 dailyGames: {},
-hubTasks: {date:'', done:{}}
+hubTasks: {date:'', done:{}},
+freeDrops: 0
 };
 
 let currentAuthMode = 'login';
@@ -1133,7 +1218,8 @@ isAdmin: isAdminEmail,
 catalogs: freshCatalogs,
 redeemedCodes: [],
 dailyGames: {},
-hubTasks: {date:'', done:{}}
+hubTasks: {date:'', done:{}},
+freeDrops: 0
 };
 
 // Écriture non bloquante : une panne de Realtime Database ne déconnecte pas le joueur.
@@ -1149,6 +1235,7 @@ const storedFriendSuffix = friendCodeKey(storedFriendId).slice(5);
 const needsFriendIdMigration = !storedFriendSuffix || storedFriendSuffix.length < 20;
 appData.friendId = needsFriendIdMigration ? fallbackFriendId : storedFriendId;
 appData.friends = Array.isArray(data.friends) ? data.friends : [];
+
 // Les amitiés partagées sont stockées séparément pour éviter qu'un joueur
 // ait besoin d'écrire dans le profil Firebase d'un autre joueur.
 try {
@@ -1168,6 +1255,7 @@ ensureStarterCards();
 appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes : [];
 appData.dailyGames = (data.dailyGames && typeof data.dailyGames === 'object') ? data.dailyGames : {};
 appData.hubTasks = (data.hubTasks && typeof data.hubTasks === 'object') ? data.hubTasks : {date:'', done:{}};
+appData.freeDrops = Math.max(0, Number(data.freeDrops) || 0);
 // Réindexe immédiatement les cartes échangeables existantes pour les amis.
 syncPublicCollection();
 
@@ -1275,7 +1363,8 @@ friendId: appData.friendId,
 isAdmin: appData.isAdmin,
 redeemedCodes: appData.redeemedCodes,
 dailyGames: appData.dailyGames,
-hubTasks: appData.hubTasks
+hubTasks: appData.hubTasks,
+freeDrops: appData.freeDrops || 0
 };
 db.ref('users/' + appData.currentUser.uid).update(userData).catch(err => console.warn('Sauvegarde profil:', err));
 syncPublicCollection();
@@ -1295,6 +1384,7 @@ if (appData.currentUser) {
 authSec.style.display = 'none';
 profSec.style.display = 'block';
 friendsSec.style.display = 'block';
+
 document.getElementById('profileName').innerText = appData.currentUser.username;
 document.getElementById('userFriendId').innerText = 'ID Ami : ' + appData.friendId;
 
@@ -1314,7 +1404,9 @@ friendsSec.style.display = 'none';
 
 renderCatalogGrid();
 renderHub();
+updateFreeDropUI();
 }
+
 function getLocalDayKey(){
  const d=new Date();
  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1665,7 +1757,32 @@ const CARD_STORIES = {
   "1405": "Faire Semblant d’Avoir Compris devait être un moment banal. Il a duré trois secondes de trop et s'est transformé en souvenir permanent.",
   "1406": "Tout le monde a vu Appeler Quelqu’un Par Le Mauvais Prénom. Personne n'a su quoi dire. C'est ainsi que le silence est devenu légendaire.",
   "1407": "Silence Après Une Blague est le genre de moment où l'on sourit pour faire croire que tout va bien avant de repenser à la scène pendant trois jours.",
-  "1408": "La scène avec Cringe Légendaire aurait pu être oubliée. Malheureusement, quelqu'un a dit « personne n'a vu » alors que tout le monde avait vu."
+  "1408": "La scène avec Cringe Légendaire aurait pu être oubliée. Malheureusement, quelqu'un a dit « personne n'a vu » alors que tout le monde avait vu.",
+"1900": "La Carte Fantôme du DROP RUSH n'apparaît jamais dans le DROP classique. Elle a été aperçue une seule fois dans un écran de score, puis a disparu avant même que quelqu'un puisse faire une capture d'écran.",
+"1901": "Sarah avait une question. Puis une deuxième. Puis une troisième. Le professeur a fini par écrire « Sarah » au tableau comme si c'était devenu une matière scolaire.",
+"1902": "Lili a découvert que la meilleure défense contre une accusation est de dire « c'est pas moi » avant même que la question soit posée. Personne ne sait si ça fonctionne. Elle, en revanche, en est convaincue.",
+"1903": "Chloé a dit « j'arrive » depuis le fond de la salle. Sept minutes plus tard, elle était toujours au même endroit, mais avec un stylo qu'elle n'avait pas avant. Mystère absolu.",
+"1904": "Emma a oublié son devoir, son agenda et pourquoi elle était entrée dans la salle. Elle a finalement retrouvé les trois, dans cet ordre, à la récréation.",
+"1905": "Jade a commencé une phrase par « regarde ça ». Toute la classe a regardé. C'était une gomme posée à l'envers. Le suspense avait été totalement disproportionné.",
+"1906": "Inès a annoncé qu'elle savait déjà. Le problème, c'est que personne ne savait quoi. Elle a maintenu cette position avec une confiance remarquable pendant quatre minutes.",
+"1907": "Clara a demandé « tu peux me passer… ». La phrase s'est arrêtée là. Elle a pointé six objets différents jusqu'à ce que quelqu'un comprenne enfin lequel elle voulait.",
+"1908": "Manon a regardé la date du contrôle et a demandé si c'était bien le devoir. Toute la classe a regardé le cahier. Le cahier a malheureusement confirmé les soupçons.",
+"1909": "Zoé a dit qu'elle n'avait rien raconté. Deux minutes plus tard, trois personnes connaissaient déjà l'histoire avec les détails, les dialogues et même une bande-son imaginaire.",
+"1910": "Léna a demandé « on rend quand ? » alors que la date était écrite en énorme sur le tableau depuis vingt minutes. Le tableau a vécu ce moment comme une attaque personnelle.",
+"1911": "Maya a juré que personne n'avait vu. Toute la classe avait vu. Même la plante près de la fenêtre semblait au courant.",
+"1912": "Nina a donné un conseil extrêmement précis à quelqu'un qui n'avait demandé absolument aucun conseil. Étrangement, le conseil était plutôt bon. C'est ce qui a rendu la situation encore plus difficile à accepter.",
+"1921": "Tom a demandé « t'as compris ? » avec l'assurance d'un professeur. Quand on lui a retourné la question, il a regardé le plafond pendant cinq secondes.",
+"1922": "Lucas a été retrouvé à côté du seul objet cassé de la salle. « J'ai rien fait » est arrivé si vite que l'objet n'avait même pas eu le temps d'être inspecté.",
+"1923": "Hugo a demandé combien de temps il restait. Il restait exactement trente secondes. Il a soupiré comme si on venait de lui annoncer une peine de prison.",
+"1924": "Noah a montré son écran à toute la rangée. Personne n'avait demandé. Dix secondes plus tard, tout le monde connaissait le contenu du téléphone. Mission accomplie, apparemment.",
+"1925": "Enzo a promis d'arriver dans deux minutes. Deux minutes plus tard, il a envoyé « j'arrive ». Cette opération s'est répétée jusqu'à la sonnerie.",
+"1926": "Mathis a déclaré « c'est facile » juste avant de découvrir la question 4. La question 4 a donc obtenu une réputation qu'elle n'avait absolument pas demandée.",
+"1927": "Nathan a commencé par « attends, j'explique ». Il a expliqué pendant si longtemps que le sujet initial a mystérieusement changé entre-temps.",
+"1928": "Théo a une théorie pour tout. Un jour, il a expliqué pourquoi le vidéoprojecteur refusait de fonctionner. Le vrai problème était qu'il n'était pas branché.",
+"1929": "Ethan n'avait pas révisé. Il a quand même ouvert le contrôle avec une confiance digne d'un héros de film. La première question a immédiatement détruit cette confiance.",
+"1930": "Sacha a proposé de faire le travail après. Personne n'a su quand « après » commençait exactement. Le devoir, lui, a continué d'attendre sur la table.",
+"1931": "Yanis a demandé « j'peux voir ? » juste après que quelqu'un a fini. Il a regardé une seconde, a hoché la tête et a rendu le cahier comme s'il venait d'obtenir une information classifiée.",
+"1932": "Max n'a pas besoin de parler pour être remarqué. Il lui suffit d'être le bruit de fond officiel de la salle : stylo, chaise, rire, commentaire, puis retour au calme. Dans cet ordre précis."
 };
 function getCardStory(card, categoryKey){
  return CARD_STORIES[String(card.id)] || `Personne ne sait exactement comment ${card.name} est devenu une carte DROP. Une chose est sûre : cette carte possède sa propre histoire.`;
@@ -1734,6 +1851,7 @@ Object.keys(appData.catalogs).forEach(cat => {
 const item = appData.catalogs[cat].find(i => i.id === id);
 if(item) found = item;
 });
+
 if (!found) return;
 if (found.unlocked) return showToast('Article déjà débloqué !', 'error');
 
@@ -1751,9 +1869,10 @@ else showToast('🎉 FÉLICITATIONS ! Objet obtenu : ' + found.emoji + ' ' + fou
 saveAppData();
 }
 
-function openRandomDrop() {
+function openRandomDrop(isFree = false) {
 if (isDropping) return;
-if (!appData.isAdmin && appData.credits < 150) return showToast('150 Crédits requis pour lancer un drop !', 'error');
+if (isFree && !appData.isAdmin && (appData.freeDrops || 0) <= 0) return showToast('Aucun drop gratuit disponible.', 'error');
+if (!isFree && !appData.isAdmin && appData.credits < 150) return showToast('150 Crédits requis pour lancer un drop !', 'error');
 ensureStarterCards();
 const roll = Math.random();
 // Répartition volontairement très déséquilibrée : les cartes communes tombent souvent,
@@ -1769,14 +1888,14 @@ let pool = [];
 Object.keys(appData.catalogs).forEach(cat => {
   if (cat === 'starter') return;
   (appData.catalogs[cat] || []).forEach(i => {
-    if (!i.unlocked && i.tradeable !== false && wantedRarities.includes(i.rarity || 'common')) pool.push(i);
+    if (!i.unlocked && i.tradeable !== false && !i.modeExclusive && wantedRarities.includes(i.rarity || 'common')) pool.push(i);
   });
 });
 if (pool.length === 0) {
-  Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(i => { if(!i.unlocked && i.tradeable !== false) pool.push(i); }));
+  Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(i => { if(!i.unlocked && i.tradeable !== false && !i.modeExclusive) pool.push(i); }));
 }
 if (pool.length === 0) return showToast('🎉 Félicitations, tout le classeur échangeable est déjà débloqué !', 'success');
-if (!appData.isAdmin) appData.credits -= 150;
+if (!appData.isAdmin) { if (isFree) appData.freeDrops = Math.max(0, (appData.freeDrops || 0) - 1); else appData.credits -= 150; }
 const picked = pool[Math.floor(Math.random() * pool.length)];
 picked.unlocked = true;
 completeHubTask('drop');
@@ -1976,7 +2095,6 @@ return showToast('❌ Vous ne pouvez pas vous ajouter vous-même.', 'error');
 
 const btn = input.nextElementSibling;
 if (btn) { btn.disabled = true; btn.innerText = 'ENVOI...'; }
-
 // Plus besoin de friend_codes : l'ID contient directement le UID Firebase.
 // La demande est écrite sous le compte du destinataire, avec le UID de
 // l'expéditeur comme clé. Cela évite les lectures croisées interdites.
@@ -2006,6 +2124,7 @@ showToast('❌ ' + (err.message || 'Impossible d’envoyer la demande.'), 'error
 if (btn) { btn.disabled = false; btn.innerText = 'AJOUTER'; }
 });
 }
+
 function listenToFriendRequests() {
 if (!appData.currentUser) return;
 db.ref('friend_requests/' + appData.currentUser.uid).on('value', snapshot => {
@@ -2194,6 +2313,7 @@ if(kind==='offer'){
 if(el)el.classList.add('selected');
 updateTradeSummary();
 }
+
 function updateTradeSummary(){
 const o=activeTrade.offerId!=null?findCardById(Number(activeTrade.offerId)):null;
 const w=activeTrade.wantId!=null?Number(activeTrade.wantId):null;
@@ -2403,6 +2523,7 @@ const code = document.getElementById('secretCodeInput').value.trim().toUpperCase
 if (!code) return;
 
 if (appData.redeemedCodes.includes(code)) return showToast('❌ Ce code a déjà été utilisé.', 'error');
+
 if (code === 'DROPDROP2627GIVEFREE10000') {
 appData.credits += 10000;
 appData.redeemedCodes.push(code);
@@ -2470,6 +2591,62 @@ function renderGameAvailability(){
    btn.style.opacity=played?'0.5':'1';
  });
 }
+
+/* ROUE DE LA CHANCE */
+const LUCK_WHEEL_PRIZES = [
+  {label:'RIEN', icon:'💀', type:'nothing', value:0, p:55, color:'#17121f'},
+  {label:'+5 CRÉDITS', icon:'🪙', type:'credits', value:5, p:15, color:'#25203a'},
+  {label:'+10 CRÉDITS', icon:'🪙', type:'credits', value:10, p:10, color:'#2c2144'},
+  {label:'+15 CRÉDITS', icon:'🪙', type:'credits', value:15, p:7, color:'#34224d'},
+  {label:'+30 CRÉDITS', icon:'🪙', type:'credits', value:30, p:5, color:'#3b2356'},
+  {label:'+50 CRÉDITS', icon:'💎', type:'credits', value:50, p:3, color:'#44255f'},
+  {label:'+100 CRÉDITS', icon:'💠', type:'credits', value:100, p:2, color:'#4c2769'},
+  {label:'+250 CRÉDITS', icon:'👑', type:'credits', value:250, p:1.5, color:'#552b70'},
+  {label:'+500 CRÉDITS', icon:'🔥', type:'credits', value:500, p:1, color:'#642f75'},
+  {label:'3 DROPS GRATUITS', icon:'🎁', type:'drops', value:3, p:.5, color:'#75377e'}
+];
+let luckWheelReady=false, luckWheelSpinning=false, luckWheelRotation=0;
+function renderLuckWheel(){
+ const wheel=document.getElementById('luckWheel'), list=document.getElementById('wheelPrizeList'); if(!wheel||!list)return;
+ let cursor=0, stops=[];
+ LUCK_WHEEL_PRIZES.forEach((x,i)=>{const start=cursor;cursor+=x.p;stops.push(start);});
+ const grad=[]; cursor=0;
+ LUCK_WHEEL_PRIZES.forEach(x=>{const a=cursor,b=cursor+x.p;grad.push(`${x.color} ${a}% ${b}%`);cursor=b;});
+ wheel.style.background=`conic-gradient(${grad.join(',')})`;
+ wheel.querySelectorAll('.wheel-label').forEach(x=>x.remove());
+ let acc=0;
+ LUCK_WHEEL_PRIZES.forEach((x,i)=>{const mid=(acc+x.p/2)*3.6;acc+=x.p;const el=document.createElement('div');el.className='wheel-label';el.innerHTML=x.icon+'<br>'+x.label;el.style.transform=`rotate(${mid}deg) translate(0,-50%) rotate(${-mid}deg)`;el.style.width=x.p<2?'52%':x.p<5?'48%':'43%';wheel.appendChild(el);});
+ list.innerHTML=LUCK_WHEEL_PRIZES.map(x=>`<div class="wheel-prize"><span>${x.icon} ${x.label}</span><b>${x.p}%</b></div>`).join('');
+ luckWheelReady=true; updateFreeDropUI();
+}
+function updateFreeDropUI(){const count=appData.freeDrops||0;const n=document.getElementById('freeDropCount'),h=document.getElementById('homeFreeDropCount'),b=document.getElementById('freeDropBtn');if(n)n.textContent=count;if(h)h.textContent=count;if(b)b.disabled=!appData.currentUser||count<=0;}
+function pickLuckPrize(){const r=Math.random()*100;let c=0;for(let i=0;i<LUCK_WHEEL_PRIZES.length;i++){c+=LUCK_WHEEL_PRIZES[i].p;if(r<c)return i;}return LUCK_WHEEL_PRIZES.length-1;}
+function spinLuckWheel(){
+ if(luckWheelSpinning)return;
+ if(!appData.currentUser)return showToast('🔐 Connecte-toi pour tourner la roue.','error');
+ if(!appData.isAdmin&&appData.credits<30)return showToast('30 Crédits nécessaires pour tourner la roue !','error');
+ const wheel=document.getElementById('luckWheel'),btn=document.getElementById('spinWheelBtn'),res=document.getElementById('wheelResult');if(!wheel||!btn)return;
+ if(!appData.isAdmin)appData.credits-=30; saveAppData();
+ luckWheelSpinning=true;btn.disabled=true;wheel.classList.add('wheel-spinning');res.textContent='🎡 La roue tourne...';
+ const idx=pickLuckPrize(), prize=LUCK_WHEEL_PRIZES[idx];
+ let start=0;for(let i=0;i<idx;i++)start+=LUCK_WHEEL_PRIZES[i];
+ const targetCenter=(start+prize.p/2)*3.6;
+ const desired=(360-targetCenter+360)%360;
+ const current=((luckWheelRotation%360)+360)%360;
+ const delta=(desired-current+360)%360;
+ luckWheelRotation+=360*8+delta;
+ wheel.style.transform=`rotate(${luckWheelRotation}deg)`;
+ setTimeout(()=>{
+   luckWheelSpinning=false;wheel.classList.remove('wheel-spinning');btn.disabled=false;
+   if(prize.type==='credits'){appData.credits+=prize.value;res.innerHTML=`${prize.icon} <b>+${prize.value.toLocaleString()} CRÉDITS</b>`;showToast(`🎡 +${prize.value.toLocaleString()} crédits !`,'success');}
+   else if(prize.type==='drops'){appData.freeDrops=(appData.freeDrops||0)+prize.value;res.innerHTML=`🎁 <b>3 DROPS GRATUITS !</b>`;showToast('🎁 3 drops gratuits gagnés !','success');}
+   else {res.innerHTML='💀 <b>RIEN. La roue a gagné.</b>';showToast('💀 Rien gagné cette fois.','error');}
+   if(prize.p<=1)res.classList.add('wheel-jackpot');else res.classList.remove('wheel-jackpot');
+   saveAppData();updateFreeDropUI();
+ },5250);
+}
+function useFreeDrop(){if(!appData.currentUser)return showToast('🔐 Connecte-toi pour utiliser un drop gratuit.','error');if((appData.freeDrops||0)<=0)return showToast('Aucun drop gratuit disponible.','error');openRandomDrop(true);}
+
 function startGame(gameType) {
 if (!appData.currentUser) return showToast('🔐 Connecte-toi pour jouer.', 'error');
 if (gamePlayedToday(gameType)) return showToast('🎮 Tu as déjà joué à ce jeu aujourd’hui. Reviens demain.', 'error');
@@ -2484,7 +2661,6 @@ document.getElementById('gameArea').classList.add('active');
 startGameMusic();
 const container = document.getElementById('gameCanvasContainer');
 container.innerHTML = '';
-
 if (gameType === 'reaction') runReactionGame(container);
 else if (gameType === 'connect4') runConnect4Game(container);
 else if (gameType === 'snake') runSnakeGame(container);
@@ -2506,6 +2682,7 @@ else if (gameType === 'coincatch') runCoinCatchGame(container);
 else if (gameType === 'quicktarget') runQuickTargetGame(container);
 else if (gameType === 'safetile') runSafeTileGame(container);
 }
+
 
 function closeGame() {
 if(currentGameInterval) clearInterval(currentGameInterval);
@@ -2567,7 +2744,6 @@ return false;
 }
 draw();
 }
-
 function runSnakeGame(c) {
 document.getElementById('gameTitle').innerText = "Snake Néon 2027";
 c.innerHTML = '<canvas id="sc" width="240" height="240" style="background:#0a0814; border-radius:14px; border:1px solid var(--card-border);"></canvas>';
@@ -2609,7 +2785,6 @@ if(timerEl) timerEl.innerText = timeLeft + 's';
 if(timeLeft <= 0) rewardPlayer(score >= 4 ? Math.min(10 + score * 2, 50) : 0);
 }, 1000);
 }
-
 function runMemoryGame(c) {
 document.getElementById('gameTitle').innerText = "Mémoire Flash";
 c.innerHTML = '<div id="mgrid" style="display:grid; grid-template-columns:repeat(2,80px); gap:10px;"><div id="m0" style="height:80px; background:#ef4444; border-radius:12px;" onclick="userTap(0)"></div><div id="m1" style="height:80px; background:#3b82f6; border-radius:12px;" onclick="userTap(1)"></div><div id="m2" style="height:80px; background:#22c55e; border-radius:12px;" onclick="userTap(2)"></div><div id="m3" style="height:80px; background:#eab308; border-radius:12px;" onclick="userTap(3)"></div></div>';
@@ -2790,7 +2965,7 @@ function startGameMusic(){if(!gameMusicEnabled)return;stopGameMusic();scheduleGa
 function stopGameMusic(){if(gameMusicTimer){clearTimeout(gameMusicTimer);gameMusicTimer=null;}}
 function toggleGameMusic(){gameMusicEnabled=!gameMusicEnabled;const btn=document.getElementById('musicToggle');if(btn)btn.innerText=gameMusicEnabled?'🔊':'🔇';if(gameMusicEnabled)startGameMusic();else stopGameMusic();}
 function bootMusic(){if(gameMusicEnabled&&!gameMusicTimer)startGameMusic();}
-window.addEventListener('load',()=>{setTimeout(bootMusic,80);});
+window.addEventListener('load',()=>{setTimeout(bootMusic,80);setTimeout(renderLuckWheel,90);});
 window.addEventListener('pointerdown',()=>{if(gameMusicEnabled){const ctx=ensureAudio();if(ctx&&ctx.state==='running'&&!gameMusicTimer)startGameMusic();else if(ctx&&ctx.state==='suspended')ctx.resume().then(()=>{if(!gameMusicTimer)startGameMusic();}).catch(()=>{});}}, {passive:true});
 
 function playEntrySound(kind){
@@ -2840,7 +3015,6 @@ function startEntryAnimation(seconds,first){
 
 function bootEntrySequence(){startEntryAnimation(20,false);}
 window.addEventListener('load',()=>setTimeout(bootEntrySequence,250));
-
 </script>
 </body>
-                          </html>
+    </html>
