@@ -126,6 +126,24 @@ color: var(--glow-cyan); margin-bottom: 12px; display: flex; justify-content: sp
 @keyframes wheelJackpot{from{filter:drop-shadow(0 0 5px rgba(217,70,239,.4));transform:scale(1)}to{filter:drop-shadow(0 0 22px rgba(217,70,239,1));transform:scale(1.06)}}
 @keyframes pointerPulse{from{filter:drop-shadow(0 0 7px rgba(255,255,255,.65)) drop-shadow(0 0 12px rgba(217,70,239,.5))}to{filter:drop-shadow(0 0 12px rgba(255,255,255,1)) drop-shadow(0 0 24px rgba(217,70,239,.9))}}
 @media (max-width:430px){.wheel-stage{width:88vw;height:88vw}.wheel-label{width:96px;margin-left:-48px;font-size:.55rem}.wheel-center{width:72px;height:72px;font-size:1.35rem}}
+
+/* PROFIL / EXPÉRIENCES SPÉCIALES */
+.profile-click-card{cursor:pointer;transition:.25s ease;border:1px solid rgba(6,182,212,.18)}
+.profile-click-card:hover{transform:translateY(-2px);border-color:rgba(6,182,212,.55);box-shadow:0 0 28px rgba(6,182,212,.12)}
+.profile-settings{display:none;margin-top:12px}.profile-settings.active{display:block;animation:storyBackdropIn .25s ease both}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:.72rem}.settings-row:last-child{border-bottom:0}
+.settings-value{color:var(--text-muted);text-align:right;word-break:break-word}.settings-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.special-experience{position:fixed;inset:0;z-index:30000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(1,1,8,.96);overflow:hidden}
+.special-experience.active{display:flex}.special-core{position:relative;width:min(94vw,760px);height:min(90vh,760px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;border:1px solid rgba(217,70,239,.32);border-radius:34px;background:radial-gradient(circle at 50% 35%,rgba(139,92,246,.15),rgba(5,4,15,.96) 58%);box-shadow:0 0 80px rgba(139,92,246,.18),inset 0 0 70px rgba(6,182,212,.05);overflow:hidden}
+.special-kicker{font-size:.62rem;font-weight:900;letter-spacing:3px;color:var(--glow-cyan);margin-bottom:12px}.special-title{font-family:'Space Grotesk';font-size:clamp(1.7rem,7vw,3.6rem);font-weight:900;letter-spacing:1px;text-shadow:0 0 25px rgba(217,70,239,.55);margin-bottom:12px}.special-text{max-width:650px;font-size:clamp(.72rem,2vw,.95rem);line-height:1.75;color:rgba(255,255,255,.82);min-height:125px;display:flex;align-items:center;justify-content:center}.special-progress{width:min(620px,88%);height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:18px}.special-progress>div{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--glow-cyan),var(--glow-magenta));box-shadow:0 0 18px rgba(217,70,239,.5)}.special-time{margin-top:9px;font-size:.58rem;color:var(--text-muted);letter-spacing:1px}.special-fireworks{position:absolute;inset:0;pointer-events:none;overflow:hidden}.firework{position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 14px currentColor;animation:fireworkBurst 1.5s ease-out forwards}
+.farewell .special-core{border-color:rgba(148,163,184,.25);background:radial-gradient(circle at 50% 40%,rgba(51,65,85,.12),rgba(3,3,9,.98) 62%);box-shadow:0 0 80px rgba(15,23,42,.4)}
+.farewell .special-title{color:#cbd5e1;text-shadow:0 0 22px rgba(148,163,184,.25)}.welcome .special-title{color:#fff;text-shadow:0 0 28px rgba(217,70,239,.75),0 0 50px rgba(6,182,212,.35)}
+.special-explosion{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none}.special-explosion.active{display:flex;animation:specialBlast .9s ease-out forwards}.special-explosion::before{content:'DROP 2027';font-family:'Space Grotesk';font-size:clamp(2rem,12vw,7rem);font-weight:900;color:#fff;text-shadow:0 0 25px #fff,0 0 60px var(--glow-magenta),0 0 100px var(--glow-cyan);animation:blastText .9s ease-out forwards}
+@keyframes fireworkBurst{0%{transform:translate(0,0) scale(.2);opacity:0}20%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+@keyframes specialBlast{0%{background:rgba(255,255,255,0)}35%{background:rgba(255,255,255,.9)}100%{background:rgba(255,255,255,0)}}
+@keyframes blastText{0%{transform:scale(.5);opacity:0}35%{transform:scale(1.15);opacity:1}100%{transform:scale(2.2);opacity:0;filter:blur(10px)}}
+@media(max-width:600px){.settings-actions{grid-template-columns:1fr}.special-core{height:84vh;padding:20px;border-radius:26px}.special-text{min-height:155px}}
+
 @media (prefers-reduced-motion:reduce){.wheel{transition:none!important}.wheel-spinning,.wheel-jackpot,.wheel-pointer{animation:none!important}}
 
 .btn {
@@ -698,12 +716,25 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </form>
 </div>
 
-<div id="userProfileSection" class="glass-card" style="display:none; text-align:center;">
-<div style="font-size:3rem; margin-bottom:5px;">👤</div>
+<div id="userProfileSection" class="glass-card profile-click-card" style="display:none; text-align:center;">
+<div onclick="openProfileSettings()" role="button" tabindex="0" style="font-size:3rem; margin-bottom:5px;cursor:pointer;">👤</div>
 <h3 style="font-family:'Space Grotesk';" id="profileName">Joueur</h3>
 <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" id="userStatus">Joueur Standard</p>
 <p style="font-size:0.8rem; color:var(--glow-cyan); margin-top:8px;" id="userFriendId">ID Ami : Chargement...</p>
-<button class="btn btn-danger" style="margin-top:15px;" onclick="logoutUser()">SE DÉCONNECTER</button>
+<button class="btn" style="margin-top:15px;" onclick="openProfileSettings()">⚙️ OUVRIR MON PROFIL & PARAMÈTRES</button>
+<div id="profileSettingsPanel" class="profile-settings">
+  <div class="card-title"><span>⚙️ PARAMÈTRES DU COMPTE</span><span>UTILITAIRES</span></div>
+  <div class="settings-row"><span>👤 Pseudo</span><span class="settings-value" id="settingsUsername">-</span></div>
+  <div class="settings-row"><span>📧 E-mail</span><span class="settings-value" id="settingsEmail">-</span></div>
+  <div class="settings-row"><span>🆔 ID ami</span><span class="settings-value" id="settingsFriendId">-</span></div>
+  <div class="settings-row"><span>🛡️ Statut</span><span class="settings-value" id="settingsStatus">-</span></div>
+  <div class="settings-row"><span>🎵 Musique</span><button class="btn btn-secondary" style="width:auto;padding:7px 12px;font-size:.65rem;" onclick="toggleGameMusic();syncProfileSettings()" id="settingsMusicBtn">🔊 ACTIVÉE</button></div>
+  <div class="settings-row"><span>📱 Plateforme</span><button class="btn btn-secondary" style="width:auto;padding:7px 12px;font-size:.65rem;" onclick="ensureDeviceMode();syncProfileSettings()">CHOISIR</button></div>
+  <div class="settings-actions">
+    <button class="btn btn-secondary" onclick="copyFriendId()">📋 COPIER MON ID</button>
+    <button class="btn btn-danger" onclick="logoutUser()">🚪 SE DÉCONNECTER</button>
+  </div>
+</div>
 </div>
 
 <!-- SECTION AMIS ET DEMANDES -->
@@ -761,6 +792,28 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </nav>
 
 <!-- MODALS -->
+<div class="special-experience farewell" id="farewellExperience" aria-hidden="true">
+  <div class="special-core">
+    <div class="special-fireworks" id="farewellParticles"></div>
+    <div class="special-kicker">DERNIER MESSAGE</div>
+    <div class="special-title" id="farewellTitle">À bientôt...</div>
+    <div class="special-text" id="farewellText">DROP 2027 ralentit. Ta musique descend doucement. Quelques souvenirs restent encore affichés avant le dernier écran.</div>
+    <div class="special-progress"><div id="farewellProgress"></div></div>
+    <div class="special-time" id="farewellTime">02:05</div>
+    <div class="special-explosion" id="farewellExplosion"></div>
+  </div>
+</div>
+<div class="special-experience welcome" id="welcomeExperience" aria-hidden="true">
+  <div class="special-core">
+    <div class="special-fireworks" id="welcomeParticles"></div>
+    <div class="special-kicker">RECONNEXION CONFIRMÉE</div>
+    <div class="special-title">AH TE REVOILÀ ENFINNN !</div>
+    <div class="special-text" id="welcomeText">On t'attendait depuis longtemps. Les lumières se rallument, les cartes reviennent et DROP 2027 reprend vie.</div>
+    <div class="special-progress"><div id="welcomeProgress"></div></div>
+    <div class="special-time" id="welcomeTime">0%</div>
+  </div>
+</div>
+
 <div class="card-story-modal" id="cardStoryModal" aria-hidden="true">
   <div class="card-story-box" id="cardStoryBox">
     <button class="card-story-close" onclick="closeCardStory()">×</button>
@@ -1192,7 +1245,8 @@ boutique: [
 {id:3005,name:'Carte Légende Absolue',emoji:'🔥',price:3500,unlocked:false,tradeable:false,rarity:'legendary'},
 {id:3006,name:'Cadre Profil Diamant',emoji:'💎',price:5000,unlocked:false,tradeable:false,rarity:'legendary'},
 {id:3007,name:'Titre Fondateur 2027',emoji:'🏆',price:7500,unlocked:false,tradeable:false,rarity:'ultra'},
-{id:3008,name:'DROP 2027 — Édition Ultime',emoji:'🌌',price:10000,unlocked:false,tradeable:false,rarity:'ultra'}
+{id:3008,name:'DROP 2027 — Édition Ultime',emoji:'🌌',price:10000,unlocked:false,tradeable:false,rarity:'ultra'},
+{id:3009,name:'Carte Personnelle',emoji:'🪪',price:10000,unlocked:false,tradeable:false,rarity:'ultra',personal:true}
 ]
 };
 
@@ -1381,6 +1435,7 @@ appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes :
 appData.dailyGames = (data.dailyGames && typeof data.dailyGames === 'object') ? data.dailyGames : {};
 appData.hubTasks = (data.hubTasks && typeof data.hubTasks === 'object') ? data.hubTasks : {date:'', done:{}};
 appData.freeDrops = Math.max(0, Number(data.freeDrops) || 0);
+personalizePlayerCard();
 // Réindexe immédiatement les cartes échangeables existantes pour les amis.
 syncPublicCollection();
 
@@ -1400,6 +1455,7 @@ if (!isAdminEmail && !appData.isAdmin && !localStorage.getItem(introKey)) {
   setTimeout(() => startEntryAnimation(60, true), 350);
 }
 if (isAdminEmail || appData.isAdmin) showToast('👑 Bienvenue administrateur. Accès illimité activé.','success');
+try { if (sessionStorage.getItem('drop2027_return_party') === '1') { sessionStorage.removeItem('drop2027_return_party'); setTimeout(startWelcomeBackCelebration, 450); } } catch(e) {}
 
 // Cache local pour que l'interface reste utilisable même si Firebase DB tombe
 // momentanément lors de la prochaine connexion.
@@ -1570,6 +1626,7 @@ friendsSec.style.display = 'block';
 
 document.getElementById('profileName').innerText = appData.currentUser.username;
 document.getElementById('userFriendId').innerText = 'ID Ami : ' + appData.friendId;
+syncProfileSettings();
 
 if (appData.isAdmin) {
 document.getElementById('userStatus').innerText = "👑 ADMINISTRATEUR SYSTEME";
@@ -2036,6 +2093,36 @@ function renderCatalogGrid() {
  });
 }
 
+function personalizePlayerCard(){
+  const card=(appData.catalogs.boutique||[]).find(x=>Number(x.id)===3009);
+  if(card && appData.currentUser){
+    card.name='Carte de '+(appData.currentUser.username || 'Joueur');
+    card.storyOwner=appData.currentUser.username || 'Joueur';
+  }
+}
+
+function startPersonalCardExperience(card){
+  const overlay=document.getElementById('welcomeExperience');
+  if(!overlay)return;
+  overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');
+  const title=overlay.querySelector('.special-title'),text=document.getElementById('welcomeText'),bar=document.getElementById('welcomeProgress'),time=document.getElementById('welcomeTime'),particles=document.getElementById('welcomeParticles');
+  if(title)title.innerText='🌌 TA CARTE PERSONNELLE EST NÉE';
+  const owner=appData.currentUser?.username||'Joueur';
+  const chapters=[
+    'Au début, il n’y avait qu’un pseudo : '+owner+'.',
+    'Puis ce pseudo a trouvé sa place dans DROP 2027, parmi les cartes, les collections et les sessions.',
+    'Cette carte ne ressemble à aucune autre : elle porte ton nom de joueur et ton histoire.',
+    'Chaque seconde de ton parcours devient une ligne de cette édition personnelle.',
+    'Les lumières du jeu s’allument autour de la carte. Les particules commencent à tourner.',
+    'Ton profil, tes choix, tes cartes et tes souvenirs de collection forment maintenant une seule pièce.',
+    'La carte reçoit son dernier éclat. Des feux d’artifice apparaissent autour de ton pseudo.',
+    'La collection est complète sur ce point précis : cette carte est à toi.',
+    'Dernier chapitre : '+owner+', cette édition restera associée à ton profil tant que tu la conserveras.'
+  ];
+  const start=performance.now(),total=120000;let last=-1;
+  const timerId=setInterval(()=>{const p=Math.min(1,(performance.now()-start)/total);const idx=Math.min(chapters.length-1,Math.floor(p*chapters.length));if(idx!==last){last=idx;if(text)text.innerText=chapters[idx];}if(bar)bar.style.width=(p*100)+'%';if(time){const r=Math.ceil((total-(performance.now()-start))/1000);time.innerText=String(Math.max(0,r)).padStart(3,'0')+' s';}for(let n=0;n<(p>.72?4:2);n++)spawnSpecialFirework(particles);if(p>=1){clearInterval(timerId);if(title)title.innerText='🎆 CARTE PERSONNELLE DÉBLOQUÉE';if(text)text.innerText='La fête est terminée. Ta carte personnelle est maintenant dans ton classeur.';setTimeout(()=>{overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');},3500);}},250);
+}
+
 function buyItemDirect(id) {
 let found = null;
 Object.keys(appData.catalogs).forEach(cat => {
@@ -2051,11 +2138,16 @@ return showToast('Crédits insuffisants ! Il faut ' + found.price + ' 🪙', 'er
 }
 
 if (!appData.isAdmin) appData.credits -= found.price;
+personalizePlayerCard();
 found.unlocked = true;
 showCardRewardAnimation(found, found.rarity || 'rare');
 setTimeout(()=>playRevealSound(found.rarity || 'rare'), 80);
 
-if (found.id === 2000) triggerAnnihilation();
+if (Number(found.id) === 3009) {
+  saveAppData();
+  renderShop();
+  setTimeout(()=>startPersonalCardExperience(found), 650);
+} else if (found.id === 2000) triggerAnnihilation();
 else showToast('🎉 FÉLICITATIONS ! Objet obtenu : ' + found.emoji + ' ' + found.name, 'success');
 saveAppData();
 renderShop();
@@ -2279,16 +2371,97 @@ submitBtn.innerText = currentAuthMode === 'login' ? 'SE CONNECTER' : "S'INSCRIRE
 }
 }
 
-async function logoutUser() {
-try {
-await auth.signOut();
-resetLocalUserState();
-updateUI();
-showToast('Déconnexion effectuée.', 'success');
-} catch (err) {
-console.error('LOGOUT ERROR:', err);
-showToast('❌ Impossible de se déconnecter : ' + (err.message || err), 'error');
+function openProfileSettings(){
+  if(!appData.currentUser) return showToast('🔐 Connecte-toi pour ouvrir ton profil.','error');
+  const panel=document.getElementById('profileSettingsPanel');
+  if(panel) panel.classList.toggle('active');
+  syncProfileSettings();
 }
+function syncProfileSettings(){
+  const u=appData.currentUser||{};
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.innerText=val;};
+  set('settingsUsername',u.username||'Joueur');
+  set('settingsEmail',u.email||'-');
+  set('settingsFriendId',appData.friendId||'-');
+  set('settingsStatus',appData.isAdmin?'Administrateur':'Joueur Standard');
+  const b=document.getElementById('settingsMusicBtn');
+  if(b){b.innerText=gameMusicEnabled?'🔊 ACTIVÉE':'🔇 COUPÉE';}
+}
+function copyFriendId(){
+  const id=appData.friendId||'';
+  if(!id)return;
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(id).then(()=>showToast('📋 ID ami copié !','success')).catch(()=>showToast('ID : '+id,'success'));
+  else showToast('ID : '+id,'success');
+}
+function fadeOfficialMusicTo(target,duration=4000){
+  const audio=document.getElementById('customMusicAudio');
+  if(!audio||audio.paused)return;
+  const start=audio.volume; const t0=performance.now();
+  if(audio.__fadeFrame)cancelAnimationFrame(audio.__fadeFrame);
+  const step=(now)=>{const p=Math.min(1,(now-t0)/duration);audio.volume=start+(target-start)*p;if(p<1)audio.__fadeFrame=requestAnimationFrame(step);};
+  audio.__fadeFrame=requestAnimationFrame(step);
+}
+function playFarewellMelody(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();
+    const notes=[329.63,293.66,261.63,246.94,220,196,174.61,164.81,146.83,130.81];
+    let i=0;
+    const play=()=>{const now=ctx.currentTime;const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=notes[i%notes.length];g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.075,now+.12);g.gain.exponentialRampToValueAtTime(.0001,now+2.5);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+2.7);i++;};
+    play(); window.__farewellMelodyTimer=setInterval(play,2450);
+  }catch(e){}
+}
+function stopFarewellMelody(){if(window.__farewellMelodyTimer){clearInterval(window.__farewellMelodyTimer);window.__farewellMelodyTimer=null;}}
+function spawnSpecialFirework(container){
+  if(!container)return;
+  const f=document.createElement('span');f.className='firework';f.style.left=(10+Math.random()*80)+'%';f.style.top=(10+Math.random()*65)+'%';
+  f.style.color=['#fff','#06b6d4','#d946ef','#f59e0b','#a855f7'][Math.floor(Math.random()*5)];
+  f.style.setProperty('--dx',((Math.random()-.5)*150)+'px');f.style.setProperty('--dy',((Math.random()-.5)*130)+'px');container.appendChild(f);setTimeout(()=>f.remove(),1600);
+}
+async function startFarewellLogout(){
+  if(window.__farewellRunning)return;
+  if(!auth.currentUser)return;
+  window.__farewellRunning=true;
+  const overlay=document.getElementById('farewellExperience');
+  const title=document.getElementById('farewellTitle'),text=document.getElementById('farewellText'),bar=document.getElementById('farewellProgress'),time=document.getElementById('farewellTime'),particles=document.getElementById('farewellParticles');
+  if(overlay) {overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');}
+  fadeOfficialMusicTo(0.04,9000);
+  setTimeout(playFarewellMelody,9000);
+  const chapters=[
+   ['À bientôt...','DROP 2027 baisse doucement le volume. Les lumières restent allumées une dernière fois.'],
+   ['Ton espace va rester là.','Tes cartes, tes progrès et ton histoire attendent simplement ton prochain passage.'],
+   ['Dernier tour de lumière.','Les menus disparaissent peu à peu et quelques souvenirs de ta collection défilent à l’écran.'],
+   ['Même les pixels ont une mémoire.','Chaque drop, chaque échange et chaque partie a laissé une petite trace dans cette session.'],
+   ['Le calme arrive.','La musique officielle est maintenant presque silencieuse. Une dernière mélodie accompagne le départ.'],
+   ['Encore quelques secondes.','Le cœur de DROP 2027 ralentit. Les particules se rassemblent autour du logo.'],
+   ['Merci d’être passé.','L’écran devient noir. Le prochain lancement pourra recommencer une nouvelle aventure.'],
+   ['À bientôt, '+(appData.currentUser?.username||'joueur')+' !','Dernière étape : fermeture de la session.']
+  ];
+  const total=125000, start=performance.now(); let chapterTimer=0;
+  const tick=setInterval(()=>{
+    const elapsed=performance.now()-start; const p=Math.min(1,elapsed/total); const idx=Math.min(chapters.length-1,Math.floor(p*chapters.length));
+    if(idx!==chapterTimer){chapterTimer=idx;if(title)title.innerText=chapters[idx][0];if(text)text.innerText=chapters[idx][1];}
+    if(bar)bar.style.width=(p*100)+'%';
+    if(time){const remain=Math.max(0,Math.ceil((total-elapsed)/1000));const m=String(Math.floor(remain/60)).padStart(2,'0'),sec=String(remain%60).padStart(2,'0');time.innerText=m+':'+sec;}
+    if(Math.random()<.22)spawnSpecialFirework(particles);
+    if(p>=1){clearInterval(tick);stopFarewellMelody();if(title)title.innerText='DERNIER ÉCLAT';if(text)text.innerText='DROP 2027 ferme la session...';const ex=document.getElementById('farewellExplosion');if(ex)ex.classList.add('active');try{playEntryExplosion();}catch(e){}setTimeout(async()=>{try{sessionStorage.setItem('drop2027_return_party','1');}catch(e){}try{await auth.signOut();}catch(e){console.warn('LOGOUT ERROR:',e);}finally{resetLocalUserState();updateUI();window.__farewellRunning=false;if(overlay){overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');}const audio=document.getElementById('customMusicAudio');if(audio){audio.pause();audio.currentTime=0;audio.volume=.55;}}},1800);}
+  },250);
+}
+
+function playWelcomeMelody(){
+  try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();const notes=[261.63,329.63,392,523.25,659.25,523.25,392,493.88,587.33,783.99];let i=0;const play=()=>{const now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=notes[i%notes.length];g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.11,now+.05);g.gain.exponentialRampToValueAtTime(.0001,now+.65);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+.75);i++;};play();window.__welcomeMelodyTimer=setInterval(play,700);setTimeout(()=>{if(window.__welcomeMelodyTimer){clearInterval(window.__welcomeMelodyTimer);window.__welcomeMelodyTimer=null;}},8500);}catch(e){}
+}
+function startWelcomeBackCelebration(){
+  const overlay=document.getElementById('welcomeExperience'),bar=document.getElementById('welcomeProgress'),time=document.getElementById('welcomeTime'),text=document.getElementById('welcomeText'),particles=document.getElementById('welcomeParticles');
+  if(!overlay)return;
+  overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');
+  const lines=['AH TE REVOILÀ ENFINNN !','On t’attendait depuis longtemps !','Les lumières sont rallumées.','Ton profil est de nouveau en ligne.','DROP 2027 reprend sa fête.'];let i=0;playWelcomeMelody();const start=performance.now(),total=9000;
+  const timerId=setInterval(()=>{const p=Math.min(1,(performance.now()-start)/total);if(text)text.innerText=lines[Math.min(lines.length-1,Math.floor(p*lines.length))];if(bar)bar.style.width=(p*100)+'%';if(time)time.innerText=Math.round(p*100)+'%';for(let n=0;n<2;n++)spawnSpecialFirework(particles);if(p>=1){clearInterval(timerId);overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');const audio=document.getElementById('customMusicAudio');if(audio&&gameMusicEnabled){audio.volume=.55;audio.play().catch(()=>{});}}},250);
+}
+
+async function logoutUser() {
+if(!auth.currentUser) return;
+startFarewellLogout();
 }
 
 // GESTION CORRIGÉE DES AMIS ET DES DEMANDES
@@ -2931,15 +3104,16 @@ function ensureDeviceMode(){
  const modal=document.getElementById('deviceModeModal');
  if(modal){modal.classList.add('active');modal.setAttribute('aria-hidden','false');}
 }
-const SHOP_IDS=[3001,3002,3003,3004,3005,3006,3007,3008];
+const SHOP_IDS=[3001,3002,3003,3004,3005,3006,3007,3008,3009];
 function renderShop(){
  const grid=document.getElementById('shopGrid'); if(!grid)return;
  const items=(appData.catalogs.boutique||[]).filter(x=>SHOP_IDS.includes(Number(x.id)));
  grid.innerHTML=items.map(item=>{
    const bought=!!item.unlocked;
+   const displayName=Number(item.id)===3009 ? ('Carte de '+(appData.currentUser?.username || 'Joueur')) : item.name;
    return `<div class="shop-item ${bought?'shop-bought':''}">
      <div class="shop-icon">${item.emoji}</div>
-     <h4>${item.name}</h4>
+     <h4>${displayName}</h4>
      <p>${SHOP_DESCRIPTIONS[item.id]||'Objet exclusif de la boutique DROP 2027.'}</p>
      <div class="shop-price">${item.price.toLocaleString('fr-FR')} 🪙</div>
      <button class="btn ${bought?'btn-secondary':''}" style="padding:10px;font-size:.7rem;" ${bought?'disabled':''} onclick="buyItemDirect(${item.id});renderShop();">${bought?'✓ DÉJÀ OBTENU':'ACHETER'}</button>
@@ -2954,7 +3128,8 @@ const SHOP_DESCRIPTIONS={
  3005:'Carte boutique de rareté légendaire, uniquement achetable avec des crédits.',
  3006:'Objet cosmétique premium pour ton profil, réservé aux gros collectionneurs.',
  3007:'Titre collector ultra rare réservé à la boutique et conservé définitivement.',
- 3008:'La pièce ultime de la boutique : carte collector exclusive à 10 000 crédits.'
+ 3008:'La pièce ultime de la boutique : carte collector exclusive à 10 000 crédits.',
+ 3009:'Une carte unique portant le pseudo du joueur. Elle raconte son parcours dans DROP 2027 et déclenche une expérience collector de deux minutes lors de son déblocage.'
 };
 
 /* ROUE DE LA CHANCE */
