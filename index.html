@@ -137,6 +137,8 @@ color: var(--glow-cyan); margin-bottom: 12px; display: flex; justify-content: sp
 .special-experience.active{display:flex}.special-core{position:relative;width:min(94vw,760px);height:min(90vh,760px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;border:1px solid rgba(217,70,239,.32);border-radius:34px;background:radial-gradient(circle at 50% 35%,rgba(139,92,246,.15),rgba(5,4,15,.96) 58%);box-shadow:0 0 80px rgba(139,92,246,.18),inset 0 0 70px rgba(6,182,212,.05);overflow:hidden}
 .special-kicker{font-size:.62rem;font-weight:900;letter-spacing:3px;color:var(--glow-cyan);margin-bottom:12px}.special-title{font-family:'Space Grotesk';font-size:clamp(1.7rem,7vw,3.6rem);font-weight:900;letter-spacing:1px;text-shadow:0 0 25px rgba(217,70,239,.55);margin-bottom:12px}.special-text{max-width:650px;font-size:clamp(.72rem,2vw,.95rem);line-height:1.75;color:rgba(255,255,255,.82);min-height:125px;display:flex;align-items:center;justify-content:center}.special-progress{width:min(620px,88%);height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:18px}.special-progress>div{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--glow-cyan),var(--glow-magenta));box-shadow:0 0 18px rgba(217,70,239,.5)}.special-time{margin-top:9px;font-size:.58rem;color:var(--text-muted);letter-spacing:1px}.special-fireworks{position:absolute;inset:0;pointer-events:none;overflow:hidden}.firework{position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 14px currentColor;animation:fireworkBurst 1.5s ease-out forwards}
 .farewell .special-core{border-color:rgba(148,163,184,.25);background:radial-gradient(circle at 50% 40%,rgba(51,65,85,.12),rgba(3,3,9,.98) 62%);box-shadow:0 0 80px rgba(15,23,42,.4)}
+.farewell-card-stream{position:absolute;inset:7% 3%;pointer-events:none;overflow:hidden;opacity:.9}.farewell-mini-card{position:absolute;width:72px;height:98px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(145deg,#16122a,#07070d);box-shadow:0 0 20px rgba(139,92,246,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.8rem;animation:farewellCardFloat 5.5s linear forwards}.farewell-mini-card span{font-size:.43rem;line-height:1.1;padding:4px;text-align:center;color:#ddd}.farewell-site-break{position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(135deg,transparent 45%,rgba(255,255,255,.18) 46%,transparent 47%),linear-gradient(45deg,transparent 58%,rgba(217,70,239,.22) 59%,transparent 60%);mix-blend-mode:screen;transition:opacity .8s,transform 1.2s}.farewell.site-cracking .farewell-site-break{opacity:1}.farewell.site-cracking .special-core{transform:scale(.985) rotate(-.25deg);filter:saturate(.7) contrast(1.15)}.farewell.site-collapsing .farewell-site-break{opacity:1;transform:scale(1.12) rotate(1deg)}.farewell.site-collapsing .special-core{animation:farewellCollapse 1.6s ease-in forwards}.farewell.site-collapsing .special-title,.farewell.site-collapsing .special-text{opacity:.55}.news-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.news-item{padding:13px;border-radius:16px;border:1px solid rgba(99,102,241,.2);background:linear-gradient(145deg,rgba(18,18,32,.85),rgba(25,12,45,.55));box-shadow:0 8px 24px rgba(0,0,0,.2)}.news-item .news-date{font-size:.55rem;color:var(--glow-cyan);font-weight:900;letter-spacing:1px}.news-item h4{margin:5px 0;font-size:.78rem}.news-item p{margin:0;color:var(--text-muted);font-size:.66rem;line-height:1.5}@keyframes farewellCardFloat{0%{transform:translateY(120vh) rotate(-18deg) scale(.7);opacity:0}12%{opacity:1}100%{transform:translateY(-125vh) rotate(22deg) scale(1.05);opacity:.05}}@keyframes farewellCollapse{0%{transform:scale(.985) rotate(-.25deg);clip-path:inset(0)}55%{transform:scale(.94) rotate(1deg);clip-path:polygon(0 0,100% 0,94% 35%,100% 70%,88% 100%,8% 96%,0 62%,5% 28%)}100%{transform:scale(.72) rotate(4deg);clip-path:polygon(12% 10%,86% 0,100% 40%,82% 90%,25% 100%,0 58%)}}
+
 .farewell .special-title{color:#cbd5e1;text-shadow:0 0 22px rgba(148,163,184,.25)}.welcome .special-title{color:#fff;text-shadow:0 0 28px rgba(217,70,239,.75),0 0 50px rgba(6,182,212,.35)}
 .special-explosion{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none}.special-explosion.active{display:flex;animation:specialBlast .9s ease-out forwards}.special-explosion::before{content:'DROP 2027';font-family:'Space Grotesk';font-size:clamp(2rem,12vw,7rem);font-weight:900;color:#fff;text-shadow:0 0 25px #fff,0 0 60px var(--glow-magenta),0 0 100px var(--glow-cyan);animation:blastText .9s ease-out forwards}
 @keyframes fireworkBurst{0%{transform:translate(0,0) scale(.2);opacity:0}20%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
@@ -593,6 +595,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 
 <div class="binder-tab" onclick="switchCategory('fillesreloues', this)">👩‍🎓 Filles Inoubliables</div>
 <div class="binder-tab" onclick="switchCategory('mecsrelous', this)">👨‍🎓 Mecs Inoubliables</div>
+<div class="binder-tab" onclick="switchCategory('irlcat', this)">🌐 Internet en PLS</div>
 <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
 </div>
 
@@ -698,6 +701,15 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </div>
 </section>
 
+<!-- ACTUALITÉS -->
+<section id="scr-news" class="screen">
+<div class="glass-card">
+<div class="card-title"><span>📰 ACTUALITÉS DROP 2027</span><span>ARCHIVES</span></div>
+<p style="font-size:.7rem;color:var(--text-muted);margin-bottom:12px;line-height:1.5">Les nouvelles du jeu, les nouvelles cartes et les petits événements du monde DROP. Parce qu’un jeu sans journal officiel, c’est juste un site qui fait semblant d’avoir une vie.</p>
+<div id="newsGrid" class="news-grid"></div>
+</div>
+</section>
+
 <!-- 5. COMPTE & AMIS -->
 <section id="scr-account" class="screen">
 <div id="authSection" class="glass-card">
@@ -788,13 +800,14 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="nav-item" onclick="switchTab('scr-wheel', this)"><span class="nav-icon">🎡</span><span>ROUE</span></button>
 <button class="nav-item" onclick="switchTab('scr-shop', this)"><span class="nav-icon">💎</span><span>SHOP</span></button>
 <button class="nav-item" onclick="switchTab('scr-hub', this)"><span class="nav-icon">🧠</span><span>HUB</span></button>
+<button class="nav-item" onclick="switchTab('scr-news', this)"><span class="nav-icon">📰</span><span>ACTU</span></button>
 <button class="nav-item" onclick="switchTab('scr-account', this)"><span class="nav-icon">👤</span><span>COMPTE</span></button>
 </nav>
 
 <!-- MODALS -->
 <div class="special-experience farewell" id="farewellExperience" aria-hidden="true">
   <div class="special-core">
-    <div class="special-fireworks" id="farewellParticles"></div>
+    <div class="farewell-card-stream" id="farewellCardStream"></div><div class="farewell-site-break"></div><div class="special-fireworks" id="farewellParticles"></div>
     <div class="special-kicker">DERNIER MESSAGE</div>
     <div class="special-title" id="farewellTitle">À bientôt...</div>
     <div class="special-text" id="farewellText">DROP 2027 ralentit. Ta musique descend doucement. Quelques souvenirs restent encore affichés avant le dernier écran.</div>
@@ -1237,6 +1250,22 @@ mecsrelous: [
 {id:1931,name:'Yanis “J’Peux Voir ?”',emoji:'👁️',price:4300,unlocked:false,tradeable:true,rarity:'ultra'},
 {id:1932,name:'Max “Le Bruit de Fond”',emoji:'🔊',price:6800,unlocked:false,tradeable:true,rarity:'ultra'}
 ],
+
+
+irlcat: [
+{id:2001,name:'Le “J’ARRIVE” Fantôme',emoji:'👻',price:260,unlocked:false,tradeable:true,rarity:'common'},
+{id:2002,name:'Notification Sans Notification',emoji:'🔔',price:420,unlocked:false,tradeable:true,rarity:'common'},
+{id:2003,name:'Capture d’Écran de Rien',emoji:'📸',price:650,unlocked:false,tradeable:true,rarity:'rare'},
+{id:2004,name:'Le Wi-Fi Qui Disparaît Quand Tu En As Besoin',emoji:'📡',price:900,unlocked:false,tradeable:true,rarity:'rare'},
+{id:2005,name:'Onglet Ouvert Depuis 2024',emoji:'🗂️',price:1200,unlocked:false,tradeable:true,rarity:'epic'},
+{id:2006,name:'Mot de Passe “123456”',emoji:'🔐',price:1500,unlocked:false,tradeable:true,rarity:'epic'},
+{id:2007,name:'Vu à 02:03 Sans Réponse',emoji:'👁️',price:2200,unlocked:false,tradeable:true,rarity:'epic'},
+{id:2008,name:'Le Message “On Doit Parler”',emoji:'💬',price:2800,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:2009,name:'Batterie à 1% au Mauvais Moment',emoji:'🪫',price:3400,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:2010,name:'Le Bug Qui Disparaît Dès Que Tu Montres',emoji:'🐛',price:4300,unlocked:false,tradeable:true,rarity:'legendary'},
+{id:2011,name:'Connexion Par Télépathie',emoji:'🧠',price:5600,unlocked:false,tradeable:true,rarity:'ultra'},
+{id:2012,name:'Internet A Décidé de Ne Plus Exister',emoji:'🌐',price:8000,unlocked:false,tradeable:true,rarity:'ultra'}
+],
 boutique: [
 {id:3001,name:'Badge VIP DROP',emoji:'🏅',price:200,unlocked:false,tradeable:false,rarity:'rare'},
 {id:3002,name:'Carte Collectionneur',emoji:'🗂️',price:500,unlocked:false,tradeable:false,rarity:'rare'},
@@ -1251,8 +1280,8 @@ boutique: [
 };
 
 let activeCategory = 'starter';
-const NEW_CARD_IDS = new Set([1900,1901,1902,1903,1904,1905,1906,1907,1908,1909,1910,1911,1912,1921,1922,1923,1924,1925,1926,1927,1928,1929,1930,1931,1932,601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408,1501,1502,1503,1504,1505,1506,1507,1508,1601,1602,1603,1604,1605,1606,1607,1608,1701,1702,1703,1704,1705,1706,1707,1708,1801,1802,1803,1804,1805,1806,1807,1808]);
-const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',fillesreloues:'👩‍🎓 Filles Inoubliables',mecsrelous:'👨‍🎓 Mecs Inoubliables',boutique:'🛍️ Boutique',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
+const NEW_CARD_IDS = new Set([2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,1900,1902,1903,1904,1905,1906,1907,1908,1909,1910,1911,1912,1921,1922,1923,1924,1925,1926,1927,1928,1929,1930,1931,1932,601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408,1501,1502,1503,1504,1505,1506,1507,1508,1601,1602,1603,1604,1605,1606,1607,1608,1701,1702,1703,1704,1705,1706,1707,1708,1801,1802,1803,1804,1805,1806,1807,1808]);
+const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',fillesreloues:'👩‍🎓 Filles Inoubliables',mecsrelous:'👨‍🎓 Mecs Inoubliables',irlcat:'🌐 Internet en PLS',boutique:'🛍️ Boutique',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
 function canonicalCardRarity(cat, item) {
   // Les cartes de la catégorie Ultra Rares sont toujours ultra rares,
   // même si une ancienne sauvegarde les avait enregistrées comme common.
@@ -1455,7 +1484,8 @@ if (!isAdminEmail && !appData.isAdmin && !localStorage.getItem(introKey)) {
   setTimeout(() => startEntryAnimation(60, true), 350);
 }
 if (isAdminEmail || appData.isAdmin) showToast('👑 Bienvenue administrateur. Accès illimité activé.','success');
-try { if (sessionStorage.getItem('drop2027_return_party') === '1') { sessionStorage.removeItem('drop2027_return_party'); setTimeout(startWelcomeBackCelebration, 450); } } catch(e) {}
+try { if (sessionStorage.getItem('drop2027_new_registration') === '1') { sessionStorage.removeItem('drop2027_new_registration'); } else if (sessionStorage.getItem('drop2027_return_party') === '1') { sessionStorage.removeItem('drop2027_return_party'); setTimeout(startWelcomeBackCelebration, 450); } } catch(e) {}
+renderNews();
 
 // Cache local pour que l'interface reste utilisable même si Firebase DB tombe
 // momentanément lors de la prochaine connexion.
@@ -2359,7 +2389,9 @@ updateUI();
 db.ref('users/' + u.uid).set(initialData).catch(err => console.warn('Profil inscription:', err));
 listenToTrades(); listenToFriendRequests();
 saveAppData();
+try { sessionStorage.setItem('drop2027_new_registration','1'); } catch(e) {}
 showToast('✨ Compte créé avec succès !', 'success');
+setTimeout(startNewPlayerCelebration, 500);
 }
 } catch (err) {
 console.error('AUTH ERROR:', err);
@@ -2423,7 +2455,7 @@ async function startFarewellLogout(){
   if(!auth.currentUser)return;
   window.__farewellRunning=true;
   const overlay=document.getElementById('farewellExperience');
-  const title=document.getElementById('farewellTitle'),text=document.getElementById('farewellText'),bar=document.getElementById('farewellProgress'),time=document.getElementById('farewellTime'),particles=document.getElementById('farewellParticles');
+  const title=document.getElementById('farewellTitle'),text=document.getElementById('farewellText'),bar=document.getElementById('farewellProgress'),time=document.getElementById('farewellTime'),particles=document.getElementById('farewellParticles'),cardStream=document.getElementById('farewellCardStream');
   if(overlay) {overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');}
   fadeOfficialMusicTo(0.04,9000);
   setTimeout(playFarewellMelody,9000);
@@ -2437,9 +2469,12 @@ async function startFarewellLogout(){
    ['Merci d’être passé.','L’écran devient noir. Le prochain lancement pourra recommencer une nouvelle aventure.'],
    ['À bientôt, '+(appData.currentUser?.username||'joueur')+' !','Dernière étape : fermeture de la session.']
   ];
-  const total=125000, start=performance.now(); let chapterTimer=0;
+  const total=125000, start=performance.now(); let chapterTimer=0, lastCard=0;
+  const farewellCards=getUnlockedCards().slice(0,80);
   const tick=setInterval(()=>{
     const elapsed=performance.now()-start; const p=Math.min(1,elapsed/total); const idx=Math.min(chapters.length-1,Math.floor(p*chapters.length));
+    if(cardStream && farewellCards.length && elapsed-lastCard>1200){ const c=farewellCards[Math.floor((elapsed/1200))%farewellCards.length]; const el=document.createElement('div'); el.className='farewell-mini-card'; el.style.left=(4+Math.random()*88)+'%'; el.style.animationDuration=(4.2+Math.random()*2.5)+'s'; el.innerHTML='<b>'+c.emoji+'</b><span>'+c.name+'</span>'; cardStream.appendChild(el); setTimeout(()=>el.remove(),7000); lastCard=elapsed; }
+    if(overlay){overlay.classList.toggle('site-cracking',p>.35);overlay.classList.toggle('site-collapsing',p>.86);}
     if(idx!==chapterTimer){chapterTimer=idx;if(title)title.innerText=chapters[idx][0];if(text)text.innerText=chapters[idx][1];}
     if(bar)bar.style.width=(p*100)+'%';
     if(time){const remain=Math.max(0,Math.ceil((total-elapsed)/1000));const m=String(Math.floor(remain/60)).padStart(2,'0'),sec=String(remain%60).padStart(2,'0');time.innerText=m+':'+sec;}
@@ -2451,6 +2486,37 @@ async function startFarewellLogout(){
 function playWelcomeMelody(){
   try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();const notes=[261.63,329.63,392,523.25,659.25,523.25,392,493.88,587.33,783.99];let i=0;const play=()=>{const now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=notes[i%notes.length];g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.11,now+.05);g.gain.exponentialRampToValueAtTime(.0001,now+.65);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+.75);i++;};play();window.__welcomeMelodyTimer=setInterval(play,700);setTimeout(()=>{if(window.__welcomeMelodyTimer){clearInterval(window.__welcomeMelodyTimer);window.__welcomeMelodyTimer=null;}},8500);}catch(e){}
 }
+const DROP_NEWS=[
+['23/09/2026','📰 La rubrique Actualités ouvre ses portes','Les nouveautés, annonces et petites absurdités officielles de DROP 2027 ont désormais leur propre rubrique.'],
+['22/09/2026','🛍️ La boutique devient officielle','De nouveaux objets premium font leur entrée dans la boutique, avec des prix allant jusqu’à 10 000 crédits.'],
+['21/09/2026','🪪 La Carte Personnelle arrive','Chaque joueur peut désormais débloquer une carte portant son propre pseudo. Oui, l’ego humain a maintenant son emplacement dans le classeur.'],
+['20/09/2026','🤝 Les amis peuvent être supprimés','Une amitié numérique peut désormais prendre fin proprement, avec confirmation avant suppression.'],
+['19/09/2026','🔄 Annulation des échanges','Les offres d’échange encore en attente peuvent être annulées par leur auteur.'],
+['18/09/2026','📱 DROP s’adapte à ton appareil','Le choix téléphone, tablette ou ordinateur est demandé au lancement pour adapter l’interface.'],
+['17/09/2026','🎵 Une nouvelle musique officielle','La bande-son officielle de DROP 2027 est désormais intégrée directement au jeu.'],
+['16/09/2026','🔊 Les sons de rareté reviennent','Les révélations de cartes utilisent maintenant des effets sonores différents selon la rareté.'],
+['15/09/2026','💎 La roue reçoit son interface responsive','Son affichage s’adapte aux petits écrans pour éviter l’infâme roue en forme de patate.'],
+['14/09/2026','👩‍🎓 Nouvelle catégorie : Filles Inoubliables','Une série de cartes humoristiques rejoint le classeur. Personnages fictifs uniquement, évidemment.'],
+['13/09/2026','👨‍🎓 Nouvelle catégorie : Mecs Inoubliables','Une deuxième galerie de personnages fictifs débarque avec ses petites habitudes parfaitement agaçantes.'],
+['12/09/2026','🌐 Nouvelle catégorie : Internet en PLS','Douze cartes consacrées aux bugs, notifications et drames minuscules de la vie numérique.'],
+['11/09/2026','🎮 Les mini-jeux poursuivent leur rotation','Le HUB continue de proposer ses défis quotidiens et ses récompenses de progression.'],
+['10/09/2026','📦 Le classeur continue de s’agrandir','De nouvelles cartes ont rejoint les catégories existantes et les raretés supérieures.'],
+['09/09/2026','✨ Les histoires de cartes deviennent centrales','Chaque carte obtenue possède son propre petit morceau de lore à découvrir.'],
+['08/09/2026','👑 Le mode administrateur reste séparé','Le compte administrateur conserve son interface dorée et ses fonctions spécifiques sans modifier l’expérience normale.'],
+['07/09/2026','🔥 Les cartes ultra rares gardent leur traitement spécial','Les raretés les plus élevées continuent de recevoir des animations renforcées lors de leur révélation.'],
+['06/09/2026','🧠 Le HUB devient le centre de progression','Missions, bonus quotidien, statistiques et objectifs sont réunis au même endroit.'],
+['05/09/2026','📚 “Mes cartes” simplifie la collection','Les cartes déjà possédées peuvent être retrouvées plus rapidement sans parcourir toutes les catégories.'],
+['04/09/2026','🚀 DROP 2027 continue sa construction','Le projet évolue version après version, avec une règle simple : ajouter des choses sans casser les anciennes. Une ambition presque révolutionnaire.']
+];
+function renderNews(){const g=document.getElementById('newsGrid');if(!g)return;g.innerHTML=DROP_NEWS.map(n=>`<article class="news-item"><div class="news-date">${n[0]}</div><h4>${n[1]}</h4><p>${n[2]}</p></article>`).join('');}
+function startNewPlayerCelebration(){
+ const overlay=document.getElementById('welcomeExperience'),bar=document.getElementById('welcomeProgress'),time=document.getElementById('welcomeTime'),text=document.getElementById('welcomeText'),particles=document.getElementById('welcomeParticles');
+ if(!overlay)return; overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');
+ const lines=['BIENVENUE DANS DROP 2027 !','Ton compte vient d’être créé.','Tes cartes de départ sont prêtes.','Ton classeur t’attend.','Les mini-jeux, les amis et les échanges sont disponibles.','La boutique et les actualités sont ouvertes.','Première connexion terminée. Ton aventure commence maintenant !'];
+ let i=0; playWelcomeMelody(); const start=performance.now(),total=14000;
+ const timerId=setInterval(()=>{const p=Math.min(1,(performance.now()-start)/total);if(text)text.innerText=lines[Math.min(lines.length-1,Math.floor(p*lines.length))];if(bar)bar.style.width=(p*100)+'%';if(time)time.innerText=Math.round(p*100)+'%';for(let n=0;n<3;n++)spawnSpecialFirework(particles);if(p>=1){clearInterval(timerId);overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');const audio=document.getElementById('customMusicAudio');if(audio&&gameMusicEnabled){audio.volume=.55;audio.play().catch(()=>{});}}},250);
+}
+
 function startWelcomeBackCelebration(){
   const overlay=document.getElementById('welcomeExperience'),bar=document.getElementById('welcomeProgress'),time=document.getElementById('welcomeTime'),text=document.getElementById('welcomeText'),particles=document.getElementById('welcomeParticles');
   if(!overlay)return;
@@ -3561,6 +3627,7 @@ window.addEventListener('load',()=>{
   setTimeout(ensureDeviceMode,60);
   setTimeout(renderLuckWheel,140);
   setTimeout(renderShop,160);
+  setTimeout(renderNews,180);
 });
 
 function playEntrySound(kind){
