@@ -2052,8 +2052,8 @@ return showToast('Crédits insuffisants ! Il faut ' + found.price + ' 🪙', 'er
 
 if (!appData.isAdmin) appData.credits -= found.price;
 found.unlocked = true;
-playUnlockSound(found.rarity || 'rare');
 showCardRewardAnimation(found, found.rarity || 'rare');
+setTimeout(()=>playRevealSound(found.rarity || 'rare'), 80);
 
 if (found.id === 2000) triggerAnnihilation();
 else showToast('🎉 FÉLICITATIONS ! Objet obtenu : ' + found.emoji + ' ' + found.name, 'success');
@@ -2093,7 +2093,6 @@ picked.unlocked = true;
 completeHubTask('drop');
 const rarity = picked.rarity || (isUltraRare ? 'ultra' : 'rare');
 showCardRewardAnimation(picked, rarity);
-playUnlockSound(rarity);
 saveAppData();
 isDropping = true;
 const card = document.getElementById('dropCard');
@@ -2104,7 +2103,7 @@ document.getElementById('dropCardEmoji').innerText = picked.emoji;
 document.getElementById('dropCardName').innerText = picked.name;
 document.getElementById('dropCardRarity').innerText = rarity === 'ultra' ? '✨ ULTRA RARE' : rarity === 'legendary' ? '👑 LÉGENDAIRE' : rarity === 'epic' ? '💜 ÉPIQUE' : rarity === 'rare' ? '💎 RARE' : '⚪ BASIQUE';
 document.getElementById('dropCardRarity').style.color = rarity === 'ultra' ? '#f0abfc' : rarity === 'legendary' ? '#f59e0b' : rarity === 'epic' ? '#a855f7' : rarity === 'rare' ? 'var(--glow-cyan)' : 'var(--text-muted)';
-setTimeout(() => card.classList.add('revealed'), 300);
+setTimeout(() => { card.classList.add('revealed'); playRevealSound(rarity); }, 300);
 setTimeout(() => { card.classList.add('exploding'); createExplosionParticles(); }, 1400);
 setTimeout(() => {
   isDropping = false; btn.disabled = false; saveAppData();
@@ -2121,6 +2120,29 @@ el.id = 'rewardFlash'; el.style.cssText='position:fixed;inset:0;z-index:1400;dis
 el.innerHTML = `<div class="catalog-card rarity-${rarity} reward-pop" style="width:190px;min-height:240px;background:rgba(8,6,18,.96);transform:scale(1.15);"><div class="emoji" style="font-size:4rem;">${card.emoji}</div><div class="item-name" style="font-size:.9rem;">${card.name}</div><div style="color:var(--glow-cyan);font-size:.7rem;font-weight:900;margin-top:8px;">${rarity === 'ultra' ? '✨ HYPER RARE ✨' : rarity.toUpperCase()}</div><div style="font-size:.6rem;color:var(--text-muted);margin-top:7px;">${card.tradeable === false ? 'NON ÉCHANGEABLE' : 'ÉCHANGEABLE'}</div></div>`;
 document.body.appendChild(el);
 setTimeout(()=>el.remove(), rarity === 'ultra' ? 2600 : 1700);
+}
+
+function duckGameMusic(duration=1200, volume=0.22){
+ try{
+  const audio=document.getElementById('customMusicAudio');
+  if(!audio || audio.paused) return;
+  const base=Number(audio.dataset.baseVolume||0.55);
+  audio.dataset.baseVolume=String(base);
+  audio.dataset.duckToken=String(Date.now()+Math.random());
+  const token=audio.dataset.duckToken;
+  audio.volume=Math.max(0.05,Math.min(base,volume));
+  setTimeout(()=>{
+   if(audio.dataset.duckToken===token){
+    audio.volume=base;
+    audio.dataset.duckToken='';
+   }
+  },Math.max(150,duration));
+ }catch(e){}
+}
+
+function playRevealSound(rarity='rare'){
+ duckGameMusic(rarity==='ultra'?2600:rarity==='legendary'?1900:rarity==='epic'?1500:1200, rarity==='ultra'?0.16:0.22);
+ playUnlockSound(rarity);
 }
 
 function playUnlockSound(rarity='rare') {
@@ -2614,7 +2636,7 @@ function renderTradePanel(){
   const div=document.createElement('div'); div.className='trade-card-box'; div.dataset.tradeId=tid;
   div.innerHTML='<p style="font-size:.75rem;color:var(--text-muted);">⏳ Offre envoyée à <b>'+String(t.receiverName||t.receiverUid||'ton ami')+'</b>.</p>'+
    '<div class="trade-offer-box"><div class="trade-offer-pair">'+tradePreviewHtml(offered,'TA CARTE')+'<div class="trade-arrow">⇄</div>'+tradePreviewHtml(wanted,'SA CARTE')+'</div>'+
-   '<button class="btn btn-secondary trade-view-btn" onclick="viewTradeCards(\''+tid+'\',\'outbox\')">👀 CONSULTER LES CARTES</button></div>';
+   '<button class="btn btn-secondary trade-view-btn" onclick="viewTradeCards(\''+tid+'\',\'outbox\')">👀 CONSULTER LES CARTES</button><button class="btn btn-danger trade-view-btn" onclick="cancelOutgoingTrade(\''+tid+'\')">↩️ ANNULER L’OFFRE</button></div>';
   tl.appendChild(div);
  });
  if(!count)tl.innerHTML='<i style="color:var(--text-muted);font-size:.75rem;">Aucune offre en cours.</i>';
@@ -2777,6 +2799,26 @@ if(item)result=item;
 return result;
 }
 
+async function cancelOutgoingTrade(tradeId){
+ if(!appData.currentUser||!tradeId)return;
+ const t=tradeOutboxCache[tradeId];
+ if(!t||t.status!=='pending')return showToast('Cette offre ne peut plus être annulée.','error');
+ const receiverName=String(t.receiverName||'ce joueur');
+ if(!confirm('Êtes-vous sûr de vouloir annuler l’offre envoyée à '+receiverName+' ?'))return;
+ try{
+  const updates={};
+  updates['trade_outbox/'+appData.currentUser.uid+'/'+tradeId]=null;
+  if(t.receiverUid)updates['trade_inbox/'+t.receiverUid+'/'+tradeId]=null;
+  await withTimeout(db.ref().update(updates),10000,'Firebase ne répond pas pour l’annulation.');
+  delete tradeOutboxCache[tradeId];
+  renderTradePanel();
+  showToast('↩️ Offre d’échange annulée.','success');
+ }catch(err){
+  console.error('Annulation échange:',err);
+  showToast('❌ Impossible d’annuler l’offre : '+(err&&err.message?err.message:'erreur Firebase'),'error');
+ }
+}
+
 async function refuseTrade(tradeId){
 try {
  const patch={status:'refused'};
@@ -2882,6 +2924,7 @@ function selectDeviceMode(mode){
  const modal=document.getElementById('deviceModeModal');
  if(modal){modal.classList.remove('active');modal.setAttribute('aria-hidden','true');}
  setTimeout(renderLuckWheel,30);
+ startGameMusic();
 }
 function ensureDeviceMode(){
  // Le choix est redemandé à chaque lancement pour adapter l'interface à l'appareil utilisé.
@@ -2972,13 +3015,13 @@ function spinLuckWheel(){
  const delta=(desired-current+360)%360;
  luckWheelRotation+=360*9+delta;
  wheel.style.transform=`rotate(${luckWheelRotation}deg)`;
- let ticks=0; const tickTimer=setInterval(()=>{ticks++;playWheelTick(Math.max(.35,1-ticks/34));if(ticks>=34){clearInterval(tickTimer);}},155);
+ let ticks=0; const tickTimer=setInterval(()=>{ticks++;if(ticks>=34){clearInterval(tickTimer);}},155);
  setTimeout(()=>{
    clearInterval(tickTimer);
    luckWheelSpinning=false;wheel.classList.remove('wheel-spinning');btn.disabled=false;
-   if(prize.type==='credits'){appData.credits+=prize.value;res.innerHTML=`${prize.icon} <b>+${prize.value.toLocaleString()} CRÉDITS</b>`;playWheelWin(prize.p<=2);showToast(`🎡 +${prize.value.toLocaleString()} crédits !`,'success');}
+   if(prize.type==='credits'){appData.credits+=prize.value;res.innerHTML=`${prize.icon} <b>+${prize.value.toLocaleString()} CRÉDITS</b>`;showToast(`🎡 +${prize.value.toLocaleString()} crédits !`,'success');}
    else if(prize.type==='drops'){appData.freeDrops=(appData.freeDrops||0)+prize.value;res.innerHTML=`🎁 <b>3 DROPS GRATUITS !</b>`;playWheelWin(true);showToast('🎁 3 drops gratuits gagnés !','success');}
-   else {res.innerHTML='💀 <b>RIEN. La roue a gagné.</b>';playWheelLose();showToast('💀 Rien gagné cette fois.','error');}
+   else {res.innerHTML='💀 <b>RIEN. La roue a gagné.</b>';showToast('💀 Rien gagné cette fois.','error');}
    if(prize.p<=1)res.classList.add('wheel-jackpot');else res.classList.remove('wheel-jackpot');
    saveAppData();updateFreeDropUI();
  },5500);
@@ -3311,6 +3354,7 @@ function startGameMusic(){
   const audio=ensureOfficialMusic();
   if(!audio) return;
   audio.loop=true;
+  audio.dataset.baseVolume='0.55';
   audio.volume=.55;
   audio.play().then(()=>{
     const b=document.getElementById('musicToggle');
@@ -3340,7 +3384,6 @@ function bootMusic(){
 
 window.addEventListener('load',()=>{
   setTimeout(ensureDeviceMode,60);
-  setTimeout(()=>{bootMusic();},80);
   setTimeout(renderLuckWheel,140);
   setTimeout(renderShop,160);
 });
@@ -3358,14 +3401,14 @@ function playEntrySound(kind){
 function stopEntryMusic(){if(entryMusicHandle){clearInterval(entryMusicHandle);entryMusicHandle=null;}}
 
 function playEntryCrack(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();const now=ctx.currentTime;const b=ctx.createBuffer(1,ctx.sampleRate*.3,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);const s=ctx.createBufferSource(),g=ctx.createGain();g.gain.value=.28;s.buffer=b;s.connect(g);g.connect(ctx.destination);s.start();}catch(e){}}
-function playEntryExplosion(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();const o=ctx.createOscillator(),g=ctx.createGain(),now=ctx.currentTime;o.type='sawtooth';o.frequency.setValueAtTime(180,now);o.frequency.exponentialRampToValueAtTime(45,now+.65);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.28,now+.03);g.gain.exponentialRampToValueAtTime(.0001,now+.8);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+.85);}catch(e){}}
+function playEntryExplosion(){try{duckGameMusic(950,.22);const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();const o=ctx.createOscillator(),g=ctx.createGain(),now=ctx.currentTime;o.type='sawtooth';o.frequency.setValueAtTime(180,now);o.frequency.exponentialRampToValueAtTime(45,now+.65);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.28,now+.03);g.gain.exponentialRampToValueAtTime(.0001,now+.8);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+.85);}catch(e){}}
 function getUnlockedCards(){const arr=[];Object.keys(appData.catalogs||{}).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>{if(c.unlocked)arr.push(c);}));return arr;}
 function startEntryAnimation(seconds,first){
  const overlay=document.getElementById('entryCinema');if(!overlay)return;
  if(entryTimerHandle)clearInterval(entryTimerHandle); stopEntryMusic();
  overlay.classList.add('active');overlay.dataset.locked='1';
  const logo=document.getElementById('entryLogo'),sub=document.getElementById('entrySub'),panel=document.getElementById('entryPanel'),bar=document.getElementById('entryProgressBar'),timer=document.getElementById('entryTimer');
- logo.classList.remove('entry-logo-explode');playEntrySound(first?'first':'entry');let elapsed=0;
+ logo.classList.remove('entry-logo-explode');let elapsed=0;
  sub.innerText=first?'BIENVENUE DANS DROP 2027':'NOUVELLE SESSION — DROP 2027';
  const cards=getUnlockedCards();
  const news=Array.from(NEW_CARD_IDS).map(id=>findCardById(id)).filter(Boolean);
@@ -3384,7 +3427,7 @@ function startEntryAnimation(seconds,first){
  entryTimerHandle=setInterval(()=>{
   elapsed++;bar.style.width=(elapsed/seconds*100)+'%';timer.innerText=Math.max(0,seconds-elapsed)+'s';
   if(first)renderFirstSlide();
-  if(!first&&elapsed===seconds-3){logo.classList.add('entry-logo-explode');playEntryCrack();}
+  if(!first&&elapsed===seconds-3){logo.classList.add('entry-logo-explode');}
   if(!first&&elapsed===seconds-1)playEntryExplosion();
   if(elapsed>=seconds){clearInterval(entryTimerHandle);entryTimerHandle=null;stopEntryMusic();overlay.classList.remove('active');overlay.dataset.locked='0';}
  },1000);
