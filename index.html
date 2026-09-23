@@ -443,6 +443,9 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 .admin-gift-title{font-size:.62rem;font-weight:900;color:#ffd700;letter-spacing:1px;margin-bottom:7px}
 .admin-gift-card{display:flex;align-items:center;gap:8px;font-size:.72rem;padding:8px;border-radius:11px;background:rgba(255,255,255,.035);margin-top:6px}
 
+
+/* DROP WORLD */
+.world-hero{position:relative;overflow:hidden;text-align:left;background:radial-gradient(circle at 80% 20%,rgba(99,102,241,.18),transparent 45%),linear-gradient(145deg,rgba(20,20,35,.96),rgba(10,10,18,.98))}.world-kicker{font-size:.62rem;letter-spacing:2px;color:var(--glow-cyan);font-weight:900}.world-hero h2{font-family:'Space Grotesk';font-size:1.25rem;margin:7px 0}.world-hero p,.world-muted{font-size:.7rem;color:var(--text-muted);line-height:1.55}.world-season-bar,.world-event-meter{height:9px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;margin:14px 0 7px}.world-season-bar>div,.world-event-meter>div{height:100%;width:0;background:linear-gradient(90deg,var(--glow-cyan),var(--glow-magenta));box-shadow:0 0 16px rgba(6,182,212,.35);transition:width .5s}.world-season-meta,.world-event-stats{display:grid;grid-template-columns:1fr auto;gap:5px;font-size:.62rem;color:var(--text-muted)}.world-event-box{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid rgba(6,182,212,.18);border-radius:15px;background:rgba(6,182,212,.035)}.world-event-icon{font-size:2rem}.world-event-box h3{font-family:'Space Grotesk';font-size:.9rem}.world-event-box p{font-size:.68rem;color:var(--text-muted);margin-top:4px;line-height:1.45}.world-event-stats{grid-template-columns:1fr auto;margin:10px 0}.world-map{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.world-zone{position:relative;min-height:105px;padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015));cursor:pointer;transition:.2s;overflow:hidden}.world-zone:hover{transform:translateY(-2px);border-color:rgba(6,182,212,.35)}.world-zone.locked{filter:grayscale(.8);opacity:.62}.world-zone .zone-icon{font-size:1.8rem}.world-zone h4{font-family:'Space Grotesk';font-size:.75rem;margin-top:7px}.world-zone span{font-size:.58rem;color:var(--text-muted)}.zone-status{position:absolute;top:9px;right:9px;font-size:.55rem;color:var(--glow-cyan)}.secret-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.secret-item{padding:10px;border-radius:14px;border:1px solid rgba(217,70,239,.13);background:rgba(217,70,239,.035)}.secret-item.locked{opacity:.52}.secret-item b{font-size:1.35rem}.secret-item h4{font-size:.68rem;margin:5px 0}.secret-item p{font-size:.57rem;color:var(--text-muted);line-height:1.4}.world-ranking{display:flex;flex-direction:column;gap:7px}.rank-row{display:flex;justify-content:space-between;align-items:center;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.035);font-size:.67rem}.rank-row b{color:var(--glow-cyan)}.drop-identity{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}.identity-avatar{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-size:1.8rem;background:linear-gradient(145deg,rgba(217,70,239,.22),rgba(6,182,212,.15));border:1px solid rgba(255,255,255,.12)}.identity-name{font-family:'Space Grotesk';font-size:1rem;font-weight:900}.identity-title{font-size:.62rem;color:var(--glow-magenta);margin-top:3px}.identity-stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.identity-stat{padding:9px;border-radius:12px;background:rgba(255,255,255,.035);text-align:center}.identity-stat b{display:block;font-family:'Space Grotesk';font-size:.8rem}.identity-stat span{font-size:.5rem;color:var(--text-muted)}.world-lore{display:flex;flex-direction:column;gap:7px}.lore-entry{padding:10px;border-left:2px solid var(--glow-magenta);background:rgba(217,70,239,.025);border-radius:0 10px 10px 0}.lore-entry b{font-size:.68rem}.lore-entry p{font-size:.6rem;color:var(--text-muted);line-height:1.45;margin-top:3px}@media(max-width:420px){.world-map{grid-template-columns:1fr}.secret-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -710,6 +713,55 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </div>
 </section>
 
+<!-- MONDE DROP : SAISONS, EVENEMENTS, PROFIL, SECRETS -->
+<section id="scr-world" class="screen">
+<div class="glass-card world-hero">
+  <div class="world-kicker">🌍 DROP WORLD</div>
+  <h2 id="worldSeasonTitle">SAISON 01 — INTERNET EN PLS</h2>
+  <p id="worldSeasonText">Le monde de DROP évolue avec des événements, des zones, des secrets et des objectifs communs.</p>
+  <div class="world-season-bar"><div id="worldSeasonBar"></div></div>
+  <div class="world-season-meta"><span id="worldSeasonProgress">0 / 1000</span><span>ÉVÉNEMENT EN COURS</span></div>
+</div>
+
+<div class="glass-card">
+  <div class="card-title"><span>🚨 ÉVÉNEMENT MONDIAL</span><span id="worldEventStatus">ACTIF</span></div>
+  <div class="world-event-box">
+    <div class="world-event-icon">🌐</div>
+    <div><h3 id="worldEventTitle">LE GRAND BUG</h3><p id="worldEventText">Chaque activité dans DROP fait progresser la saison. Le réseau tient encore debout. Pour combien de temps ?</p></div>
+  </div>
+  <div class="world-event-meter"><div id="worldEventBar"></div></div>
+  <div class="world-event-stats"><span>Ta contribution</span><b id="worldContribution">0</b><span>Objectif collectif</span><b>1 000</b></div>
+  <button class="btn btn-secondary" onclick="contributeToWorldEvent()">⚡ CONTRIBUER À L'ÉVÉNEMENT</button>
+</div>
+
+<div class="glass-card">
+  <div class="card-title"><span>🗺️ DROP WORLD</span><span>EXPLORATION</span></div>
+  <div class="world-map" id="worldMap"></div>
+</div>
+
+<div class="glass-card">
+  <div class="card-title"><span>🔐 DÉCOUVERTES SECRÈTES</span><span id="secretCount">0 / 6</span></div>
+  <p class="world-muted">Certaines découvertes n'apparaissent qu'après des actions précises. Elles ne remplacent pas ton classeur, elles ajoutent une couche de mystère au monde.</p>
+  <div class="secret-grid" id="secretGrid"></div>
+</div>
+
+<div class="glass-card">
+  <div class="card-title"><span>🏆 TOP DROP</span><span>TON HISTORIQUE</span></div>
+  <div class="world-ranking" id="worldRanking"></div>
+  <p class="world-muted">Le classement inter-joueurs nécessite une lecture globale sécurisée côté serveur. La version actuelle garde Firebase V3 intacte, donc cette zone affiche tes propres records plutôt que d'inventer un faux classement mondial.</p>
+</div>
+
+<div class="glass-card">
+  <div class="card-title"><span>🪪 MON IDENTITÉ DROP</span><span>PROFIL</span></div>
+  <div class="drop-identity" id="dropIdentity"></div>
+</div>
+
+<div class="glass-card">
+  <div class="card-title"><span>📖 CHRONIQUE DE DROP</span><span id="worldLoreCount">0 / 5</span></div>
+  <div class="world-lore" id="worldLore"></div>
+</div>
+</section>
+
 <!-- 5. COMPTE & AMIS -->
 <section id="scr-account" class="screen">
 <div id="authSection" class="glass-card">
@@ -801,6 +853,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="nav-item" onclick="switchTab('scr-shop', this)"><span class="nav-icon">💎</span><span>SHOP</span></button>
 <button class="nav-item" onclick="switchTab('scr-hub', this)"><span class="nav-icon">🧠</span><span>HUB</span></button>
 <button class="nav-item" onclick="switchTab('scr-news', this)"><span class="nav-icon">📰</span><span>ACTU</span></button>
+<button class="nav-item" onclick="switchTab('scr-world', this);renderWorld()"><span class="nav-icon">🌍</span><span>MONDE</span></button>
 <button class="nav-item" onclick="switchTab('scr-account', this)"><span class="nav-icon">👤</span><span>COMPTE</span></button>
 </nav>
 
@@ -1324,7 +1377,8 @@ isAdmin: false,
 catalogs: JSON.parse(JSON.stringify(CATALOGS)),
 dailyGames: {},
 hubTasks: {date:'', done:{}},
-freeDrops: 0
+freeDrops: 0,
+worldData: {event:0, secrets:[], zones:[], lore:[], totalActions:0, records:{drops:0,games:0,discoveries:0}}
 };
 
 let currentAuthMode = 'login';
@@ -1370,6 +1424,7 @@ appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = [];
 appData.dailyGames = {};
 appData.hubTasks = {date:'', done:{}};
+appData.worldData = {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0}};
 }
 
 async function loadFirebaseUserProfile(user) {
@@ -1464,6 +1519,12 @@ appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes :
 appData.dailyGames = (data.dailyGames && typeof data.dailyGames === 'object') ? data.dailyGames : {};
 appData.hubTasks = (data.hubTasks && typeof data.hubTasks === 'object') ? data.hubTasks : {date:'', done:{}};
 appData.freeDrops = Math.max(0, Number(data.freeDrops) || 0);
+appData.worldData = (data.worldData && typeof data.worldData === 'object') ? data.worldData : {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0}};
+appData.worldData.event = Math.max(0, Number(appData.worldData.event)||0);
+appData.worldData.secrets = Array.isArray(appData.worldData.secrets)?appData.worldData.secrets:[];
+appData.worldData.zones = Array.isArray(appData.worldData.zones)?appData.worldData.zones:[];
+appData.worldData.lore = Array.isArray(appData.worldData.lore)?appData.worldData.lore:[];
+appData.worldData.records = {...{drops:0,games:0,discoveries:0},...(appData.worldData.records||{})};
 personalizePlayerCard();
 // Réindexe immédiatement les cartes échangeables existantes pour les amis.
 syncPublicCollection();
@@ -1491,7 +1552,7 @@ renderNews();
 // momentanément lors de la prochaine connexion.
 try { localStorage.setItem('drop2027_profile_' + user.uid, JSON.stringify({
 username: appData.currentUser.username, credits: appData.credits, friendId: appData.friendId,
-friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, redeemedCodes: appData.redeemedCodes, dailyGames: appData.dailyGames, hubTasks: appData.hubTasks
+friends: appData.friends, isAdmin: appData.isAdmin, catalogs: appData.catalogs, redeemedCodes: appData.redeemedCodes, dailyGames: appData.dailyGames, hubTasks: appData.hubTasks, worldData: appData.worldData
 })); } catch (_) {}
 
 return true;
@@ -1513,6 +1574,7 @@ if (appData.isAdmin) applyAdminMode(true);
 appData.redeemedCodes = Array.isArray(cached.redeemedCodes) ? cached.redeemedCodes : [];
 appData.dailyGames = (cached.dailyGames && typeof cached.dailyGames === 'object') ? cached.dailyGames : {};
 appData.hubTasks = (cached.hubTasks && typeof cached.hubTasks === 'object') ? cached.hubTasks : {date:'', done:{}};
+appData.worldData = (cached.worldData && typeof cached.worldData === 'object') ? cached.worldData : {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0}};
 updateUI();
 } } catch (_) {}
 
@@ -1577,7 +1639,8 @@ isAdmin: appData.isAdmin,
 redeemedCodes: appData.redeemedCodes,
 dailyGames: appData.dailyGames,
 hubTasks: appData.hubTasks,
-freeDrops: appData.freeDrops || 0
+freeDrops: appData.freeDrops || 0,
+worldData: appData.worldData || {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0}}
 };
 db.ref('users/' + appData.currentUser.uid).update(userData).catch(err => console.warn('Sauvegarde profil:', err));
 syncPublicCollection();
@@ -1675,6 +1738,7 @@ friendsSec.style.display = 'none';
 renderCatalogGrid();
 renderHub();
 updateFreeDropUI();
+renderWorld();
 }
 
 function getLocalDayKey(){
@@ -3681,6 +3745,100 @@ function bootEntrySequence(){
 }
 window.addEventListener('load',()=>setTimeout(bootEntrySequence,250));
 
+
+
+/* ===== DROP WORLD ENGINE ===== */
+const DROP_WORLD_ZONES=[
+ {id:'city',icon:'🏙️',name:'VILLE DROP',desc:'Le centre où tout commence.',unlock:0},
+ {id:'internet',icon:'🌐',name:'ZONE INTERNET',desc:'Notifications, bugs et anomalies.',unlock:100},
+ {id:'lab',icon:'🧪',name:'LABORATOIRE',desc:'Les expériences que personne n’a demandées.',unlock:250},
+ {id:'arena',icon:'⚡',name:'ARÈNE',desc:'Défis et records personnels.',unlock:450},
+ {id:'forest',icon:'🌲',name:'FORÊT DES CARTES',desc:'Des fragments de lore y apparaissent.',unlock:700},
+ {id:'unknown',icon:'⬛',name:'ZONE INCONNUE',desc:'Une porte sans explication.',unlock:950}
+];
+const DROP_SECRET_DISCOVERIES=[
+ {id:'s01',icon:'📁',name:'DOSSIER 0000',desc:'Un fichier qui ne devrait pas exister.',need:60},
+ {id:'s02',icon:'👁️',name:'REGARD DU SERVEUR',desc:'Quelqu’un semble observer les statistiques.',need:140},
+ {id:'s03',icon:'🔢',name:'ID IMPOSSIBLE',desc:'Le numéro 4097 apparaît une seconde.',need:260},
+ {id:'s04',icon:'📡',name:'SIGNAL INCONNU',desc:'Un message traverse une zone verrouillée.',need:420},
+ {id:'s05',icon:'🕳️',name:'LA PORTE',desc:'Elle était absente hier.',need:650},
+ {id:'s06',icon:'❓',name:'PREMIÈRE TRACE',desc:'Le début de quelque chose de beaucoup plus grand.',need:900}
+];
+const DROP_WORLD_LORE=[
+ ['INCIDENT 00','Le réseau DROP fonctionne normalement. Enfin, selon le réseau.'],
+ ['INCIDENT 01','Une anomalie a été repérée dans une zone qui n’existait pas hier.'],
+ ['INCIDENT 02','Le numéro 0000 est apparu dans plusieurs journaux internes.'],
+ ['INCIDENT 03','Quelqu’un a laissé une phrase : « NE CHERCHEZ PAS LA PORTE. »'],
+ ['INCIDENT 04','La carte du monde affiche maintenant une zone sans nom.']
+];
+function ensureWorldData(){
+ if(!appData.worldData||typeof appData.worldData!=='object')appData.worldData={event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0}};
+ appData.worldData.records={...{drops:0,games:0,discoveries:0},...(appData.worldData.records||{})};
+ appData.worldData.secrets=Array.isArray(appData.worldData.secrets)?appData.worldData.secrets:[];
+ appData.worldData.zones=Array.isArray(appData.worldData.zones)?appData.worldData.zones:[];
+ appData.worldData.lore=Array.isArray(appData.worldData.lore)?appData.worldData.lore:[];
+ return appData.worldData;
+}
+function worldAction(kind='action',amount=1){
+ const w=ensureWorldData();
+ w.totalActions=(Number(w.totalActions)||0)+amount;
+ w.event=Math.min(1000,(Number(w.event)||0)+amount);
+ if(kind==='drop')w.records.drops=(Number(w.records.drops)||0)+amount;
+ if(kind==='game')w.records.games=(Number(w.records.games)||0)+amount;
+ discoverWorldSecrets();
+ unlockWorldZones();
+ if(appData.currentUser)saveAppData();
+}
+function unlockWorldZones(){
+ const w=ensureWorldData();
+ DROP_WORLD_ZONES.forEach(z=>{if(w.totalActions>=z.unlock&&!w.zones.includes(z.id))w.zones.push(z.id);});
+ const loreUnlocked=Math.min(DROP_WORLD_LORE.length,Math.floor(w.totalActions/180));
+ for(let i=0;i<loreUnlocked;i++)if(!w.lore.includes(DROP_WORLD_LORE[i][0]))w.lore.push(DROP_WORLD_LORE[i][0]);
+}
+function discoverWorldSecrets(){
+ const w=ensureWorldData();
+ DROP_SECRET_DISCOVERIES.forEach(s=>{
+   if(w.totalActions>=s.need&&!w.secrets.includes(s.id)){w.secrets.push(s.id);w.records.discoveries=(Number(w.records.discoveries)||0)+1;}
+ });
+}
+function contributeToWorldEvent(){
+ if(!appData.currentUser)return showToast('🔐 Connecte-toi pour participer à l’événement.','error');
+ worldAction('event',10); renderWorld(); showToast('⚡ Contribution enregistrée. Le monde avance de +10.','success');
+}
+function renderWorld(){
+ const root=document.getElementById('scr-world');if(!root)return;
+ const w=ensureWorldData();unlockWorldZones();discoverWorldSecrets();
+ const seasonBar=document.getElementById('worldSeasonBar'), eventBar=document.getElementById('worldEventBar');
+ const pct=Math.min(100,(w.event/1000)*100);if(seasonBar)seasonBar.style.width=pct+'%';if(eventBar)eventBar.style.width=pct+'%';
+ const sp=document.getElementById('worldSeasonProgress');if(sp)sp.textContent=w.event+' / 1000';
+ const contrib=document.getElementById('worldContribution');if(contrib)contrib.textContent=w.totalActions;
+ const map=document.getElementById('worldMap');
+ if(map)map.innerHTML=DROP_WORLD_ZONES.map(z=>{const unlocked=w.zones.includes(z.id);return `<div class="world-zone ${unlocked?'':'locked'}" onclick="inspectWorldZone('${z.id}')"><span class="zone-status">${unlocked?'● OUVERTE':'🔒 '+z.unlock}</span><div class="zone-icon">${z.icon}</div><h4>${z.name}</h4><span>${z.desc}</span></div>`}).join('');
+ const sg=document.getElementById('secretGrid');
+ if(sg)sg.innerHTML=DROP_SECRET_DISCOVERIES.map(x=>{const found=w.secrets.includes(x.id);return `<div class="secret-item ${found?'':'locked'}"><b>${found?x.icon:'❔'}</b><h4>${found?x.name:'DÉCOUVERTE INCONNUE'}</h4><p>${found?x.desc:'Progression requise : '+x.need+' actions.'}</p></div>`}).join('');
+ const sc=document.getElementById('secretCount');if(sc)sc.textContent=w.secrets.length+' / '+DROP_SECRET_DISCOVERIES.length;
+ const lore=document.getElementById('worldLore');
+ if(lore)lore.innerHTML=DROP_WORLD_LORE.map(x=>w.lore.includes(x[0])?`<div class="lore-entry"><b>${x[0]}</b><p>${x[1]}</p></div>`:'').join('')||'<p class="world-muted">Aucune trace supplémentaire. Le serveur fait semblant de ne rien savoir.</p>';
+ const lc=document.getElementById('worldLoreCount');if(lc)lc.textContent=w.lore.length+' / '+DROP_WORLD_LORE.length;
+ const rank=document.getElementById('worldRanking');
+ const rows=[['👑','Records de DROP',w.records.drops],['🎮','Mini-jeux réussis',w.records.games],['🔐','Secrets découverts',w.records.discoveries],['⚡','Actions de saison',w.totalActions]];
+ if(rank)rank.innerHTML=rows.map((r,i)=>`<div class="rank-row"><span>${r[0]} ${r[1]}</span><b>${Number(r[2]).toLocaleString()}</b></div>`).join('');
+ const id=document.getElementById('dropIdentity');
+ const owned=Object.values(appData.catalogs||{}).flat().filter(c=>c.unlocked).length;
+ const title=w.records.discoveries>=5?'ARCHITECTE DES SECRETS':w.records.drops>=25?'CHASSEUR DE DROP':owned>=50?'COLLECTIONNEUR':'EXPLORATEUR';
+ if(id)id.innerHTML=`<div class="identity-avatar">${appData.isAdmin?'👑':'🧑‍🚀'}</div><div><div class="identity-name">${appData.currentUser?escapeHtml(appData.currentUser.username):'Joueur'}</div><div class="identity-title">${title}</div></div><div class="identity-stats"><div class="identity-stat"><b>${owned}</b><span>CARTES</span></div><div class="identity-stat"><b>${w.records.drops}</b><span>DROPS</span></div><div class="identity-stat"><b>${w.records.discoveries}</b><span>SECRETS</span></div></div>`;
+}
+function inspectWorldZone(id){
+ const w=ensureWorldData(),z=DROP_WORLD_ZONES.find(x=>x.id===id);if(!z)return;
+ if(!w.zones.includes(id))return showToast('🔒 Cette zone est encore verrouillée. Continue ton exploration.','error');
+ showToast(z.icon+' '+z.name+' : '+z.desc,'success');
+}
+function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
+
+/* Hooks non destructifs : les anciennes fonctions restent intactes. */
+const __dropOriginalOpenRandomDrop = openRandomDrop;
+openRandomDrop = function(isFree=false){const wasDropping=isDropping;const result=__dropOriginalOpenRandomDrop.apply(this,arguments);const started=!wasDropping && isDropping;if(started)setTimeout(()=>worldAction('drop',1),1200);return result;};
+const __dropOriginalRewardPlayer = rewardPlayer;
+rewardPlayer = function(amount){const result=__dropOriginalRewardPlayer.apply(this,arguments);worldAction('game',1);return result;};
+
 </script>
-</body>
-</html>
