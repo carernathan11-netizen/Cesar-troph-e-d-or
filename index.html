@@ -874,6 +874,21 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="btn" onclick="adminGiftCard()">DONNER LA CARTE</button>
 </div>
 <div class="admin-gift-box">
+<div class="admin-gift-title">🚨 CONTRÔLE GLOBAL DU SITE</div>
+<div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Maintenance globale : bloque temporairement l'accès au jeu pour tous les joueurs connectés. Le contrôle est partagé via Firebase.</div>
+<input id="adminLockMessage" class="input-field" placeholder="Message affiché aux joueurs" value="DROP 2027 est temporairement en maintenance." style="margin-bottom:7px;">
+<div style="display:flex;gap:7px;">
+<button class="btn btn-danger" style="flex:1;" onclick="adminLockSite(15)">🔒 BLOQUER 15 MIN</button>
+<button class="btn btn-secondary" style="flex:1;" onclick="adminLockSite(60)">🔒 BLOQUER 1 H</button>
+</div>
+<button class="btn btn-secondary" style="margin-top:7px;" onclick="adminUnlockSite()">🔓 RÉOUVRIR LE SITE</button>
+</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">📢 ANNONCE GLOBALE</div>
+<input id="adminAnnouncement" class="input-field" placeholder="Message à afficher à tous les joueurs" style="margin-bottom:7px;">
+<button class="btn btn-secondary" onclick="adminBroadcastAnnouncement()">📢 PUBLIER L'ANNONCE</button>
+</div>
+<div class="admin-gift-box">
 <div class="admin-gift-title">🪙 DONNER DES CRÉDITS</div>
 <input id="adminCreditTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="margin-bottom:7px;">
 <input id="adminCreditAmount" class="input-field" type="number" min="1" step="1" placeholder="Nombre de crédits" style="margin-bottom:7px;">
@@ -1158,9 +1173,9 @@ secret: [
 { id: 414, name: "Carte de Crédit Obsidienne", emoji: "🖤", price: 400000, unlocked: false },
 { id: 415, name: "Sceau Absolu de l'Infiniment Grand", emoji: "🌌", price: 600000, unlocked: false },
 { id: 416, name: "Passeport Cosmique 2027", emoji: "🛸", price: 800000, unlocked: false },
-{ id: 1900, name: "🌀 Carte Fantôme du DROP RUSH", emoji: "🌀", price: 12000, unlocked: false, tradeable: true, rarity: "ultra", modeExclusive: true },
-  { id: 1901, name: "🕳️ L’Agent Fantôme", emoji: "🕳️", price: 18000, unlocked: false, tradeable: true, rarity: "ultra", modeExclusive: true },
-{ id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false, tradeable: false, rarity: "ultra" }
+{ id: 1900, name: "🌀 Carte Fantôme du DROP RUSH", emoji: "🌀", price: 12000, unlocked: false, tradeable: true, rarity: "ultra" },
+  { id: 1901, name: "🕳️ L’Agent Fantôme", emoji: "🕳️", price: 18000, unlocked: false, tradeable: true, rarity: "ultra" },
+{ id: 2000, name: "⚡ DROP Administrateur", emoji: "⚡", price: 1000000, unlocked: false, tradeable: true, rarity: "ultra" }
 ],
 mauvaisesidees: [
 {id:1501,name:'Idée Géniale à 3h du Matin',emoji:'💡',price:150,unlocked:false,tradeable:true,rarity:'common'},
@@ -1694,6 +1709,7 @@ try{
     ? existing.worldEvent
     : {contribution:Math.max(0,Number(ensureWorldData().globalContribution)||0),lastParticipation:ensureWorldData().eventLastParticipation||''};
   const next={...publicCards,worldEvent};
+  if(appData.isAdmin) next.__adminControl={owner:true};
   // Supprime les anciennes cartes qui ne sont plus publiques, sans toucher à worldEvent.
   Object.keys(existing).forEach(k=>{if(k!=='worldEvent' && !Object.prototype.hasOwnProperty.call(publicCards,k))next[k]=null;});
   await ref.update(next);
@@ -1776,6 +1792,57 @@ async function adminGiftCredits(){
     document.getElementById('adminCreditTarget').value=''; document.getElementById('adminCreditAmount').value='';
     showToast('👑 Crédits envoyés au joueur.','success');
   }catch(err){showToast('❌ Cadeau non envoyé : '+(err&&err.message?err.message:'erreur Firebase'),'error');}
+}
+
+let globalControlRef=null, globalControlHandler=null, globalControlAdminUid=null;
+async function resolveGlobalControlRef(){
+  if(appData.isAdmin && appData.currentUser) return db.ref('public_collections/'+appData.currentUser.uid+'/siteControl');
+  try{
+    const snap=await db.ref('public_collections').once('value');
+    const all=snap.val()||{};
+    const uid=Object.keys(all).find(k=>all[k]&&all[k].__adminControl&&all[k].__adminControl.owner);
+    if(uid){globalControlAdminUid=uid;return db.ref('public_collections/'+uid+'/siteControl');}
+  }catch(e){console.warn('Contrôle global:',e);}
+  return null;
+}
+async function listenGlobalSiteControl(){
+  if(globalControlRef && globalControlHandler){globalControlRef.off('value',globalControlHandler);}
+  globalControlRef=await resolveGlobalControlRef();
+  if(!globalControlRef)return;
+  globalControlHandler=snap=>{
+    const v=snap.val()||{};
+    const locked=!!v.locked && Number(v.until||0)>Date.now();
+    if(locked) showGlobalLockOverlay(v); else hideGlobalLockOverlay();
+    if(v.announcement && Number(v.announcementAt||0)>=(Date.now()-24*60*60*1000) && v.announcementId!==sessionStorage.getItem('drop2027_last_global_announcement')){
+      try{sessionStorage.setItem('drop2027_last_global_announcement',String(v.announcementId||v.announcementAt));}catch(e){}
+      showToast('📢 '+String(v.announcement),'success');
+    }
+  };
+  globalControlRef.on('value',globalControlHandler);
+}
+function showGlobalLockOverlay(v){
+  let el=document.getElementById('globalSiteLock');
+  if(!el){el=document.createElement('div');el.id='globalSiteLock';el.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(3,3,8,.97);display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:white;';document.body.appendChild(el);}
+  const remaining=Math.max(0,Number(v.until)-Date.now());
+  const mins=Math.ceil(remaining/60000);
+  el.innerHTML='<div style="max-width:520px;border:1px solid rgba(217,70,239,.55);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(25,10,35,.96),rgba(6,6,14,.98));box-shadow:0 0 45px rgba(217,70,239,.18)"><div style="font-size:3rem">🚧</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#f0abfc">DROP 2027 EN PAUSE</h2><p style="color:#d4d4d8;line-height:1.6">'+escapeHtml(v.message||'Le site est temporairement en maintenance.')+'</p><div style="margin-top:16px;font-size:.7rem;color:#a1a1aa">Retour estimé dans environ '+mins+' min.</div></div>';
+}
+function hideGlobalLockOverlay(){const el=document.getElementById('globalSiteLock');if(el)el.remove();}
+async function adminLockSite(minutes){
+  if(!appData.isAdmin)return;
+  const message=(document.getElementById('adminLockMessage')?.value||'DROP 2027 est temporairement en maintenance.').trim();
+  try{const ref=await resolveGlobalControlRef(); if(!ref) throw new Error('Contrôle global indisponible'); await ref.update({locked:true,until:Date.now()+minutes*60000,message,by:'admin',updatedAt:firebase.database.ServerValue.TIMESTAMP});showToast('🔒 Site bloqué pour tous les joueurs pendant '+minutes+' minutes.','success');}
+  catch(e){showToast('❌ Impossible de bloquer le site avec les règles Firebase actuelles.','error');}
+}
+async function adminUnlockSite(){
+  if(!appData.isAdmin)return;
+  try{const ref=await resolveGlobalControlRef(); if(!ref) throw new Error('Contrôle global indisponible'); await ref.update({locked:false,until:0,message:'',updatedAt:firebase.database.ServerValue.TIMESTAMP});hideGlobalLockOverlay();showToast('🔓 Site rouvert pour tous.','success');}
+  catch(e){showToast('❌ Impossible de rouvrir le site.','error');}
+}
+async function adminBroadcastAnnouncement(){
+  if(!appData.isAdmin)return; const input=document.getElementById('adminAnnouncement');const announcement=(input?.value||'').trim();if(!announcement)return showToast('❌ Écris une annonce avant de publier.','error');
+  try{const ref=await resolveGlobalControlRef(); if(!ref) throw new Error('Contrôle global indisponible'); await ref.update({announcement,announcementAt:Date.now(),announcementId:'ann_'+Date.now(),updatedAt:firebase.database.ServerValue.TIMESTAMP});if(input)input.value='';showToast('📢 Annonce publiée.','success');}
+  catch(e){showToast('❌ Impossible de publier l’annonce.','error');}
 }
 
 function updateUI() {
@@ -2344,10 +2411,23 @@ Object.keys(appData.catalogs).forEach(cat => {
     if (!i.unlocked && i.tradeable !== false && !i.modeExclusive && wantedRarities.includes(i.rarity || 'common')) pool.push(i);
   });
 });
-if (pool.length === 0) {
-  Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(i => { if(!i.unlocked && i.tradeable !== false && !i.modeExclusive) pool.push(i); }));
+// DROP Administrateur est volontairement verrouillé jusqu'au tout dernier drop.
+// Il ne peut apparaître que lorsqu'il ne reste plus aucune autre carte de DROP à obtenir.
+const allRemaining = [];
+Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(i => {
+  if(!i.unlocked && i.tradeable !== false && !i.modeExclusive) allRemaining.push(i);
+}));
+const adminDrop = allRemaining.find(i => Number(i.id) === 2000);
+const nonAdminRemaining = allRemaining.filter(i => Number(i.id) !== 2000);
+if (adminDrop && nonAdminRemaining.length === 0) {
+  pool = [adminDrop];
+} else if (pool.length === 0) {
+  pool = nonAdminRemaining;
 }
-if (pool.length === 0) return showToast('🎉 Félicitations, tout le classeur échangeable est déjà débloqué !', 'success');
+if (pool.length === 0) {
+  const completionPool = allRemaining;
+  return showToast(completionPool.length === 0 ? '🎉 CLASSEUR COMPLET : toutes les cartes sont obtenues !' : 'Aucune carte disponible dans ce niveau de rareté pour le moment.', 'success');
+}
 if (!appData.isAdmin) { if (isFree) appData.freeDrops = Math.max(0, (appData.freeDrops || 0) - 1); else appData.credits -= 150; }
 const picked = pool[Math.floor(Math.random() * pool.length)];
 picked.unlocked = true;
