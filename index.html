@@ -925,6 +925,41 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="btn btn-secondary" style="margin-top:7px;" onclick="adminUnbanUser()">♻️ RETIRER LE BANNISSEMENT</button>
 </div>
 <div class="admin-gift-box">
+<div class="admin-gift-title">🧹 GESTION DU COMPTE JOUEUR</div>
+<div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Sélectionne un joueur depuis la liste ci-dessous ou indique son ID. Tu peux retirer uniquement les crédits, uniquement les cartes, ou remettre sa progression à zéro.</div>
+<input id="adminResetTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="margin-bottom:7px;">
+<div style="display:flex;gap:7px;flex-wrap:wrap;">
+<button class="btn btn-danger" style="flex:1;" onclick="adminResetCredits()">🪙 RÉINITIALISER CRÉDITS</button>
+<button class="btn btn-danger" style="flex:1;" onclick="adminResetCards()">🃏 RETIRER CARTES</button>
+</div>
+<button class="btn btn-danger" style="margin-top:7px;width:100%;" onclick="adminResetFullAccount()">💥 RÉINITIALISER TOUT LE COMPTE</button>
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;">
+<button class="btn btn-secondary" style="flex:1;" onclick="adminResetSocial()">👥 RÉINITIALISER AMIS</button>
+<button class="btn btn-secondary" style="flex:1;" onclick="adminResetDailyProgress()">🔄 RÉINITIALISER LIMITES</button>
+</div>
+</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">🎛️ MODIFICATION RAPIDE</div>
+<div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Ajoute ou retire exactement le nombre de crédits choisi. La carte sélectionnée peut aussi être retirée du compte.</div>
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:7px;">
+<input id="adminAdjustTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="flex:1;min-width:150px;">
+<input id="adminAdjustAmount" class="input-field" type="number" min="1" step="1" placeholder="Crédits" style="flex:1;min-width:90px;">
+</div>
+<div style="display:flex;gap:7px;flex-wrap:wrap;">
+<button class="btn" style="flex:1;" onclick="adminAdjustCredits(1)">➕ AJOUTER</button>
+<button class="btn btn-secondary" style="flex:1;" onclick="adminAdjustCredits(-1)">➖ RETIRER</button>
+</div>
+<select id="adminRemoveCard" class="input-field" style="margin-top:7px;margin-bottom:7px;"></select>
+<button class="btn btn-secondary" style="width:100%;" onclick="adminRemoveSpecificCard()">🗑️ RETIRER CETTE CARTE</button>
+</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">⚡ ACTIONS RAPIDES</div>
+<div style="display:flex;gap:7px;flex-wrap:wrap;">
+<button class="btn btn-secondary" style="flex:1;" onclick="adminForcePlayerRefresh()">🔄 ACTUALISER LE COMPTE</button>
+<button class="btn btn-secondary" style="flex:1;" onclick="adminClearPlayerRequests()">📨 VIDER DEMANDES</button>
+</div>
+</div>
+<div class="admin-gift-box">
 <div class="admin-gift-title">👥 JOUEURS EN LIGNE / ACTIVITÉ</div>
 <div id="adminOnlineList" style="max-height:260px;overflow:auto;"><i style="color:var(--text-muted);font-size:.7rem;">Chargement…</i></div>
 <div id="adminPlayerDetails" style="margin-top:9px;"></div>
@@ -1798,7 +1833,7 @@ function applyAdminMode(active) {
   if (vp) vp.classList.toggle('admin-mode', !!active);
   const panel=document.getElementById('adminPanel');
   if (panel) panel.style.display=active ? 'block' : 'none';
-  if (active) { populateAdminGiftCards(); loadAdminPlayers(); }
+  if (active) { populateAdminGiftCards(); populateAdminRemoveCards(); loadAdminPlayers(); }
 }
 function populateAdminGiftCards(){
   const sel=document.getElementById('adminGiftCard'); if(!sel || !appData.isAdmin)return;
@@ -1808,11 +1843,100 @@ function populateAdminGiftCards(){
   sel.innerHTML=all.map(({c,cat})=>'<option value="'+Number(c.id)+'">'+String(c.emoji||'🃏')+' '+String(c.name||('Carte #'+c.id))+' • '+String(c.rarity||'common').toUpperCase()+' • #'+Number(c.id)+'</option>').join('');
 }
 
+function populateAdminRemoveCards(){
+  const sel=document.getElementById('adminRemoveCard'); if(!sel || !appData.isAdmin)return;
+  const all=[]; Object.keys(appData.catalogs||{}).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>all.push(c)));
+  all.sort((a,b)=>Number(a.id)-Number(b.id));
+  sel.innerHTML=all.map(c=>'<option value="'+Number(c.id)+'">'+String(c.emoji||'🃏')+' '+String(c.name||('Carte #'+c.id))+' • #'+Number(c.id)+'</option>').join('');
+}
+
+function adminSetTargetEverywhere(uid){
+  const value=uid ? '#DROP-'+uid : '';
+  ['adminResetTarget','adminAdjustTarget','adminGiftTarget','adminCreditTarget','adminBanTarget'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=value;});
+}
+
 function adminTargetUid(raw){
   const v=String(raw||'').trim().replace(/^#/,'');
   if(!v.startsWith('DROP-')) return null;
   const uid=v.slice(5);
   return uid && uid!==appData.currentUser?.uid ? uid : null;
+}
+
+async function adminGetUser(uid){
+  const snap=await withTimeout(db.ref('users/'+uid).once('value'),8000,'Firebase ne répond pas.');
+  return snap.val()||null;
+}
+function adminCatalogReset(){
+  const c=JSON.parse(JSON.stringify(CATALOGS));
+  Object.keys(c).forEach(cat=>(c[cat]||[]).forEach(card=>{card.unlocked=false;}));
+  return c;
+}
+async function adminUpdateUser(uid, patch){
+  if(!appData.isAdmin || !uid)return;
+  await withTimeout(db.ref('users/'+uid).update(patch),8000,'Firebase a refusé la modification.');
+}
+async function adminResetCredits(){
+  if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminResetTarget')?.value);
+  if(!uid)return showToast('❌ Sélectionne un joueur.','error');
+  if(!confirm('Réinitialiser les crédits de ce joueur à 0 ?'))return;
+  try{await adminUpdateUser(uid,{credits:0});showToast('🪙 Crédits réinitialisés.','success');adminInspectPlayer(uid);}catch(e){showToast('❌ '+(e.message||e),'error');}
+}
+async function adminResetCards(){
+  if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminResetTarget')?.value);
+  if(!uid)return showToast('❌ Sélectionne un joueur.','error');
+  if(!confirm('Retirer toutes les cartes obtenues à ce joueur ? Les cartes de départ resteront disponibles.'))return;
+  try{await adminUpdateUser(uid,{catalogs:adminCatalogReset()});showToast('🃏 Cartes réinitialisées.','success');adminInspectPlayer(uid);}catch(e){showToast('❌ '+(e.message||e),'error');}
+}
+async function adminResetFullAccount(){
+  if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminResetTarget')?.value);
+  if(!uid)return showToast('❌ Sélectionne un joueur.','error');
+  if(!confirm('ATTENTION : remettre ce compte à zéro supprimera crédits, cartes, amis, codes utilisés et progression quotidienne. Continuer ?'))return;
+  try{
+    const updates={};
+    updates['users/'+uid+'/credits']=0;
+    updates['users/'+uid+'/catalogs']=adminCatalogReset();
+    updates['users/'+uid+'/friends']=[];
+    updates['users/'+uid+'/redeemedCodes']=[];
+    updates['users/'+uid+'/dailyGames']={};
+    updates['users/'+uid+'/hubTasks']={};
+    updates['users/'+uid+'/worldData']={event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0};
+    updates['friendships/'+uid]=null;
+    updates['friend_requests/'+uid]=null;
+    updates['trade_inbox/'+uid]=null;
+    updates['trade_outbox/'+uid]=null;
+    updates['public_collections/'+uid]={worldEvent:{contribution:0,lastParticipation:''}};
+    await withTimeout(db.ref().update(updates),10000,'Firebase a refusé la réinitialisation.');
+    showToast('💥 Compte remis à zéro.','success'); adminInspectPlayer(uid);
+  }catch(e){showToast('❌ Réinitialisation impossible : '+(e.message||e),'error');}
+}
+async function adminResetSocial(){
+  if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminResetTarget')?.value);
+  if(!uid)return showToast('❌ Sélectionne un joueur.','error');
+  if(!confirm('Supprimer les amis et demandes de ce joueur ?'))return;
+  try{await withTimeout(db.ref().update({['users/'+uid+'/friends']:[],['friendships/'+uid]:null,['friend_requests/'+uid]:null}),8000,'Firebase a refusé la modification.');showToast('👥 Relations du joueur réinitialisées.','success');adminInspectPlayer(uid);}catch(e){showToast('❌ '+(e.message||e),'error');}
+}
+async function adminResetDailyProgress(){
+  if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminResetTarget')?.value);
+  if(!uid)return showToast('❌ Sélectionne un joueur.','error');
+  try{await adminUpdateUser(uid,{dailyGames:{},hubTasks:{}});showToast('🔄 Limites quotidiennes réinitialisées.','success');}catch(e){showToast('❌ '+(e.message||e),'error');}
+}
+async function adminAdjustCredits(direction){
+  if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminAdjustTarget')?.value); const amount=Math.floor(Number(document.getElementById('adminAdjustAmount')?.value));
+  if(!uid)return showToast('❌ Sélectionne un joueur.','error'); if(!Number.isFinite(amount)||amount<1)return showToast('❌ Montant invalide.','error');
+  try{const u=await adminGetUser(uid);const next=Math.max(0,Number(u?.credits||0)+(direction*amount));await adminUpdateUser(uid,{credits:next});showToast((direction>0?'➕ ':'➖ ')+amount.toLocaleString('fr-FR')+' crédits appliqués.','success');adminInspectPlayer(uid);}catch(e){showToast('❌ '+(e.message||e),'error');}
+}
+async function adminRemoveSpecificCard(){
+  if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminAdjustTarget')?.value||document.getElementById('adminResetTarget')?.value); const id=Number(document.getElementById('adminRemoveCard')?.value);
+  if(!uid)return showToast('❌ Sélectionne un joueur.','error'); if(!Number.isFinite(id))return showToast('❌ Carte invalide.','error');
+  try{const u=await adminGetUser(uid);const cats=u?.catalogs||adminCatalogReset();let found=false;Object.keys(cats).forEach(cat=>(cats[cat]||[]).forEach(c=>{if(Number(c.id)===id){c.unlocked=false;found=true;}}));if(!found)return showToast('❌ Carte introuvable.','error');await adminUpdateUser(uid,{catalogs:cats});showToast('🗑️ Carte retirée du compte.','success');adminInspectPlayer(uid);}catch(e){showToast('❌ '+(e.message||e),'error');}
+}
+async function adminForcePlayerRefresh(){
+  if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminResetTarget')?.value); if(!uid)return showToast('❌ Sélectionne un joueur.','error');
+  try{await db.ref('admin_control/'+uid).update({refreshToken:Date.now()});showToast('🔄 Actualisation demandée au joueur.','success');}catch(e){showToast('❌ '+(e.message||e),'error');}
+}
+async function adminClearPlayerRequests(){
+  if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminResetTarget')?.value); if(!uid)return showToast('❌ Sélectionne un joueur.','error');
+  try{await db.ref('friend_requests/'+uid).remove();showToast('📨 Demandes reçues vidées.','success');}catch(e){showToast('❌ '+(e.message||e),'error');}
 }
 
 async function adminGiftCard(){
@@ -1859,7 +1983,7 @@ function listenAccountAdminControl(){
   if(accountControlRef && accountControlHandler)accountControlRef.off('value',accountControlHandler);
   if(!appData.currentUser)return;
   accountControlRef=db.ref('admin_control/'+appData.currentUser.uid);
-  accountControlHandler=snap=>{const v=snap.val()||{};if(v.banned===true && !appData.isAdmin){showBanOverlay(v);}else hideBanOverlay();};
+  accountControlHandler=snap=>{const v=snap.val()||{};if(v.banned===true && !appData.isAdmin){showBanOverlay(v);}else hideBanOverlay();if(v.refreshToken && !appData.isAdmin){try{const seen=sessionStorage.getItem('drop2027_admin_refresh_seen');if(seen!==String(v.refreshToken)){sessionStorage.setItem('drop2027_admin_refresh_seen',String(v.refreshToken));location.reload();}}catch(e){location.reload();}}};
   accountControlRef.on('value',accountControlHandler);
 }
 
@@ -1971,7 +2095,7 @@ async function adminInspectPlayer(uid){
   if(!appData.isAdmin)return; const el=document.getElementById('adminPlayerDetails');if(!el)return; el.innerHTML='<span style="color:var(--text-muted);font-size:.7rem">Chargement du joueur…</span>';
   try{const [us,pr,ban]=await Promise.all([db.ref('users/'+uid).once('value'),db.ref('presence/'+uid).once('value'),db.ref('admin_control/'+uid).once('value')]);const u=us.val()||{};const p=pr.val()||{};const b=ban.val()||{};const cards=[];Object.keys(u.catalogs||{}).forEach(cat=>(u.catalogs[cat]||[]).forEach(c=>{if(c.unlocked)cards.push(c);}));
     el.innerHTML='<div style="padding:10px;border:1px solid rgba(255,215,0,.22);border-radius:12px;background:rgba(255,255,255,.025)"><b style="color:#ffd700">'+escapeHtml(u.username||'Joueur')+'</b><div style="font-size:.62rem;color:#aaa;margin-top:4px">'+escapeHtml(uid)+'<br>🪙 '+Number(u.credits||0).toLocaleString('fr-FR')+' crédits · '+(p.online?'🟢 en ligne':'⚪ hors ligne')+'<br>📍 '+escapeHtml(p.screen||'')+' · '+escapeHtml(p.action||'')+'</div><div style="margin-top:7px;font-size:.65rem;color:#ddd">🃏 '+cards.length+' cartes obtenues</div><div style="max-height:150px;overflow:auto;margin-top:5px">'+cards.map(c=>'<div style="font-size:.62rem;padding:2px 0">'+escapeHtml(c.emoji||'🃏')+' '+escapeHtml(c.name||'Carte')+'</div>').join('')+'</div>'+(b.banned?'<div style="margin-top:7px;color:#f87171;font-weight:900">🚫 BANNI · '+escapeHtml(b.reason||'')+'</div>':'')+'</div>';
-    const target=document.getElementById('adminBanTarget');if(target)target.value='#DROP-'+uid;
+    adminSetTargetEverywhere(uid);
   }catch(e){el.innerHTML='<span style="color:#f87171;font-size:.7rem">Impossible de charger ce joueur.</span>';}
 }
 function setPresenceAction(action){
