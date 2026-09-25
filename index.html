@@ -905,6 +905,31 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="btn btn-secondary" style="margin-top:7px;" onclick="adminUnlockSite()">🔓 RÉOUVRIR LE SITE</button>
 </div>
 <div class="admin-gift-box">
+<div class="admin-gift-title">🛠️ MAINTENANCE & DURÉE</div>
+<div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Choisis une durée précise, ou bloque le site jusqu’à ce que tu reviennes ici pour le rouvrir.</div>
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:7px;">
+<input id="adminLockDuration" class="input-field" type="number" min="1" step="1" value="30" placeholder="Durée" style="flex:1;min-width:90px;">
+<select id="adminLockUnit" class="input-field" style="flex:1;min-width:110px;"><option value="minutes">minutes</option><option value="hours">heures</option></select>
+</div>
+<div style="display:flex;gap:7px;flex-wrap:wrap;">
+<button class="btn btn-danger" style="flex:1;" onclick="adminLockCustom()">🔒 BLOQUER POUR LA DURÉE</button>
+<button class="btn btn-secondary" style="flex:1;" onclick="adminLockManual()">🔒 BLOQUER JUSQU’AU DÉBLOCAGE</button>
+</div>
+<div id="adminLockStatus" style="margin-top:7px;font-size:.62rem;color:#ffd700;"></div>
+</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">🚫 BANNIR UN UTILISATEUR</div>
+<input id="adminBanTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="margin-bottom:7px;">
+<input id="adminBanReason" class="input-field" placeholder="Motif du bannissement (facultatif)" style="margin-bottom:7px;">
+<button class="btn btn-danger" onclick="adminBanUser()">🚫 BANNIR DÉFINITIVEMENT</button>
+<button class="btn btn-secondary" style="margin-top:7px;" onclick="adminUnbanUser()">♻️ RETIRER LE BANNISSEMENT</button>
+</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">👥 JOUEURS EN LIGNE / ACTIVITÉ</div>
+<div id="adminOnlineList" style="max-height:260px;overflow:auto;"><i style="color:var(--text-muted);font-size:.7rem;">Chargement…</i></div>
+<div id="adminPlayerDetails" style="margin-top:9px;"></div>
+</div>
+<div class="admin-gift-box">
 <div class="admin-gift-title">📢 ANNONCE GLOBALE</div>
 <input id="adminAnnouncement" class="input-field" placeholder="Message à afficher à tous les joueurs" style="margin-bottom:7px;">
 <button class="btn btn-secondary" onclick="adminBroadcastAnnouncement()">📢 PUBLIER L'ANNONCE</button>
@@ -1618,6 +1643,10 @@ if (needsFriendIdMigration) {
 
 listenToTrades();
 listenToFriendRequests();
+listenGlobalSiteControl();
+startPresence();
+listenAccountAdminControl();
+if (appData.isAdmin) loadAdminPlayers();
 updateUI();
 
 if (isAdminEmail || appData.isAdmin) showToast('👑 Bienvenue administrateur. Accès illimité activé.','success');
@@ -1660,6 +1689,10 @@ updateUI();
 // L'utilisateur reste connecté même si la DB est temporairement inaccessible.
 listenToTrades();
 listenToFriendRequests();
+listenGlobalSiteControl();
+startPresence();
+listenAccountAdminControl();
+if (appData.isAdmin) loadAdminPlayers();
 updateUI();
 showToast('⚠️ Connecté. Firebase Data ne répond pas pour le moment.', 'error');
 return true;
@@ -1671,6 +1704,9 @@ let authStateReady = false;
 auth.onAuthStateChanged(async (user) => {
 if (authLoading && !user) return;
 if (!user) {
+if(accountControlRef && accountControlHandler)accountControlRef.off('value',accountControlHandler);
+accountControlRef=null; accountControlHandler=null; hideBanOverlay();
+stopPresence();
 profileLoadToken++;
 resetLocalUserState();
 updateUI();
@@ -1687,6 +1723,7 @@ hideAuthGate();
 const homeNav = document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');
 switchTab('scr-home', homeNav || null);
 listenGlobalWorldEvent();
+listenGlobalSiteControl();
 });
 
 function generateFriendCode(uid) {
@@ -1761,7 +1798,7 @@ function applyAdminMode(active) {
   if (vp) vp.classList.toggle('admin-mode', !!active);
   const panel=document.getElementById('adminPanel');
   if (panel) panel.style.display=active ? 'block' : 'none';
-  if (active) populateAdminGiftCards();
+  if (active) { populateAdminGiftCards(); loadAdminPlayers(); }
 }
 function populateAdminGiftCards(){
   const sel=document.getElementById('adminGiftCard'); if(!sel || !appData.isAdmin)return;
@@ -1811,16 +1848,30 @@ async function adminGiftCredits(){
   }catch(err){showToast('❌ Cadeau non envoyé : '+(err&&err.message?err.message:'erreur Firebase'),'error');}
 }
 
+let accountControlRef=null, accountControlHandler=null;
+function showBanOverlay(v){
+  let el=document.getElementById('accountBanOverlay');
+  if(!el){el=document.createElement('div');el.id='accountBanOverlay';el.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(3,3,8,.98);display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:white;';document.body.appendChild(el);}
+  el.innerHTML='<div style="max-width:520px;border:1px solid rgba(248,113,113,.7);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(35,8,8,.97),rgba(6,6,14,.99));box-shadow:0 0 45px rgba(248,113,113,.18)"><div style="font-size:3rem">🚫</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#fca5a5">ACCÈS REFUSÉ</h2><p style="color:#d4d4d8;line-height:1.6">Ce compte a été définitivement banni de DROP 2027.</p><p style="margin-top:12px;font-size:.72rem;color:#a1a1aa">'+escapeHtml(v.reason||'Aucun motif communiqué.')+'</p></div>';
+}
+function hideBanOverlay(){const el=document.getElementById('accountBanOverlay');if(el)el.remove();}
+function listenAccountAdminControl(){
+  if(accountControlRef && accountControlHandler)accountControlRef.off('value',accountControlHandler);
+  if(!appData.currentUser)return;
+  accountControlRef=db.ref('admin_control/'+appData.currentUser.uid);
+  accountControlHandler=snap=>{const v=snap.val()||{};if(v.banned===true && !appData.isAdmin){showBanOverlay(v);}else hideBanOverlay();};
+  accountControlRef.on('value',accountControlHandler);
+}
+
 let globalControlRef=null, globalControlHandler=null, globalControlAdminUid=null;
-async function resolveGlobalControlRef(){
-  if(appData.isAdmin && appData.currentUser) return db.ref('public_collections/'+appData.currentUser.uid+'/siteControl');
-  try{
-    const snap=await db.ref('public_collections').once('value');
-    const all=snap.val()||{};
-    const uid=Object.keys(all).find(k=>all[k]&&all[k].__adminControl&&all[k].__adminControl.owner);
-    if(uid){globalControlAdminUid=uid;return db.ref('public_collections/'+uid+'/siteControl');}
-  }catch(e){console.warn('Contrôle global:',e);}
-  return null;
+async function resolveGlobalControlRef(){ return db.ref('site_control'); }
+function updateAdminLockStatus(v){
+  const el=document.getElementById('adminLockStatus'); if(!el || !appData.isAdmin)return;
+  if(v && v.locked){
+    if(v.manual){ el.textContent='🔴 SITE BLOQUÉ MANUELLEMENT — déblocage uniquement par l’administrateur.'; }
+    else if(Number(v.until)>Date.now()){ el.textContent='🔴 SITE BLOQUÉ — fin prévue le '+new Date(Number(v.until)).toLocaleString('fr-FR')+'.'; }
+    else el.textContent='🟢 SITE OUVERT';
+  } else el.textContent='🟢 SITE OUVERT';
 }
 async function listenGlobalSiteControl(){
   if(globalControlRef && globalControlHandler){globalControlRef.off('value',globalControlHandler);}
@@ -1828,8 +1879,10 @@ async function listenGlobalSiteControl(){
   if(!globalControlRef)return;
   globalControlHandler=snap=>{
     const v=snap.val()||{};
-    const locked=!!v.locked && Number(v.until||0)>Date.now();
-    if(locked) showGlobalLockOverlay(v); else hideGlobalLockOverlay();
+    const locked=!!v.locked && (v.manual===true || Number(v.until||0)>Date.now());
+    if(locked && !appData.isAdmin) showGlobalLockOverlay(v); else hideGlobalLockOverlay();
+    updateAdminLockStatus(v);
+    if(locked && !v.manual && Number(v.until)>Date.now()) setTimeout(()=>{ if(globalControlRef) globalControlRef.once('value').catch(()=>{}); }, Math.max(500, Number(v.until)-Date.now()+100));
     if(v.announcement && Number(v.announcementAt||0)>=(Date.now()-24*60*60*1000) && v.announcementId!==sessionStorage.getItem('drop2027_last_global_announcement')){
       try{sessionStorage.setItem('drop2027_last_global_announcement',String(v.announcementId||v.announcementAt));}catch(e){}
       showToast('📢 '+String(v.announcement),'success');
@@ -1842,25 +1895,97 @@ function showGlobalLockOverlay(v){
   if(!el){el=document.createElement('div');el.id='globalSiteLock';el.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(3,3,8,.97);display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:white;';document.body.appendChild(el);}
   const remaining=Math.max(0,Number(v.until)-Date.now());
   const mins=Math.ceil(remaining/60000);
-  el.innerHTML='<div style="max-width:520px;border:1px solid rgba(217,70,239,.55);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(25,10,35,.96),rgba(6,6,14,.98));box-shadow:0 0 45px rgba(217,70,239,.18)"><div style="font-size:3rem">🚧</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#f0abfc">DROP 2027 EN PAUSE</h2><p style="color:#d4d4d8;line-height:1.6">'+escapeHtml(v.message||'Le site est temporairement en maintenance.')+'</p><div style="margin-top:16px;font-size:.7rem;color:#a1a1aa">Retour estimé dans environ '+mins+' min.</div></div>';
+  const timing=v.manual?'Jusqu’à ce que l’administrateur rouvre le site.':('Retour estimé dans environ '+mins+' min.');
+  el.innerHTML='<div style="max-width:520px;border:1px solid rgba(217,70,239,.55);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(25,10,35,.96),rgba(6,6,14,.98));box-shadow:0 0 45px rgba(217,70,239,.18)"><div style="font-size:3rem">🚧</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#f0abfc">DROP 2027 EN PAUSE</h2><p style="color:#d4d4d8;line-height:1.6">'+escapeHtml(v.message||'Le site est temporairement en maintenance.')+'</p><div style="margin-top:16px;font-size:.7rem;color:#a1a1aa">'+timing+'</div></div>';
 }
 function hideGlobalLockOverlay(){const el=document.getElementById('globalSiteLock');if(el)el.remove();}
+async function adminWriteSiteControl(payload){
+  if(!appData.isAdmin)return;
+  const ref=await resolveGlobalControlRef(); if(!ref)throw new Error('Contrôle global indisponible');
+  await withTimeout(ref.update({...payload,by:'admin',updatedAt:firebase.database.ServerValue.TIMESTAMP}),8000,'Firebase a refusé le contrôle global.');
+}
 async function adminLockSite(minutes){
   if(!appData.isAdmin)return;
   const message=(document.getElementById('adminLockMessage')?.value||'DROP 2027 est temporairement en maintenance.').trim();
-  try{const ref=await resolveGlobalControlRef(); if(!ref) throw new Error('Contrôle global indisponible'); await ref.update({locked:true,until:Date.now()+minutes*60000,message,by:'admin',updatedAt:firebase.database.ServerValue.TIMESTAMP});showToast('🔒 Site bloqué pour tous les joueurs pendant '+minutes+' minutes.','success');}
-  catch(e){showToast('❌ Impossible de bloquer le site avec les règles Firebase actuelles.','error');}
+  try{await adminWriteSiteControl({locked:true,manual:false,until:Date.now()+minutes*60000,message});showToast('🔒 Site bloqué pour tous les joueurs pendant '+minutes+' minutes.','success');}
+  catch(e){showToast('❌ Impossible de bloquer le site : '+(e.message||e),'error');}
+}
+async function adminLockCustom(){
+  if(!appData.isAdmin)return;
+  const n=Number(document.getElementById('adminLockDuration')?.value); const unit=document.getElementById('adminLockUnit')?.value;
+  if(!Number.isFinite(n)||n<1)return showToast('❌ Durée invalide.','error');
+  const minutes=Math.round(n*(unit==='hours'?60:1));
+  await adminLockSite(minutes);
+}
+async function adminLockManual(){
+  if(!appData.isAdmin)return;
+  const message=(document.getElementById('adminLockMessage')?.value||'DROP 2027 est temporairement en maintenance.').trim();
+  try{await adminWriteSiteControl({locked:true,manual:true,until:0,message});showToast('🔒 Site bloqué jusqu’à ton déblocage manuel.','success');}
+  catch(e){showToast('❌ Impossible de bloquer le site : '+(e.message||e),'error');}
 }
 async function adminUnlockSite(){
   if(!appData.isAdmin)return;
-  try{const ref=await resolveGlobalControlRef(); if(!ref) throw new Error('Contrôle global indisponible'); await ref.update({locked:false,until:0,message:'',updatedAt:firebase.database.ServerValue.TIMESTAMP});hideGlobalLockOverlay();showToast('🔓 Site rouvert pour tous.','success');}
-  catch(e){showToast('❌ Impossible de rouvrir le site.','error');}
+  try{await adminWriteSiteControl({locked:false,manual:false,until:0,message:''});hideGlobalLockOverlay();showToast('🔓 Site rouvert pour tous.','success');}
+  catch(e){showToast('❌ Impossible de rouvrir le site : '+(e.message||e),'error');}
 }
 async function adminBroadcastAnnouncement(){
   if(!appData.isAdmin)return; const input=document.getElementById('adminAnnouncement');const announcement=(input?.value||'').trim();if(!announcement)return showToast('❌ Écris une annonce avant de publier.','error');
-  try{const ref=await resolveGlobalControlRef(); if(!ref) throw new Error('Contrôle global indisponible'); await ref.update({announcement,announcementAt:Date.now(),announcementId:'ann_'+Date.now(),updatedAt:firebase.database.ServerValue.TIMESTAMP});if(input)input.value='';showToast('📢 Annonce publiée.','success');}
-  catch(e){showToast('❌ Impossible de publier l’annonce.','error');}
+  try{await adminWriteSiteControl({announcement,announcementAt:Date.now(),announcementId:'ann_'+Date.now()});if(input)input.value='';showToast('📢 Annonce publiée.','success');}
+  catch(e){showToast('❌ Impossible de publier l’annonce : '+(e.message||e),'error');}
 }
+
+let adminUsersCache={};
+let adminPresenceRef=null, adminPresenceHandler=null;
+function adminBanTargetUid(){return adminTargetUid(document.getElementById('adminBanTarget')?.value);}
+async function adminBanUser(){
+  if(!appData.isAdmin)return; const uid=adminBanTargetUid(); if(!uid)return showToast('❌ ID joueur invalide. Utilise #DROP-UID.','error'); if(uid===appData.currentUser.uid)return showToast('❌ Tu ne peux pas te bannir toi-même.','error');
+  const reason=(document.getElementById('adminBanReason')?.value||'Bannissement administratif.').trim();
+  try{await db.ref('admin_control/'+uid).set({banned:true,reason,by:appData.currentUser.uid,at:firebase.database.ServerValue.TIMESTAMP});showToast('🚫 Joueur banni définitivement.','success');}
+  catch(e){showToast('❌ Bannissement impossible : '+(e.message||e),'error');}
+}
+async function adminUnbanUser(){
+  if(!appData.isAdmin)return; const uid=adminBanTargetUid(); if(!uid)return showToast('❌ ID joueur invalide.','error');
+  try{await db.ref('admin_control/'+uid).remove();showToast('♻️ Bannissement retiré.','success');}
+  catch(e){showToast('❌ Débannissement impossible : '+(e.message||e),'error');}
+}
+function renderAdminOnline(){
+  const el=document.getElementById('adminOnlineList'); if(!el||!appData.isAdmin)return;
+  const entries=Object.values(adminUsersCache).sort((a,b)=>Number(b.online)-Number(a.online)||String(a.username||'').localeCompare(String(b.username||'')));
+  if(!entries.length){el.innerHTML='<i style="color:var(--text-muted);font-size:.7rem;">Aucun joueur trouvé.</i>';return;}
+  el.innerHTML=entries.map(u=>{const uid=escapeHtml(u.uid||'');const online=!!u.online;return '<div style="padding:7px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;gap:8px;align-items:center;cursor:pointer" onclick="adminInspectPlayer(\''+uid+'\')"><span><b>'+escapeHtml(u.username||'Joueur')+'</b><br><small style="color:var(--text-muted)">'+escapeHtml(u.friendId||('#DROP-'+u.uid))+' · '+(online?'🟢 EN LIGNE':'⚪ hors ligne')+'</small></span><span style="font-size:.62rem;color:#aaa;text-align:right">'+escapeHtml(u.screen||'')+'<br>'+escapeHtml(u.action||'')+'</span></div>';}).join('');
+}
+async function loadAdminPlayers(){
+  if(!appData.isAdmin)return;
+  try{
+    const snap=await withTimeout(db.ref('users').once('value'),8000,'Impossible de charger les joueurs.');
+    const all=snap.val()||{}; adminUsersCache={};
+    Object.keys(all).forEach(uid=>{const u=all[uid]||{};adminUsersCache[uid]={uid,username:u.username||'Joueur',friendId:u.friendId||('#DROP-'+uid),credits:Number(u.credits)||0,online:false,screen:'',action:''};});
+    renderAdminOnline();
+    if(adminPresenceRef&&adminPresenceHandler)adminPresenceRef.off('value',adminPresenceHandler);
+    adminPresenceRef=db.ref('presence');
+    adminPresenceHandler=s=>{const pres=s.val()||{};Object.keys(adminUsersCache).forEach(uid=>{const p=pres[uid]||{};adminUsersCache[uid].online=p.online===true;adminUsersCache[uid].screen=p.screen||'';adminUsersCache[uid].action=p.action||'';adminUsersCache[uid].lastSeen=p.lastSeen||0;});renderAdminOnline();};
+    adminPresenceRef.on('value',adminPresenceHandler);
+  }catch(e){const el=document.getElementById('adminOnlineList');if(el)el.innerHTML='<span style="color:#f87171">Impossible de charger les joueurs.</span>';console.warn('Admin joueurs:',e);}
+}
+async function adminInspectPlayer(uid){
+  if(!appData.isAdmin)return; const el=document.getElementById('adminPlayerDetails');if(!el)return; el.innerHTML='<span style="color:var(--text-muted);font-size:.7rem">Chargement du joueur…</span>';
+  try{const [us,pr,ban]=await Promise.all([db.ref('users/'+uid).once('value'),db.ref('presence/'+uid).once('value'),db.ref('admin_control/'+uid).once('value')]);const u=us.val()||{};const p=pr.val()||{};const b=ban.val()||{};const cards=[];Object.keys(u.catalogs||{}).forEach(cat=>(u.catalogs[cat]||[]).forEach(c=>{if(c.unlocked)cards.push(c);}));
+    el.innerHTML='<div style="padding:10px;border:1px solid rgba(255,215,0,.22);border-radius:12px;background:rgba(255,255,255,.025)"><b style="color:#ffd700">'+escapeHtml(u.username||'Joueur')+'</b><div style="font-size:.62rem;color:#aaa;margin-top:4px">'+escapeHtml(uid)+'<br>🪙 '+Number(u.credits||0).toLocaleString('fr-FR')+' crédits · '+(p.online?'🟢 en ligne':'⚪ hors ligne')+'<br>📍 '+escapeHtml(p.screen||'')+' · '+escapeHtml(p.action||'')+'</div><div style="margin-top:7px;font-size:.65rem;color:#ddd">🃏 '+cards.length+' cartes obtenues</div><div style="max-height:150px;overflow:auto;margin-top:5px">'+cards.map(c=>'<div style="font-size:.62rem;padding:2px 0">'+escapeHtml(c.emoji||'🃏')+' '+escapeHtml(c.name||'Carte')+'</div>').join('')+'</div>'+(b.banned?'<div style="margin-top:7px;color:#f87171;font-weight:900">🚫 BANNI · '+escapeHtml(b.reason||'')+'</div>':'')+'</div>';
+    const target=document.getElementById('adminBanTarget');if(target)target.value='#DROP-'+uid;
+  }catch(e){el.innerHTML='<span style="color:#f87171;font-size:.7rem">Impossible de charger ce joueur.</span>';}
+}
+function setPresenceAction(action){
+  if(!appData.currentUser)return;
+  const uid=appData.currentUser.uid; const ref=db.ref('presence/'+uid);
+  ref.update({online:true,uid,username:appData.currentUser.username||'Joueur',friendId:appData.friendId||'',action:String(action||''),lastSeen:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});
+}
+function startPresence(){
+  if(!appData.currentUser)return; const uid=appData.currentUser.uid; const ref=db.ref('presence/'+uid);
+  ref.onDisconnect().remove().catch(()=>{});
+  ref.set({online:true,uid,username:appData.currentUser.username||'Joueur',friendId:appData.friendId||'',screen:'Accueil',action:'Connexion',lastSeen:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});
+  setPresenceAction('En jeu');
+}
+function stopPresence(){if(appData.currentUser)db.ref('presence/'+appData.currentUser.uid).remove().catch(()=>{});}
 
 function updateUI() {
 ensureStarterCards();
@@ -1955,6 +2080,7 @@ document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 if (btn) btn.classList.add('active');
+setPresenceAction('Ouvre '+id);
 }
 
 function switchCategory(catKey, tabBtn) {
@@ -3919,7 +4045,7 @@ function bootEntrySequence(){
   if (window.__launchSequenceRunning) return;
   window.__launchSequenceRunning=true;
   const isNewPlayer=!!window.__pendingNewPlayerTutorial;
-  startEntryAnimation(isNewPlayer?20:1,true===isNewPlayer);
+  startEntryAnimation(isNewPlayer?20:1,isNewPlayer);
 }
 function getLaunchCollectionCards(){
  return getUnlockedCards().sort((a,b)=>Number(a.id)-Number(b.id));
