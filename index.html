@@ -3892,7 +3892,7 @@ function startEntryAnimation(seconds,first){
  overlay.classList.add('active');overlay.dataset.locked='1';
  const logo=document.getElementById('entryLogo'),sub=document.getElementById('entrySub'),panel=document.getElementById('entryPanel'),bar=document.getElementById('entryProgressBar'),timer=document.getElementById('entryTimer');
  logo.classList.remove('entry-logo-explode');let elapsed=0;
- sub.innerText=first?'BIENVENUE DANS DROP 2027':'NOUVELLE SESSION — DROP 2027';
+ sub.innerText=first?'BIENVENUE DANS DROP 2027':'';
  const cards=getUnlockedCards();
  const news=Array.from(NEW_CARD_IDS).map(id=>findCardById(id)).filter(Boolean);
  const renderFirstSlide=()=>{const slides=[
@@ -3906,24 +3906,21 @@ function startEntryAnimation(seconds,first){
   ['🚀 TON OBJECTIF','Collectionne, joue, échange, découvre les nouvelles catégories et complète ton classeur. DROP 2027 commence maintenant.']
  ]; const idx=Math.min(slides.length-1,Math.floor(elapsed/7.5));const sl=slides[idx];panel.innerHTML='<h3>'+sl[0]+'</h3><p>'+sl[1]+'</p><p style="margin-top:9px;color:var(--glow-cyan);font-size:.65rem">Étape '+(idx+1)+' / '+slides.length+'</p>';};
  const renderEntry=()=>{panel.innerHTML='<h3>📦 RÉCAP DE TA COLLECTION</h3><p>'+cards.length+' cartes obtenues au total.</p><div class="entry-cards-preview">'+cards.map(c=>`<div class="entry-mini-card"><b>${c.emoji}</b><span>${c.name}</span></div>`).join('')+'</div><p style="margin-top:8px;color:var(--glow-magenta)">✨ Nouvelles cartes : '+news.slice(0,5).map(c=>c.name).join(' • ')+'</p>';};
- if(first)renderFirstSlide();else renderEntry();
+ if(first)renderFirstSlide();else {panel.innerHTML='';setTimeout(()=>{logo.classList.add('entry-logo-explode');playEntryExplosion();},250);}
  entryTimerHandle=setInterval(()=>{
   elapsed++;bar.style.width=(elapsed/seconds*100)+'%';timer.innerText=Math.max(0,seconds-elapsed)+'s';
   if(first)renderFirstSlide();
-  if(!first&&elapsed===seconds-3){logo.classList.add('entry-logo-explode');}
-  if(!first&&elapsed===seconds-1)playEntryExplosion();
   if(elapsed>=seconds){clearInterval(entryTimerHandle);entryTimerHandle=null;stopEntryMusic();overlay.classList.remove('active');overlay.dataset.locked='0';setTimeout(showLaunchRecap,220);}
  },1000);
 }
 
 function bootEntrySequence(){
- if (!auth.currentUser || !appData.currentUser) return;
- if (window.__launchSequenceRunning) return;
- window.__launchSequenceRunning=true;
- startEntryAnimation(20,true);
+  if (!auth.currentUser || !appData.currentUser) return;
+  if (window.__launchSequenceRunning) return;
+  window.__launchSequenceRunning=true;
+  const isNewPlayer=!!window.__pendingNewPlayerTutorial;
+  startEntryAnimation(isNewPlayer?20:1,true===isNewPlayer);
 }
-window.addEventListener('load',()=>setTimeout(bootEntrySequence,650));
-
 function getLaunchCollectionCards(){
  return getUnlockedCards().sort((a,b)=>Number(a.id)-Number(b.id));
 }
@@ -4046,8 +4043,9 @@ async function contributeToWorldEvent(){
    w.eventLastParticipation=String(saved.lastParticipation||today);
    w.globalContribution=Math.max(0,Number(saved.contribution)||0);
    worldAction('event',10);
-   // Ne jamais afficher ici la contribution personnelle comme compteur mondial.
-   // On recharge la somme de TOUS les joueurs depuis Firebase, puis on l'affiche.
+   // Affichage immédiat côté joueur, puis recalcul du total partagé depuis Firebase.
+   window.__dropGlobalEvent=Math.max(0,Number(window.__dropGlobalEvent)||0)+10;
+   renderWorld();
    await loadGlobalWorldEvent();
    renderWorld();
    showToast('⚡ Contribution du jour enregistrée : +10 pour le monde entier.','success');
