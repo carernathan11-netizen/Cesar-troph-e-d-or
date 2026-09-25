@@ -926,6 +926,11 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <button class="btn btn-secondary" style="flex:1;" onclick="adminLockSite(60)">🔒 BLOQUER 1 H</button>
 </div>
 <button class="btn btn-secondary" style="margin-top:7px;" onclick="adminUnlockSite()">🔓 RÉOUVRIR LE SITE</button>
+<div style="font-size:.62rem;color:var(--text-muted);margin-top:10px;margin-bottom:6px;">⏰ OU CHOISIS UNE HEURE EXACTE DE RÉOUVERTURE</div>
+<div style="display:flex;gap:7px;flex-wrap:wrap;">
+<input id="adminLockUntilDate" class="input-field" type="datetime-local" style="flex:1;min-width:180px;">
+<button class="btn btn-danger" style="flex:1;min-width:180px;" onclick="adminLockUntilDateTime()">⏰ BLOQUER JUSQU'À CETTE HEURE</button>
+</div>
 </div>
 <div class="admin-gift-box">
 <div class="admin-gift-title">🛠️ MAINTENANCE & DURÉE</div>
@@ -937,11 +942,6 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div style="display:flex;gap:7px;flex-wrap:wrap;">
 <button class="btn btn-danger" style="flex:1;" onclick="adminLockCustom()">🔒 BLOQUER POUR LA DURÉE</button>
 <button class="btn btn-secondary" style="flex:1;" onclick="adminLockManual()">🔒 BLOQUER JUSQU’AU DÉBLOCAGE</button>
-<div style="margin-top:10px;font-size:.62rem;color:var(--text-muted);">🕒 Ou choisis directement l’heure exacte de réouverture :</div>
-<div style="display:flex;gap:7px;align-items:center;margin-top:6px;">
-<input id="adminLockUntilDate" class="input-field" type="datetime-local" style="flex:1;">
-<button class="btn btn-danger" onclick="adminLockUntilDate()">🔒 BLOQUER JUSQU’À CETTE HEURE</button>
-</div>
 </div>
 <div id="adminLockStatus" style="margin-top:7px;font-size:.62rem;color:#ffd700;"></div>
 </div>
@@ -993,9 +993,35 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div id="adminPlayerDetails" style="margin-top:9px;"></div>
 </div>
 <div class="admin-gift-box">
+<div class="admin-gift-title">🗓️ EMPLOI DU TEMPS DU SITE — 7 JOURS / 7</div>
+<div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Définis les horaires d’ouverture et de fermeture de chaque jour. Les joueurs verront automatiquement le site fermé en dehors de ces créneaux.</div>
+<div id="adminWeeklySchedule" style="display:grid;gap:7px;"></div>
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;">
+<button class="btn" style="flex:1;" onclick="adminSaveWeeklySchedule()">💾 ENREGISTRER LES HORAIRES</button>
+<button class="btn btn-secondary" style="flex:1;" onclick="adminLoadWeeklySchedule()">🔄 ACTUALISER</button>
+</div>
+<div id="adminScheduleStatus" style="font-size:.62rem;color:#ffd700;margin-top:7px;"></div>
+</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">🎪 ÉVÉNEMENTS PROGRAMMÉS</div>
+<div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Programme des événements à une date et une heure précises. Ils apparaissent dans l’emploi du temps du site.</div>
+<div style="display:grid;gap:7px;">
+<select id="adminEventType" class="input-field"></select>
+<input id="adminEventTitle" class="input-field" placeholder="Nom de l’événement">
+<div style="display:flex;gap:7px;flex-wrap:wrap;"><input id="adminEventStart" class="input-field" type="datetime-local" style="flex:1;min-width:180px;"><input id="adminEventEnd" class="input-field" type="datetime-local" style="flex:1;min-width:180px;"></div>
+<textarea id="adminEventMessage" class="input-field" rows="2" placeholder="Description / message de l’événement" style="resize:vertical;"></textarea>
+</div>
+<button class="btn" style="margin-top:7px;width:100%;" onclick="adminAddScheduledEvent()">➕ AJOUTER L’ÉVÉNEMENT</button>
+<div id="adminEventsList" style="max-height:360px;overflow:auto;margin-top:9px;"></div>
+</div>
+<div class="admin-gift-box">
 <div class="admin-gift-title">📢 ANNONCE GLOBALE</div>
 <input id="adminAnnouncement" class="input-field" placeholder="Message à afficher à tous les joueurs" style="margin-bottom:7px;">
-<button class="btn btn-secondary" onclick="adminBroadcastAnnouncement()">📢 PUBLIER L'ANNONCE</button>
+<div style="display:flex;gap:7px;flex-wrap:wrap;">
+<button class="btn btn-secondary" style="flex:1;" onclick="adminBroadcastAnnouncement()">📢 PUBLIER L'ANNONCE</button>
+<button class="btn btn-danger" style="flex:1;" onclick="adminDeleteGlobalAnnouncement()">🗑️ SUPPRIMER L'ANNONCE</button>
+</div>
+<div id="adminAnnouncementStatus" style="font-size:.6rem;color:var(--text-muted);margin-top:6px;"></div>
 </div>
 <div class="admin-gift-box">
 <div class="admin-gift-title">🪙 DONNER DES CRÉDITS</div>
@@ -1019,8 +1045,8 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <input id="adminMessageTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="margin-bottom:7px;">
 <textarea id="adminMessageText" class="input-field" placeholder="Écris ton message…" rows="4" style="margin-bottom:7px;resize:vertical;"></textarea>
 <button class="btn btn-secondary" onclick="adminSendPrivateMessage()">💬 ENVOYER LE MESSAGE</button>
-<button class="btn btn-danger" style="margin-top:7px;" onclick="adminLoadPrivateMessages()">🗑️ VOIR / SUPPRIMER LES MESSAGES DE CE JOUEUR</button>
-<div id="adminPrivateMessagesList" style="margin-top:9px;"></div>
+<button class="btn btn-danger" style="margin-top:7px;" onclick="adminDeletePlayerMessages()">🗑️ SUPPRIMER LES MESSAGES DE CE JOUEUR</button>
+<div id="adminMessageDeleteHint" style="font-size:.6rem;color:var(--text-muted);margin-top:6px;">La suppression retire les messages déjà envoyés à ce joueur.</div>
 </div>
 </div>
 
@@ -1730,6 +1756,9 @@ listenAdminMessages();
 listenPlayerReports();
 listenReportNotifications();
 listenGlobalSiteControl();
+listenSiteSchedule();
+listenSiteEvents();
+startSiteScheduleClock();
 startPresence();
 listenAccountAdminControl();
 if (appData.isAdmin) loadAdminPlayers();
@@ -1887,7 +1916,7 @@ function applyAdminMode(active) {
   if (vp) vp.classList.toggle('admin-mode', !!active);
   const panel=document.getElementById('adminPanel');
   if (panel) panel.style.display=active ? 'block' : 'none';
-  if (active) { populateAdminGiftCards(); populateAdminRemoveCards(); loadAdminPlayers(); loadAdminReports(); listenAdminReports(); }
+  if (active) { populateAdminGiftCards(); populateAdminRemoveCards(); loadAdminPlayers(); loadAdminReports(); listenAdminReports(); populateEventOptions(); adminLoadWeeklySchedule(); }
 }
 function populateAdminGiftCards(){
   const sel=document.getElementById('adminGiftCard'); if(!sel || !appData.isAdmin)return;
@@ -2159,6 +2188,17 @@ async function adminGiftCreditsToAll(){
   }catch(err){showToast('❌ Cadeau collectif impossible : '+(err.message||err),'error');}
 }
 
+async function adminDeletePlayerMessages(){
+  if(!appData.isAdmin)return;
+  const target=adminTargetUid(document.getElementById('adminMessageTarget')?.value);
+  if(!target)return showToast('❌ ID joueur invalide. Utilise #DROP-UID.','error');
+  if(!confirm('Supprimer tous les messages administrateur déjà envoyés à ce joueur ?'))return;
+  try{
+    await withTimeout(db.ref('admin_messages/'+target).remove(),10000,'Firebase a refusé la suppression.');
+    showToast('🗑️ Messages supprimés pour ce joueur.','success');
+  }catch(err){showToast('❌ Suppression impossible : '+(err.message||err),'error');}
+}
+
 async function adminSendPrivateMessage(){
   if(!appData.isAdmin || !appData.currentUser)return;
   const target=adminTargetUid(document.getElementById('adminMessageTarget')?.value);
@@ -2173,28 +2213,6 @@ async function adminSendPrivateMessage(){
     document.getElementById('adminMessageTarget').value=''; document.getElementById('adminMessageText').value='';
     showToast('💬 Message privé envoyé.','success');
   }catch(err){showToast('❌ Message non envoyé : '+(err.message||err),'error');}
-}
-
-async function adminLoadPrivateMessages(){
-  if(!appData.isAdmin)return;
-  const target=adminTargetUid(document.getElementById('adminMessageTarget')?.value);
-  const el=document.getElementById('adminPrivateMessagesList');
-  if(!el)return;
-  if(!target)return showToast('❌ ID joueur invalide.','error');
-  el.innerHTML='<div style="font-size:.65rem;color:var(--text-muted);">Chargement…</div>';
-  try{
-    const snap=await db.ref('admin_messages/'+target).once('value');
-    const data=snap.val()||{};
-    const rows=Object.entries(data).sort((a,b)=>Number(b[1]?.createdAt||0)-Number(a[1]?.createdAt||0));
-    if(!rows.length){el.innerHTML='<div style="font-size:.65rem;color:var(--text-muted);">Aucun message pour ce joueur.</div>';return;}
-    el.innerHTML=rows.map(([id,m])=>'<div style="padding:9px;border:1px solid var(--card-border);border-radius:12px;margin-bottom:7px;"><div style="font-size:.65rem;color:var(--text-muted);">'+(m.read?'📖 Lu':'🔴 Non lu')+' • '+(m.createdAt?new Date(Number(m.createdAt)).toLocaleString('fr-FR'):'')+'</div><div style="font-size:.72rem;line-height:1.5;margin-top:4px;white-space:pre-wrap;">'+escapeHtml(m.text||'')+'</div><button class="btn btn-danger" style="margin-top:7px;width:100%;" onclick="adminDeletePrivateMessage(&quot;'+target+'&quot;,&quot;'+id+'&quot;)">🗑️ SUPPRIMER CE MESSAGE</button></div>').join('');
-  }catch(e){el.innerHTML='<div style="font-size:.65rem;color:#fca5a5;">Impossible de charger les messages.</div>';}
-}
-async function adminDeletePrivateMessage(target,id){
-  if(!appData.isAdmin)return;
-  if(!target||!id)return;
-  try{await withTimeout(db.ref('admin_messages/'+target+'/'+id).remove(),8000,'Firebase a refusé la suppression.');showToast('🗑️ Message supprimé.','success');await adminLoadPrivateMessages();}
-  catch(e){showToast('❌ Suppression impossible : '+(e.message||e),'error');}
 }
 
 let adminMessagesRef=null;
@@ -2250,13 +2268,16 @@ function listenAccountAdminControl(){
 
 let globalControlRef=null, globalControlHandler=null, globalControlAdminUid=null;
 async function resolveGlobalControlRef(){ return db.ref('site_control'); }
+let adminLockStatusTimer=null;
 function updateAdminLockStatus(v){
   const el=document.getElementById('adminLockStatus'); if(!el || !appData.isAdmin)return;
+  if(adminLockStatusTimer){clearInterval(adminLockStatusTimer);adminLockStatusTimer=null;}
   if(v && v.locked){
     if(v.manual){ el.textContent='🔴 SITE BLOQUÉ MANUELLEMENT — déblocage uniquement par l’administrateur.'; }
-    else if(Number(v.until)>Date.now()){ el.textContent='🔴 SITE BLOQUÉ — fin prévue le '+new Date(Number(v.until)).toLocaleString('fr-FR')+'.'; }
+    else if(Number(v.until)>Date.now()){ el.textContent='🔴 SITE BLOQUÉ — réouverture le '+new Date(Number(v.until)).toLocaleString('fr-FR')+' • ⏳ '+formatLockCountdown(Number(v.until)-Date.now()); }
     else el.textContent='🟢 SITE OUVERT';
   } else el.textContent='🟢 SITE OUVERT';
+  if(v && v.locked && !v.manual && Number(v.until)>Date.now()) adminLockStatusTimer=setInterval(()=>updateAdminLockStatus(v),1000);
 }
 async function listenGlobalSiteControl(){
   if(globalControlRef && globalControlHandler){globalControlRef.off('value',globalControlHandler);}
@@ -2270,6 +2291,10 @@ async function listenGlobalSiteControl(){
     if(locked && !v.manual && Number(v.until)>Date.now()) setTimeout(()=>{ if(globalControlRef) globalControlRef.once('value').catch(()=>{}); }, Math.max(500, Number(v.until)-Date.now()+100));
     if(v.announcement && Number(v.announcementAt||0)>=(Date.now()-24*60*60*1000) && String(v.announcementId||v.announcementAt)!==sessionStorage.getItem('drop2027_closed_global_announcement')){
       showGlobalAnnouncement(v.announcement,String(v.announcementId||v.announcementAt));
+    } else if(!v.announcement){
+      const existing=document.getElementById('globalAnnouncementOverlay');
+      if(existing) existing.remove();
+      window.__currentGlobalAnnouncementId=null;
     }
   };
   globalControlRef.on('value',globalControlHandler);
@@ -2289,25 +2314,25 @@ function closeGlobalAnnouncement(){
 }
 
 let globalLockCountdownTimer=null;
+function formatLockCountdown(ms){
+  const total=Math.max(0,Math.ceil(ms/1000));
+  const h=Math.floor(total/3600), m=Math.floor((total%3600)/60), sec=total%60;
+  return [h,m,sec].map((n,i)=>String(n).padStart(2,'0')).join(':');
+}
 function showGlobalLockOverlay(v){
   let el=document.getElementById('globalSiteLock');
   if(!el){el=document.createElement('div');el.id='globalSiteLock';el.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(3,3,8,.97);display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:white;';document.body.appendChild(el);}
   if(globalLockCountdownTimer)clearInterval(globalLockCountdownTimer);
+  const timed=!v.manual && Number(v.until)>Date.now();
   const render=()=>{
     const remaining=Math.max(0,Number(v.until)-Date.now());
-    let timing='Jusqu’à ce que l’administrateur rouvre le site.';
-    if(!v.manual){
-      const total=Math.ceil(remaining/1000);
-      const d=Math.floor(total/86400), h=Math.floor((total%86400)/3600), m=Math.floor((total%3600)/60), sec=total%60;
-      timing=remaining>0 ? 'RÉOUVERTURE DANS <strong style="font-size:1.55rem;color:#fff;display:block;margin-top:7px;letter-spacing:.08em;">'+(d?d+'j ':'')+String(h).padStart(2,'0')+'h '+String(m).padStart(2,'0')+'m '+String(sec).padStart(2,'0')+'s</strong>' : 'RÉOUVERTURE IMMINENTE…';
-    }
-    el.innerHTML='<div style="max-width:520px;border:1px solid rgba(217,70,239,.55);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(25,10,35,.96),rgba(6,6,14,.98));box-shadow:0 0 45px rgba(217,70,239,.18)"><div style="font-size:3rem">🚧</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#f0abfc">DROP 2027 EN PAUSE</h2><p style="color:#d4d4d8;line-height:1.6">'+escapeHtml(v.message||'Le site est temporairement en maintenance.')+'</p><div style="margin-top:16px;font-size:.7rem;color:#a1a1aa">'+timing+'</div></div>';
-    if(remaining<=0 && !v.manual){clearInterval(globalLockCountdownTimer);globalLockCountdownTimer=null;hideGlobalLockOverlay();}
+    const countdown=timed ? formatLockCountdown(remaining) : '';
+    el.innerHTML='<div style="max-width:560px;border:1px solid rgba(217,70,239,.55);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(25,10,35,.96),rgba(6,6,14,.98));box-shadow:0 0 45px rgba(217,70,239,.18)"><div style="font-size:3rem">🚧</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#f0abfc">DROP 2027 EN PAUSE</h2><p style="color:#d4d4d8;line-height:1.6">'+escapeHtml(v.message||'Le site est temporairement en maintenance.')+'</p>'+(timed?'<div style="margin-top:18px;font-size:.68rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.12em;">RÉOUVERTURE PRÉVUE</div><div id="globalLockCountdown" style="margin-top:5px;font-size:2.3rem;font-weight:800;letter-spacing:.08em;color:#fff;">'+countdown+'</div><div style="margin-top:5px;font-size:.65rem;color:#a1a1aa;">'+new Date(Number(v.until)).toLocaleString('fr-FR')+'</div>':'<div style="margin-top:16px;font-size:.7rem;color:#a1a1aa">Jusqu’à ce que l’administrateur rouvre le site.</div>')+'</div>';
+    if(timed && remaining<=0){clearInterval(globalLockCountdownTimer);globalLockCountdownTimer=null;hideGlobalLockOverlay();return;}
   };
   render();
-  if(!v.manual)globalLockCountdownTimer=setInterval(render,1000);
+  if(timed){globalLockCountdownTimer=setInterval(render,1000);}
 }
-
 function hideGlobalLockOverlay(){if(globalLockCountdownTimer){clearInterval(globalLockCountdownTimer);globalLockCountdownTimer=null;}const el=document.getElementById('globalSiteLock');if(el)el.remove();}
 async function adminWriteSiteControl(payload){
   if(!appData.isAdmin)return;
@@ -2327,17 +2352,16 @@ async function adminLockCustom(){
   const minutes=Math.round(n*(unit==='hours'?60:1));
   await adminLockSite(minutes);
 }
-async function adminLockUntilDate(){
+async function adminLockUntilDateTime(){
   if(!appData.isAdmin)return;
-  const input=document.getElementById('adminLockUntilDate');
-  const raw=input?.value||'';
-  if(!raw)return showToast('❌ Choisis une date et une heure de réouverture.','error');
+  const raw=document.getElementById('adminLockUntilDate')?.value||'';
   const until=new Date(raw).getTime();
-  if(!Number.isFinite(until)||until<=Date.now())return showToast('❌ L’heure de réouverture doit être dans le futur.','error');
+  if(!raw || !Number.isFinite(until) || until<=Date.now())return showToast('❌ Choisis une heure de réouverture située dans le futur.','error');
   const message=(document.getElementById('adminLockMessage')?.value||'DROP 2027 est temporairement en maintenance.').trim();
-  try{await adminWriteSiteControl({locked:true,manual:false,until,message});showToast('🔒 Site bloqué jusqu’au '+new Date(until).toLocaleString('fr-FR')+'.','success');}
-  catch(e){showToast('❌ Impossible de bloquer le site : '+(e.message||e),'error');}
+  try{await adminWriteSiteControl({locked:true,manual:false,until,message});showToast('🔒 Site bloqué jusqu’à '+new Date(until).toLocaleString('fr-FR')+'.','success');}
+  catch(e){showToast('❌ Impossible de programmer la réouverture : '+(e.message||e),'error');}
 }
+
 async function adminLockManual(){
   if(!appData.isAdmin)return;
   const message=(document.getElementById('adminLockMessage')?.value||'DROP 2027 est temporairement en maintenance.').trim();
@@ -2354,6 +2378,49 @@ async function adminBroadcastAnnouncement(){
   try{await adminWriteSiteControl({announcement,announcementAt:Date.now(),announcementId:'ann_'+Date.now()});if(input)input.value='';showToast('📢 Annonce publiée.','success');}
   catch(e){showToast('❌ Impossible de publier l’annonce : '+(e.message||e),'error');}
 }
+
+/* ===== UPDATE 33 — EMPLOI DU TEMPS + ÉVÉNEMENTS ===== */
+const SITE_WEEK_DAYS=[
+  {key:0,label:'Dimanche'},{key:1,label:'Lundi'},{key:2,label:'Mardi'},{key:3,label:'Mercredi'},{key:4,label:'Jeudi'},{key:5,label:'Vendredi'},{key:6,label:'Samedi'}
+];
+const SITE_EVENT_OPTIONS=[
+  ['bonus_credits','🪙 Bonus de crédits'],['double_rewards','✨ Récompenses doublées'],['special_drop','🎁 Drop spécial'],['free_drop','🎟️ Drop gratuit'],
+  ['new_cards','🃏 Nouvelles cartes'],['collection_spotlight','📚 Collection à l’honneur'],['shop_sale','🛍️ Animation boutique'],['community_challenge','🌍 Défi communautaire'],
+  ['world_event','🌍 Événement du monde'],['mini_game','🎮 Défi mini-jeu'],['hub_challenge','🧠 Défi HUB'],['news','📰 Actualité spéciale'],
+  ['announcement','📢 Annonce spéciale'],['theme_day','🎨 Journée à thème'],['music','🎵 Session musicale'],['cinema','🎬 Journée cinéma'],
+  ['easter_egg','🥚 Chasse aux easter eggs'],['mystery','❓ Événement mystère'],['maintenance','🚧 Maintenance programmée'],['custom','⭐ Événement personnalisé']
+];
+let siteScheduleRef=null, siteEventsRef=null, siteScheduleCache=null, siteEventsCache={};
+let siteScheduleTimer=null;
+function defaultSiteSchedule(){const x={};SITE_WEEK_DAYS.forEach(d=>x[d.key]={open:'09:00',close:'22:00',closed:false});return x;}
+function renderAdminScheduleUI(data){
+ const el=document.getElementById('adminWeeklySchedule'); if(!el)return;
+ const sch={...defaultSiteSchedule(),...(data||{})};
+ el.innerHTML=SITE_WEEK_DAYS.map(d=>{const v=sch[d.key]||{open:'09:00',close:'22:00',closed:false};return `<div style="display:grid;grid-template-columns:90px 1fr 1fr auto;gap:6px;align-items:center;padding:7px;border:1px solid var(--card-border);border-radius:12px;"><b style="font-size:.68rem;">${d.label}</b><input class="input-field sched-open" data-day="${d.key}" type="time" value="${escapeHtml(v.open||'09:00')}" ${v.closed?'disabled':''}><input class="input-field sched-close" data-day="${d.key}" type="time" value="${escapeHtml(v.close||'22:00')}" ${v.closed?'disabled':''}><label style="font-size:.6rem;display:flex;gap:4px;align-items:center;"><input type="checkbox" class="sched-closed" data-day="${d.key}" ${v.closed?'checked':''} onchange="toggleScheduleDay(${d.key},this.checked)"> fermé</label></div>`;}).join('');
+}
+function toggleScheduleDay(day,closed){document.querySelectorAll('.sched-open[data-day="'+day+'"],.sched-close[data-day="'+day+'"]').forEach(x=>x.disabled=closed);}
+async function adminLoadWeeklySchedule(){if(!appData.isAdmin)return;try{const snap=await db.ref('site_schedule').once('value');siteScheduleCache=snap.val()||defaultSiteSchedule();renderAdminScheduleUI(siteScheduleCache);renderAdminEvents(siteEventsCache); }catch(e){showToast('❌ Impossible de charger l’emploi du temps : '+(e.message||e),'error');}}
+async function adminSaveWeeklySchedule(){
+ if(!appData.isAdmin)return; const next={};
+ SITE_WEEK_DAYS.forEach(d=>{const o=document.querySelector('.sched-open[data-day="'+d.key+'"]')?.value||'09:00';const c=document.querySelector('.sched-close[data-day="'+d.key+'"]')?.value||'22:00';const closed=!!document.querySelector('.sched-closed[data-day="'+d.key+'"]')?.checked;next[d.key]={open:o,close:c,closed};});
+ try{await db.ref('site_schedule').set({days:next,updatedAt:firebase.database.ServerValue.TIMESTAMP,by:appData.currentUser.uid});siteScheduleCache=next;document.getElementById('adminScheduleStatus').textContent='✅ Horaires enregistrés.';evaluateSiteSchedule();}catch(e){showToast('❌ Impossible d’enregistrer les horaires : '+(e.message||e),'error');}
+}
+function populateEventOptions(){const s=document.getElementById('adminEventType');if(!s)return;s.innerHTML=SITE_EVENT_OPTIONS.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');}
+async function adminAddScheduledEvent(){
+ if(!appData.isAdmin)return;const type=document.getElementById('adminEventType')?.value||'custom';const title=(document.getElementById('adminEventTitle')?.value||'').trim();const start=new Date(document.getElementById('adminEventStart')?.value||'').getTime();const end=new Date(document.getElementById('adminEventEnd')?.value||'').getTime();const message=(document.getElementById('adminEventMessage')?.value||'').trim();
+ if(!title)return showToast('❌ Donne un nom à l’événement.','error');if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return showToast('❌ Les dates de l’événement sont invalides.','error');
+ const id='event_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);const opt=SITE_EVENT_OPTIONS.find(x=>x[0]===type);const payload={type,title,icon:(opt?.[1]||'⭐').split(' ')[0],start,end,message,createdAt:firebase.database.ServerValue.TIMESTAMP,by:appData.currentUser.uid};
+ try{await db.ref('site_events/'+id).set(payload);document.getElementById('adminEventTitle').value='';document.getElementById('adminEventMessage').value='';showToast('🎪 Événement ajouté à l’emploi du temps.','success');}catch(e){showToast('❌ Impossible d’ajouter l’événement : '+(e.message||e),'error');}
+}
+function renderAdminEvents(data){const el=document.getElementById('adminEventsList');if(!el)return;const rows=Object.entries(data||{}).sort((a,b)=>Number(a[1]?.start||0)-Number(b[1]?.start||0));el.innerHTML=rows.length?rows.map(([id,e])=>`<div style="padding:10px;border:1px solid var(--card-border);border-radius:12px;margin-bottom:7px;"><b style="font-size:.7rem;">${escapeHtml(e.icon||'⭐')} ${escapeHtml(e.title||'Événement')}</b><div style="font-size:.6rem;color:var(--text-muted);margin-top:4px;">${new Date(Number(e.start)).toLocaleString('fr-FR')} → ${new Date(Number(e.end)).toLocaleString('fr-FR')}</div>${e.message?`<div style="font-size:.64rem;margin-top:4px;">${escapeHtml(e.message)}</div>`:''}<button class="btn btn-danger" style="margin-top:7px;width:100%;" onclick="adminDeleteScheduledEvent('${id}')">🗑️ SUPPRIMER</button></div>`).join(''):'<div style="font-size:.65rem;color:var(--text-muted);">Aucun événement programmé.</div>';}
+async function adminDeleteScheduledEvent(id){if(!appData.isAdmin)return;try{await db.ref('site_events/'+id).remove();showToast('🗑️ Événement supprimé.','success');}catch(e){showToast('❌ Suppression impossible : '+(e.message||e),'error');}}
+function listenSiteSchedule(){if(siteScheduleRef)siteScheduleRef.off();siteScheduleRef=db.ref('site_schedule');siteScheduleRef.on('value',snap=>{const v=snap.val()||{};siteScheduleCache=v.days||v||defaultSiteSchedule();if(appData.isAdmin)renderAdminScheduleUI(siteScheduleCache);evaluateSiteSchedule();});}
+function listenSiteEvents(){if(siteEventsRef)siteEventsRef.off();siteEventsRef=db.ref('site_events');siteEventsRef.on('value',snap=>{siteEventsCache=snap.val()||{};if(appData.isAdmin)renderAdminEvents(siteEventsCache);});}
+function evaluateSiteSchedule(){if(appData.isAdmin)return;const sch=siteScheduleCache;if(!sch||!sch.days&&Object.keys(sch||{}).length===0)return;const now=new Date();const day=now.getDay();const v=sch.days?sch.days[day]:sch[day];if(!v||v.closed)return showScheduledClosure('Le site est fermé aujourd’hui.');const hm=now.getHours()*60+now.getMinutes();const [oh,om]=String(v.open||'09:00').split(':').map(Number);const [ch,cm]=String(v.close||'22:00').split(':').map(Number);const open=oh*60+om,close=ch*60+cm;let inside=close>open?hm>=open&&hm<close:(hm>=open||hm<close);if(!inside)showScheduledClosure('Le site est actuellement fermé selon l’emploi du temps.');else hideScheduledClosure();}
+function showScheduledClosure(reason){let el=document.getElementById('siteScheduleClosure');if(!el){el=document.createElement('div');el.id='siteScheduleClosure';el.style.cssText='position:fixed;inset:0;z-index:99998;background:rgba(3,3,8,.98);display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:white;';document.body.appendChild(el);}const now=new Date();el.innerHTML=`<div style="max-width:560px;border:1px solid rgba(217,70,239,.55);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(25,10,35,.96),rgba(6,6,14,.98));"><div style="font-size:3rem">🌙</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#f0abfc;">DROP 2027 FERMÉ</h2><p style="color:#d4d4d8;line-height:1.6;">${escapeHtml(reason)}</p><div style="margin-top:14px;font-size:.65rem;color:#a1a1aa;">Horaires définis par l’administrateur.</div></div>`;}
+function hideScheduledClosure(){const el=document.getElementById('siteScheduleClosure');if(el)el.remove();}
+function startSiteScheduleClock(){if(siteScheduleTimer)clearInterval(siteScheduleTimer);siteScheduleTimer=setInterval(evaluateSiteSchedule,15000);evaluateSiteSchedule();}
+async function adminDeleteGlobalAnnouncement(){if(!appData.isAdmin)return;try{await adminWriteSiteControl({announcement:'',announcementAt:0,announcementId:''});showToast('🗑️ Annonce globale supprimée.','success');}catch(e){showToast('❌ Impossible de supprimer l’annonce : '+(e.message||e),'error');}}
 
 let adminUsersCache={};
 let adminPresenceRef=null, adminPresenceHandler=null;
