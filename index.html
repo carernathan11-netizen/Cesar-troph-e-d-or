@@ -975,6 +975,18 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <input id="adminCreditAmount" class="input-field" type="number" min="1" step="1" placeholder="Nombre de crédits" style="margin-bottom:7px;">
 <button class="btn" onclick="adminGiftCredits()">DONNER LES CRÉDITS</button>
 </div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">🎁 CADEAU DE CRÉDITS À TOUS</div>
+<div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Envoie le même nombre de crédits à tous les comptes joueurs existants. Le cadeau est ajouté directement aux comptes.</div>
+<input id="adminAllCreditAmount" class="input-field" type="number" min="1" step="1" placeholder="Crédits offerts à chaque joueur" style="margin-bottom:7px;">
+<button class="btn" onclick="adminGiftCreditsToAll()">🎁 ENVOYER À TOUS LES JOUEURS</button>
+</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">💬 MESSAGE PRIVÉ À UN JOUEUR</div>
+<input id="adminMessageTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="margin-bottom:7px;">
+<textarea id="adminMessageText" class="input-field" placeholder="Écris ton message…" rows="4" style="margin-bottom:7px;resize:vertical;"></textarea>
+<button class="btn btn-secondary" onclick="adminSendPrivateMessage()">💬 ENVOYER LE MESSAGE</button>
+</div>
 </div>
 
 <div class="glass-card">
@@ -1678,6 +1690,7 @@ if (needsFriendIdMigration) {
 
 listenToTrades();
 listenToFriendRequests();
+listenAdminMessages();
 listenGlobalSiteControl();
 startPresence();
 listenAccountAdminControl();
@@ -1724,6 +1737,7 @@ updateUI();
 // L'utilisateur reste connecté même si la DB est temporairement inaccessible.
 listenToTrades();
 listenToFriendRequests();
+listenAdminMessages();
 listenGlobalSiteControl();
 startPresence();
 listenAccountAdminControl();
@@ -1852,7 +1866,7 @@ function populateAdminRemoveCards(){
 
 function adminSetTargetEverywhere(uid){
   const value=uid ? '#DROP-'+uid : '';
-  ['adminResetTarget','adminAdjustTarget','adminGiftTarget','adminCreditTarget','adminBanTarget'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=value;});
+  ['adminResetTarget','adminAdjustTarget','adminGiftTarget','adminCreditTarget','adminBanTarget','adminMessageTarget'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=value;});
 }
 
 function adminTargetUid(raw){
@@ -1890,8 +1904,19 @@ async function adminResetCards(){
 async function adminResetFullAccount(){
   if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminResetTarget')?.value);
   if(!uid)return showToast('❌ Sélectionne un joueur.','error');
-  if(!confirm('ATTENTION : remettre ce compte à zéro supprimera crédits, cartes, amis, codes utilisés et progression quotidienne. Continuer ?'))return;
+  if(!confirm('ATTENTION : remettre ce compte à zéro supprimera crédits, cartes, amis, demandes, échanges, codes utilisés et progression quotidienne. Continuer ?'))return;
   try{
+    // Les règles Firebase autorisent la suppression au niveau d’un élément enfant,
+    // mais pas au niveau du parent friend_requests/friendships/trades. On lit donc
+    // d’abord les IDs concernés puis on construit une mise à jour ciblée.
+    const [userSnap, friendsSnap, reqSnap, inSnap, outSnap]=await Promise.all([
+      withTimeout(db.ref('users/'+uid).once('value'),8000,'Firebase ne répond pas pour le compte.'),
+      withTimeout(db.ref('friendships/'+uid).once('value'),8000,'Firebase ne répond pas pour les amitiés.'),
+      withTimeout(db.ref('friend_requests/'+uid).once('value'),8000,'Firebase ne répond pas pour les demandes.'),
+      withTimeout(db.ref('trade_inbox/'+uid).once('value'),8000,'Firebase ne répond pas pour les offres reçues.'),
+      withTimeout(db.ref('trade_outbox/'+uid).once('value'),8000,'Firebase ne répond pas pour les offres envoyées.')
+    ]);
+    const oldUser=userSnap.val()||{};
     const updates={};
     updates['users/'+uid+'/credits']=0;
     updates['users/'+uid+'/catalogs']=adminCatalogReset();
@@ -1900,14 +1925,43 @@ async function adminResetFullAccount(){
     updates['users/'+uid+'/dailyGames']={};
     updates['users/'+uid+'/hubTasks']={};
     updates['users/'+uid+'/worldData']={event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0};
-    updates['friendships/'+uid]=null;
-    updates['friend_requests/'+uid]=null;
-    updates['trade_inbox/'+uid]=null;
-    updates['trade_outbox/'+uid]=null;
     updates['public_collections/'+uid]={worldEvent:{contribution:0,lastParticipation:''}};
-    await withTimeout(db.ref().update(updates),10000,'Firebase a refusé la réinitialisation.');
-    showToast('💥 Compte remis à zéro.','success'); adminInspectPlayer(uid);
-  }catch(e){showToast('❌ Réinitialisation impossible : '+(e.message||e),'error');}
+
+    const friends=friendsSnap.val()||{};
+    Object.keys(friends).forEach(fid=>{ updates['friendships/'+fid+'/'+uid]=null; });
+    Object.keys(friends).forEach(fid=>{ updates['friendships/'+uid+'/'+fid]=null; });
+
+    const requests=reqSnap.val()||{};
+    Object.keys(requests).forEach(rid=>{ updates['friend_requests/'+uid+'/'+rid]=null; });
+    // Supprimer aussi les demandes sortantes connues à partir des amis/relations.
+    const possibleTargets=Object.keys(friends);
+    possibleTargets.forEach(fid=>{ updates['friend_requests/'+fid+'/'+uid]=null; });
+
+    const inbox=inSnap.val()||{};
+    Object.keys(inbox).forEach(tid=>{
+      updates['trade_inbox/'+uid+'/'+tid]=null;
+      const t=inbox[tid]; if(t&&t.senderUid) updates['trade_outbox/'+t.senderUid+'/'+tid]=null;
+    });
+    const outbox=outSnap.val()||{};
+    Object.keys(outbox).forEach(tid=>{
+      updates['trade_outbox/'+uid+'/'+tid]=null;
+      const t=outbox[tid]; if(t&&t.receiverUid) updates['trade_inbox/'+t.receiverUid+'/'+tid]=null;
+    });
+
+    // Nettoyage des cadeaux/messages admin en attente pour ce joueur.
+    const adminGiftSnap=await withTimeout(db.ref('admin_gift_inbox/'+uid).once('value'),8000,'Firebase ne répond pas pour les cadeaux.');
+    Object.keys(adminGiftSnap.val()||{}).forEach(id=>{updates['admin_gift_inbox/'+uid+'/'+id]=null;});
+    const adminMsgSnap=await withTimeout(db.ref('admin_messages/'+uid).once('value'),8000,'Firebase ne répond pas pour les messages.');
+    Object.keys(adminMsgSnap.val()||{}).forEach(id=>{updates['admin_messages/'+uid+'/'+id]=null;});
+
+    // Préserve les autres champs du profil, notamment username/friendId/isAdmin.
+    if(oldUser.username!==undefined)updates['users/'+uid+'/username']=oldUser.username;
+    if(oldUser.friendId!==undefined)updates['users/'+uid+'/friendId']=oldUser.friendId;
+    updates['users/'+uid+'/isAdmin']=oldUser.isAdmin===true;
+
+    await withTimeout(db.ref().update(updates),15000,'Firebase a refusé la réinitialisation.');
+    showToast('💥 Compte entièrement réinitialisé.','success'); adminInspectPlayer(uid);
+  }catch(e){console.error('Réinitialisation complète:',e);showToast('❌ Réinitialisation impossible : '+(e.message||e),'error');}
 }
 async function adminResetSocial(){
   if(!appData.isAdmin)return; const uid=adminTargetUid(document.getElementById('adminResetTarget')?.value);
@@ -1965,11 +2019,72 @@ async function adminGiftCredits(){
   const giftId='gift_credits_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
   const gift={kind:'admin_credit_gift',senderUid:appData.currentUser.uid,senderName:'Administrateur',receiverUid:target,receiverName:'Joueur',offeredCardId:0,wantedCardId:0,offeredCard:{id:0,name:'CRÉDITS ADMINISTRATEUR',emoji:'🪙',rarity:'common'},wantedCard:{id:0,name:'CADEAU ADMINISTRATEUR',emoji:'👑',rarity:'common'},creditAmount:amount,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
   try{
-    await withTimeout(db.ref('trade_inbox/'+target+'/'+giftId).set(gift),8000,'Firebase a refusé le cadeau.');
-    await withTimeout(db.ref('trade_outbox/'+appData.currentUser.uid+'/'+giftId).set(gift),8000,'Firebase a refusé la confirmation du cadeau.');
+    // Boîte d’échange historique + boîte cadeau dédiée : le joueur voit l’offre
+    // même si un ancien écran n’affiche pas encore trade_inbox.
+    const updates={};
+    updates['trade_inbox/'+target+'/'+giftId]=gift;
+    updates['trade_outbox/'+appData.currentUser.uid+'/'+giftId]=gift;
+    updates['admin_gift_inbox/'+target+'/'+giftId]=gift;
+    await withTimeout(db.ref().update(updates),12000,'Firebase a refusé le cadeau.');
     document.getElementById('adminCreditTarget').value=''; document.getElementById('adminCreditAmount').value='';
-    showToast('👑 Crédits envoyés au joueur.','success');
+    showToast('👑 Offre de crédits envoyée au joueur.','success');
   }catch(err){showToast('❌ Cadeau non envoyé : '+(err&&err.message?err.message:'erreur Firebase'),'error');}
+}
+
+async function adminGiftCreditsToAll(){
+  if(!appData.isAdmin)return;
+  const amount=Math.floor(Number(document.getElementById('adminAllCreditAmount')?.value));
+  if(!Number.isFinite(amount)||amount<1)return showToast('❌ Montant de crédits invalide.','error');
+  if(!confirm('Envoyer '+amount.toLocaleString('fr-FR')+' crédits à TOUS les joueurs existants ?'))return;
+  try{
+    const snap=await withTimeout(db.ref('users').once('value'),10000,'Impossible de charger la liste des joueurs.');
+    const users=snap.val()||{}; const updates={}; let count=0;
+    Object.keys(users).forEach(uid=>{
+      if(uid===appData.currentUser.uid)return;
+      const u=users[uid]||{}; if(!u.username && !u.friendId && !u.email)return;
+      updates['users/'+uid+'/credits']=Math.max(0,Number(u.credits)||0)+amount; count++;
+    });
+    if(!count)return showToast('ℹ️ Aucun autre joueur à créditer.','error');
+    await withTimeout(db.ref().update(updates),20000,'Firebase a refusé le cadeau collectif.');
+    document.getElementById('adminAllCreditAmount').value='';
+    showToast('🎁 '+amount.toLocaleString('fr-FR')+' crédits envoyés à '+count+' joueur'+(count>1?'s':'')+'.','success');
+  }catch(err){showToast('❌ Cadeau collectif impossible : '+(err.message||err),'error');}
+}
+
+async function adminSendPrivateMessage(){
+  if(!appData.isAdmin || !appData.currentUser)return;
+  const target=adminTargetUid(document.getElementById('adminMessageTarget')?.value);
+  const message=String(document.getElementById('adminMessageText')?.value||'').trim();
+  if(!target)return showToast('❌ ID joueur invalide.','error');
+  if(!message)return showToast('❌ Écris un message.','error');
+  if(message.length>1000)return showToast('❌ Message trop long (1000 caractères maximum).','error');
+  const messageId='msg_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const payload={from:'Administrateur',senderUid:appData.currentUser.uid,text:message,createdAt:firebase.database.ServerValue.TIMESTAMP,read:false};
+  try{
+    await withTimeout(db.ref('admin_messages/'+target+'/'+messageId).set(payload),10000,'Firebase a refusé le message.');
+    document.getElementById('adminMessageTarget').value=''; document.getElementById('adminMessageText').value='';
+    showToast('💬 Message privé envoyé.','success');
+  }catch(err){showToast('❌ Message non envoyé : '+(err.message||err),'error');}
+}
+
+let adminMessagesRef=null;
+function listenAdminMessages(){
+  if(adminMessagesRef)adminMessagesRef.off();
+  if(!appData.currentUser || appData.isAdmin)return;
+  adminMessagesRef=db.ref('admin_messages/'+appData.currentUser.uid);
+  adminMessagesRef.on('child_added',snap=>{
+    const m=snap.val(); if(!m||m.read===true)return;
+    showAdminPrivateMessage(m.text||'');
+    db.ref('admin_messages/'+appData.currentUser.uid+'/'+snap.key).update({read:true}).catch(()=>{});
+  });
+}
+function showAdminPrivateMessage(message){
+  let el=document.getElementById('adminPrivateMessageOverlay');
+  if(!el){
+    el=document.createElement('div'); el.id='adminPrivateMessageOverlay'; el.style.cssText='position:fixed;inset:0;z-index:100001;background:rgba(3,3,8,.78);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);';
+    document.body.appendChild(el);
+  }
+  el.innerHTML='<div style="width:min(520px,100%);background:linear-gradient(145deg,#11111d,#080812);border:1px solid rgba(255,215,0,.45);border-radius:24px;padding:24px;box-shadow:0 0 50px rgba(255,215,0,.12);color:white;"><div style="font-size:2rem">👑</div><h2 style="margin:8px 0;font-family:Space Grotesk;">MESSAGE DE L’ADMINISTRATEUR</h2><p style="white-space:pre-wrap;line-height:1.65;color:#ddd;">'+escapeHtml(message)+'</p><button class="btn" style="margin-top:12px;" onclick="document.getElementById(\'adminPrivateMessageOverlay\')?.remove()">FERMER</button></div>';
 }
 
 let accountControlRef=null, accountControlHandler=null;
