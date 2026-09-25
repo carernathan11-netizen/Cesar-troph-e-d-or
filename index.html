@@ -937,6 +937,11 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div style="display:flex;gap:7px;flex-wrap:wrap;">
 <button class="btn btn-danger" style="flex:1;" onclick="adminLockCustom()">🔒 BLOQUER POUR LA DURÉE</button>
 <button class="btn btn-secondary" style="flex:1;" onclick="adminLockManual()">🔒 BLOQUER JUSQU’AU DÉBLOCAGE</button>
+<div style="margin-top:10px;font-size:.62rem;color:var(--text-muted);">🕒 Ou choisis directement l’heure exacte de réouverture :</div>
+<div style="display:flex;gap:7px;align-items:center;margin-top:6px;">
+<input id="adminLockUntilDate" class="input-field" type="datetime-local" style="flex:1;">
+<button class="btn btn-danger" onclick="adminLockUntilDate()">🔒 BLOQUER JUSQU’À CETTE HEURE</button>
+</div>
 </div>
 <div id="adminLockStatus" style="margin-top:7px;font-size:.62rem;color:#ffd700;"></div>
 </div>
@@ -1014,6 +1019,8 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <input id="adminMessageTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="margin-bottom:7px;">
 <textarea id="adminMessageText" class="input-field" placeholder="Écris ton message…" rows="4" style="margin-bottom:7px;resize:vertical;"></textarea>
 <button class="btn btn-secondary" onclick="adminSendPrivateMessage()">💬 ENVOYER LE MESSAGE</button>
+<button class="btn btn-danger" style="margin-top:7px;" onclick="adminLoadPrivateMessages()">🗑️ VOIR / SUPPRIMER LES MESSAGES DE CE JOUEUR</button>
+<div id="adminPrivateMessagesList" style="margin-top:9px;"></div>
 </div>
 </div>
 
@@ -2168,6 +2175,28 @@ async function adminSendPrivateMessage(){
   }catch(err){showToast('❌ Message non envoyé : '+(err.message||err),'error');}
 }
 
+async function adminLoadPrivateMessages(){
+  if(!appData.isAdmin)return;
+  const target=adminTargetUid(document.getElementById('adminMessageTarget')?.value);
+  const el=document.getElementById('adminPrivateMessagesList');
+  if(!el)return;
+  if(!target)return showToast('❌ ID joueur invalide.','error');
+  el.innerHTML='<div style="font-size:.65rem;color:var(--text-muted);">Chargement…</div>';
+  try{
+    const snap=await db.ref('admin_messages/'+target).once('value');
+    const data=snap.val()||{};
+    const rows=Object.entries(data).sort((a,b)=>Number(b[1]?.createdAt||0)-Number(a[1]?.createdAt||0));
+    if(!rows.length){el.innerHTML='<div style="font-size:.65rem;color:var(--text-muted);">Aucun message pour ce joueur.</div>';return;}
+    el.innerHTML=rows.map(([id,m])=>'<div style="padding:9px;border:1px solid var(--card-border);border-radius:12px;margin-bottom:7px;"><div style="font-size:.65rem;color:var(--text-muted);">'+(m.read?'📖 Lu':'🔴 Non lu')+' • '+(m.createdAt?new Date(Number(m.createdAt)).toLocaleString('fr-FR'):'')+'</div><div style="font-size:.72rem;line-height:1.5;margin-top:4px;white-space:pre-wrap;">'+escapeHtml(m.text||'')+'</div><button class="btn btn-danger" style="margin-top:7px;width:100%;" onclick="adminDeletePrivateMessage(&quot;'+target+'&quot;,&quot;'+id+'&quot;)">🗑️ SUPPRIMER CE MESSAGE</button></div>').join('');
+  }catch(e){el.innerHTML='<div style="font-size:.65rem;color:#fca5a5;">Impossible de charger les messages.</div>';}
+}
+async function adminDeletePrivateMessage(target,id){
+  if(!appData.isAdmin)return;
+  if(!target||!id)return;
+  try{await withTimeout(db.ref('admin_messages/'+target+'/'+id).remove(),8000,'Firebase a refusé la suppression.');showToast('🗑️ Message supprimé.','success');await adminLoadPrivateMessages();}
+  catch(e){showToast('❌ Suppression impossible : '+(e.message||e),'error');}
+}
+
 let adminMessagesRef=null;
 let adminPrivateMessageQueue=[];
 let adminPrivateMessageCurrentId=null;
@@ -2259,15 +2288,27 @@ function closeGlobalAnnouncement(){
   const el=document.getElementById('globalAnnouncementOverlay');if(el)el.remove();
 }
 
+let globalLockCountdownTimer=null;
 function showGlobalLockOverlay(v){
   let el=document.getElementById('globalSiteLock');
   if(!el){el=document.createElement('div');el.id='globalSiteLock';el.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(3,3,8,.97);display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:white;';document.body.appendChild(el);}
-  const remaining=Math.max(0,Number(v.until)-Date.now());
-  const mins=Math.ceil(remaining/60000);
-  const timing=v.manual?'Jusqu’à ce que l’administrateur rouvre le site.':('Retour estimé dans environ '+mins+' min.');
-  el.innerHTML='<div style="max-width:520px;border:1px solid rgba(217,70,239,.55);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(25,10,35,.96),rgba(6,6,14,.98));box-shadow:0 0 45px rgba(217,70,239,.18)"><div style="font-size:3rem">🚧</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#f0abfc">DROP 2027 EN PAUSE</h2><p style="color:#d4d4d8;line-height:1.6">'+escapeHtml(v.message||'Le site est temporairement en maintenance.')+'</p><div style="margin-top:16px;font-size:.7rem;color:#a1a1aa">'+timing+'</div></div>';
+  if(globalLockCountdownTimer)clearInterval(globalLockCountdownTimer);
+  const render=()=>{
+    const remaining=Math.max(0,Number(v.until)-Date.now());
+    let timing='Jusqu’à ce que l’administrateur rouvre le site.';
+    if(!v.manual){
+      const total=Math.ceil(remaining/1000);
+      const d=Math.floor(total/86400), h=Math.floor((total%86400)/3600), m=Math.floor((total%3600)/60), sec=total%60;
+      timing=remaining>0 ? 'RÉOUVERTURE DANS <strong style="font-size:1.55rem;color:#fff;display:block;margin-top:7px;letter-spacing:.08em;">'+(d?d+'j ':'')+String(h).padStart(2,'0')+'h '+String(m).padStart(2,'0')+'m '+String(sec).padStart(2,'0')+'s</strong>' : 'RÉOUVERTURE IMMINENTE…';
+    }
+    el.innerHTML='<div style="max-width:520px;border:1px solid rgba(217,70,239,.55);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(25,10,35,.96),rgba(6,6,14,.98));box-shadow:0 0 45px rgba(217,70,239,.18)"><div style="font-size:3rem">🚧</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#f0abfc">DROP 2027 EN PAUSE</h2><p style="color:#d4d4d8;line-height:1.6">'+escapeHtml(v.message||'Le site est temporairement en maintenance.')+'</p><div style="margin-top:16px;font-size:.7rem;color:#a1a1aa">'+timing+'</div></div>';
+    if(remaining<=0 && !v.manual){clearInterval(globalLockCountdownTimer);globalLockCountdownTimer=null;hideGlobalLockOverlay();}
+  };
+  render();
+  if(!v.manual)globalLockCountdownTimer=setInterval(render,1000);
 }
-function hideGlobalLockOverlay(){const el=document.getElementById('globalSiteLock');if(el)el.remove();}
+
+function hideGlobalLockOverlay(){if(globalLockCountdownTimer){clearInterval(globalLockCountdownTimer);globalLockCountdownTimer=null;}const el=document.getElementById('globalSiteLock');if(el)el.remove();}
 async function adminWriteSiteControl(payload){
   if(!appData.isAdmin)return;
   const ref=await resolveGlobalControlRef(); if(!ref)throw new Error('Contrôle global indisponible');
@@ -2285,6 +2326,17 @@ async function adminLockCustom(){
   if(!Number.isFinite(n)||n<1)return showToast('❌ Durée invalide.','error');
   const minutes=Math.round(n*(unit==='hours'?60:1));
   await adminLockSite(minutes);
+}
+async function adminLockUntilDate(){
+  if(!appData.isAdmin)return;
+  const input=document.getElementById('adminLockUntilDate');
+  const raw=input?.value||'';
+  if(!raw)return showToast('❌ Choisis une date et une heure de réouverture.','error');
+  const until=new Date(raw).getTime();
+  if(!Number.isFinite(until)||until<=Date.now())return showToast('❌ L’heure de réouverture doit être dans le futur.','error');
+  const message=(document.getElementById('adminLockMessage')?.value||'DROP 2027 est temporairement en maintenance.').trim();
+  try{await adminWriteSiteControl({locked:true,manual:false,until,message});showToast('🔒 Site bloqué jusqu’au '+new Date(until).toLocaleString('fr-FR')+'.','success');}
+  catch(e){showToast('❌ Impossible de bloquer le site : '+(e.message||e),'error');}
 }
 async function adminLockManual(){
   if(!appData.isAdmin)return;
