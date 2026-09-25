@@ -724,6 +724,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="game-card"><div class="game-info"><h4>🪙 Coin Catch</h4><p>Attrape les pièces qui tombent — 75 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('coincatch')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🎯 Quick Target</h4><p>Explose 8 cibles avant la fin — 85 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('quicktarget')">JOUER</button></div>
 <div class="game-card"><div class="game-info"><h4>🟦 Safe Tile</h4><p>Évite la case piégée pendant 12 tours — 95 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('safetile')">JOUER</button></div>
+<div class="game-card"><div class="game-info"><h4>👻 Parcours Fantôme</h4><p>Mémorise le chemin invisible puis refais-le dans le bon ordre — 100 🪙 max</p></div><button class="btn" style="width:auto; padding:8px 14px;" onclick="startGame('ghostpath')">JOUER</button></div>
 </div>
 </div>
 </section>
@@ -868,6 +869,28 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 </div>
 
 <!-- SECTION AMIS ET DEMANDES -->
+<div id="reportSection" class="glass-card" style="display:none;">
+<div class="card-title"><span>🚨 SIGNALER UN PROBLÈME</span><span>SUPPORT DROP</span></div>
+<p style="font-size:.7rem;color:var(--text-muted);line-height:1.5;margin-bottom:10px;">Tu as trouvé une anomalie, un comportement étrange ou un problème avec un joueur ? Décris précisément ce qui s’est passé. L’administrateur examinera le signalement.</p>
+<select id="reportCategory" class="input-field">
+<option value="bug">🐛 Bug / anomalie technique</option>
+<option value="player">👤 Joueur / comportement</option>
+<option value="trade">🔄 Problème d’échange</option>
+<option value="card">🃏 Problème de carte / collection</option>
+<option value="credits">🪙 Problème de crédits</option>
+<option value="account">🔐 Problème de compte / connexion</option>
+<option value="content">📢 Contenu / message inapproprié</option>
+<option value="security">🛡️ Problème de sécurité</option>
+<option value="event">🌍 Problème lié à un événement</option>
+<option value="suggestion">💡 Suggestion / amélioration</option>
+<option value="other">📌 Autre</option>
+</select>
+<input id="reportTarget" class="input-field" placeholder="ID du joueur concerné (facultatif)">
+<textarea id="reportText" class="input-field" rows="5" maxlength="1500" placeholder="Explique ce qui ne va pas…" style="resize:vertical;"></textarea>
+<button class="btn btn-danger" onclick="submitPlayerReport()">🚨 ENVOYER LE SIGNALEMENT</button>
+<div id="myReportsList" style="margin-top:12px;"></div>
+</div>
+
 <div id="friendsSection" class="glass-card" style="display:none;">
 <div class="card-title"><span>🤝 CENTRE D'AMIS & DEMANDES</span></div>
 <div style="display:flex; gap:8px; margin-bottom:12px;">
@@ -980,6 +1003,11 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Envoie le même nombre de crédits à tous les comptes joueurs existants. Le cadeau est ajouté directement aux comptes.</div>
 <input id="adminAllCreditAmount" class="input-field" type="number" min="1" step="1" placeholder="Crédits offerts à chaque joueur" style="margin-bottom:7px;">
 <button class="btn" onclick="adminGiftCreditsToAll()">🎁 ENVOYER À TOUS LES JOUEURS</button>
+</div>
+<div class="admin-gift-box">
+<div class="admin-gift-title">🚨 SIGNALEMENTS DES JOUEURS</div>
+<div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Tous les signalements arrivent ici. Tu peux les examiner puis les valider ou les classer sans suite. Le joueur reçoit automatiquement le résultat.</div>
+<div id="adminReportsList" style="max-height:520px;overflow:auto;"><i style="color:var(--text-muted);font-size:.7rem;">Chargement des signalements…</i></div>
 </div>
 <div class="admin-gift-box">
 <div class="admin-gift-title">💬 MESSAGE PRIVÉ À UN JOUEUR</div>
@@ -1568,6 +1596,7 @@ reject(err);
 }
 
 function resetLocalUserState() {
+const report=document.getElementById('reportSection'); if(report) report.style.display='none';
 appData.currentUser = null;
 appData.credits = 0;
 appData.friendId = null;
@@ -1691,6 +1720,8 @@ if (needsFriendIdMigration) {
 listenToTrades();
 listenToFriendRequests();
 listenAdminMessages();
+listenPlayerReports();
+listenReportNotifications();
 listenGlobalSiteControl();
 startPresence();
 listenAccountAdminControl();
@@ -1738,6 +1769,8 @@ updateUI();
 listenToTrades();
 listenToFriendRequests();
 listenAdminMessages();
+listenPlayerReports();
+listenReportNotifications();
 listenGlobalSiteControl();
 startPresence();
 listenAccountAdminControl();
@@ -1847,7 +1880,7 @@ function applyAdminMode(active) {
   if (vp) vp.classList.toggle('admin-mode', !!active);
   const panel=document.getElementById('adminPanel');
   if (panel) panel.style.display=active ? 'block' : 'none';
-  if (active) { populateAdminGiftCards(); populateAdminRemoveCards(); loadAdminPlayers(); }
+  if (active) { populateAdminGiftCards(); populateAdminRemoveCards(); loadAdminPlayers(); loadAdminReports(); listenAdminReports(); }
 }
 function populateAdminGiftCards(){
   const sel=document.getElementById('adminGiftCard'); if(!sel || !appData.isAdmin)return;
@@ -1862,6 +1895,74 @@ function populateAdminRemoveCards(){
   const all=[]; Object.keys(appData.catalogs||{}).forEach(cat=>(appData.catalogs[cat]||[]).forEach(c=>all.push(c)));
   all.sort((a,b)=>Number(a.id)-Number(b.id));
   sel.innerHTML=all.map(c=>'<option value="'+Number(c.id)+'">'+String(c.emoji||'🃏')+' '+String(c.name||('Carte #'+c.id))+' • #'+Number(c.id)+'</option>').join('');
+}
+
+const REPORT_CATEGORIES={bug:'🐛 Bug / anomalie technique',player:'👤 Joueur / comportement',trade:'🔄 Problème d’échange',card:'🃏 Problème de carte / collection',credits:'🪙 Problème de crédits',account:'🔐 Compte / connexion',content:'📢 Contenu / message',security:'🛡️ Sécurité',event:'🌍 Événement',suggestion:'💡 Suggestion',other:'📌 Autre'};
+let playerReportsRef=null, reportNotificationsRef=null, adminReportsRef=null;
+async function submitPlayerReport(){
+  if(!appData.currentUser)return showToast('🔐 Connecte-toi pour envoyer un signalement.','error');
+  const category=document.getElementById('reportCategory')?.value||'other';
+  const target=String(document.getElementById('reportTarget')?.value||'').trim();
+  const textValue=String(document.getElementById('reportText')?.value||'').trim();
+  if(textValue.length<10)return showToast('❌ Décris un peu plus précisément le problème.','error');
+  const reportId='report_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const payload={reporterUid:appData.currentUser.uid,reporterName:appData.currentUser.username||'Joueur',reporterFriendId:appData.friendId||'',category,categoryLabel:REPORT_CATEGORIES[category]||'📌 Autre',target:target.slice(0,100),text:textValue.slice(0,1500),status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
+  try{
+    const updates={};
+    updates['reports/'+reportId]=payload;
+    updates['player_reports/'+appData.currentUser.uid+'/'+reportId]=payload;
+    await withTimeout(db.ref().update(updates),10000,'Firebase a refusé le signalement.');
+    const ta=document.getElementById('reportText'),tg=document.getElementById('reportTarget');if(ta)ta.value='';if(tg)tg.value='';
+    showToast('🚨 Signalement envoyé à l’administrateur.','success');
+    loadMyReports();
+  }catch(e){showToast('❌ Signalement non envoyé : '+(e.message||e),'error');}
+}
+function listenPlayerReports(){
+  if(playerReportsRef)playerReportsRef.off();
+  if(!appData.currentUser||appData.isAdmin)return;
+  playerReportsRef=db.ref('player_reports/'+appData.currentUser.uid);
+  playerReportsRef.on('value',()=>loadMyReports());
+}
+async function loadMyReports(){
+  const el=document.getElementById('myReportsList');if(!el||!appData.currentUser)return;
+  try{const snap=await db.ref('player_reports/'+appData.currentUser.uid).once('value');const data=snap.val()||{};const rows=Object.entries(data).sort((a,b)=>Number(b[1]?.createdAt||0)-Number(a[1]?.createdAt||0));
+    el.innerHTML=rows.length?'<div style="font-size:.7rem;color:var(--text-muted);margin-bottom:7px;">📋 MES SIGNALEMENTS</div>'+rows.map(([id,r])=>{const st=r.status==='approved'?'✅ Validé':r.status==='rejected'?'❌ Sans suite':'🕒 En attente';return '<div style="padding:9px;border:1px solid var(--card-border);border-radius:12px;margin-bottom:7px;font-size:.68rem;"><b>'+escapeHtml(r.categoryLabel||REPORT_CATEGORIES[r.category]||'📌 Autre')+'</b><span style="float:right">'+st+'</span><div style="margin-top:5px;color:var(--text-muted);white-space:pre-wrap;">'+escapeHtml(r.text||'')+'</div></div>';}).join(''):'<div style="font-size:.68rem;color:var(--text-muted);">Aucun signalement envoyé.</div>';
+  }catch(e){el.innerHTML='';}
+}
+function listenReportNotifications(){
+  if(reportNotificationsRef)reportNotificationsRef.off();
+  if(!appData.currentUser||appData.isAdmin)return;
+  reportNotificationsRef=db.ref('report_notifications/'+appData.currentUser.uid);
+  reportNotificationsRef.on('child_added',snap=>{const n=snap.val();if(!n)return;showReportNotification(n,snap.key);});
+}
+function showReportNotification(n,id){
+  if(document.getElementById('reportNotificationOverlay'))return;
+  const approved=n.status==='approved';
+  const el=document.createElement('div');el.id='reportNotificationOverlay';el.style.cssText='position:fixed;inset:0;z-index:100003;background:rgba(3,3,8,.9);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px);';
+  el.innerHTML='<div style="width:min(620px,100%);background:linear-gradient(145deg,#11111d,#080812);border:1px solid '+(approved?'rgba(34,197,94,.65)':'rgba(248,113,113,.65)')+';border-radius:26px;padding:30px;box-shadow:0 0 70px rgba(0,0,0,.35);color:white;"><div style="font-size:3rem;text-align:center">'+(approved?'✅':'❌')+'</div><h2 style="font-family:Space Grotesk;text-align:center;margin:10px 0 18px;">'+(approved?'SIGNALEMENT VALIDÉ':'SIGNALEMENT SANS SUITE')+'</h2><p style="white-space:pre-wrap;line-height:1.7;color:#ddd;">'+escapeHtml(n.message||'')+'</p><button class="btn" style="width:100%;margin-top:20px;" onclick="closeReportNotification(\''+escapeHtml(id)+'\')">FERMER</button></div>';
+  document.body.appendChild(el);
+}
+async function closeReportNotification(id){const el=document.getElementById('reportNotificationOverlay');if(el)el.remove();if(id&&appData.currentUser)await db.ref('report_notifications/'+appData.currentUser.uid+'/'+id).remove().catch(()=>{});}
+async function loadAdminReports(){
+  if(!appData.isAdmin)return;const el=document.getElementById('adminReportsList');if(!el)return;
+  try{const snap=await db.ref('reports').once('value');renderAdminReports(snap.val()||{});}catch(e){el.innerHTML='<div style="color:#fca5a5;font-size:.7rem;">Impossible de charger les signalements.</div>';}
+}
+function listenAdminReports(){
+  if(adminReportsRef)adminReportsRef.off();
+  if(!appData.isAdmin)return;
+  adminReportsRef=db.ref('reports');adminReportsRef.on('value',snap=>renderAdminReports(snap.val()||{}));
+}
+function renderAdminReports(data){
+  const el=document.getElementById('adminReportsList');if(!el||!appData.isAdmin)return;
+  const rows=Object.entries(data).sort((a,b)=>{const sa=a[1]?.status==='pending'?0:1,sb=b[1]?.status==='pending'?0:1;return sa-sb||Number(b[1]?.createdAt||0)-Number(a[1]?.createdAt||0);});
+  if(!rows.length){el.innerHTML='<div style="font-size:.7rem;color:var(--text-muted);">Aucun signalement pour le moment.</div>';return;}
+  el.innerHTML=rows.map(([id,r])=>{const status=r.status==='approved'?'✅ VALIDÉ':r.status==='rejected'?'❌ SANS SUITE':'🕒 EN ATTENTE';const actions=r.status==='pending'?'<div style="display:flex;gap:7px;margin-top:9px;"><button class="btn btn-success" style="flex:1;" onclick="adminResolveReport(\''+id+'\',\'approved\')">✅ VALIDER</button><button class="btn btn-danger" style="flex:1;" onclick="adminResolveReport(\''+id+'\',\'rejected\')">✕ SANS SUITE</button></div>':'';return '<div style="padding:12px;border:1px solid var(--card-border);border-radius:14px;margin-bottom:9px;background:rgba(255,255,255,.025);"><div style="display:flex;justify-content:space-between;gap:8px;"><b style="font-size:.72rem;">'+escapeHtml(r.categoryLabel||'📌 Autre')+'</b><span style="font-size:.62rem;color:var(--text-muted);">'+status+'</span></div><div style="font-size:.64rem;color:var(--text-muted);margin-top:5px;">👤 '+escapeHtml(r.reporterName||'Joueur')+' • '+escapeHtml(r.reporterFriendId||r.reporterUid||'')+(r.target?' • 🎯 '+escapeHtml(r.target):'')+'</div><div style="font-size:.7rem;line-height:1.55;margin-top:8px;white-space:pre-wrap;">'+escapeHtml(r.text||'')+'</div>'+actions+'</div>';}).join('');
+}
+async function adminResolveReport(id,status){
+  if(!appData.isAdmin)return;const snap=await db.ref('reports/'+id).once('value');const r=snap.val();if(!r)return showToast('❌ Signalement introuvable.','error');if(r.status!=='pending')return showToast('ℹ️ Ce signalement a déjà été traité.','error');
+  const message=status==='approved'?'Ton signalement a été examiné et validé par l’administrateur. Merci pour ton retour.':'Ton signalement a été examiné mais classé sans suite. Merci pour ton retour.';
+  const updates={};updates['reports/'+id+'/status']=status;updates['reports/'+id+'/resolvedAt']=firebase.database.ServerValue.TIMESTAMP;updates['reports/'+id+'/resolvedBy']=appData.currentUser.uid;updates['player_reports/'+r.reporterUid+'/'+id+'/status']=status;updates['player_reports/'+r.reporterUid+'/'+id+'/resolvedAt']=firebase.database.ServerValue.TIMESTAMP;updates['report_notifications/'+r.reporterUid+'/'+id]={status,message,createdAt:firebase.database.ServerValue.TIMESTAMP};
+  try{await withTimeout(db.ref().update(updates),10000,'Firebase a refusé le traitement du signalement.');showToast(status==='approved'?'✅ Signalement validé.':'❌ Signalement classé sans suite.','success');}catch(e){showToast('❌ Traitement impossible : '+(e.message||e),'error');}
 }
 
 function adminSetTargetEverywhere(uid){
@@ -2068,23 +2169,39 @@ async function adminSendPrivateMessage(){
 }
 
 let adminMessagesRef=null;
+let adminPrivateMessageQueue=[];
+let adminPrivateMessageCurrentId=null;
 function listenAdminMessages(){
   if(adminMessagesRef)adminMessagesRef.off();
   if(!appData.currentUser || appData.isAdmin)return;
   adminMessagesRef=db.ref('admin_messages/'+appData.currentUser.uid);
   adminMessagesRef.on('child_added',snap=>{
     const m=snap.val(); if(!m||m.read===true)return;
-    showAdminPrivateMessage(m.text||'');
-    db.ref('admin_messages/'+appData.currentUser.uid+'/'+snap.key).update({read:true}).catch(()=>{});
+    adminPrivateMessageQueue.push({id:snap.key,text:m.text||''});
+    renderNextAdminPrivateMessage();
   });
+}
+function renderNextAdminPrivateMessage(){
+  if(document.getElementById('adminPrivateMessageOverlay') || !adminPrivateMessageQueue.length)return;
+  const item=adminPrivateMessageQueue.shift();
+  adminPrivateMessageCurrentId=item.id;
+  showAdminPrivateMessage(item.text);
+}
+function closeAdminPrivateMessage(){
+  const id=adminPrivateMessageCurrentId;
+  const el=document.getElementById('adminPrivateMessageOverlay');
+  if(el)el.remove();
+  adminPrivateMessageCurrentId=null;
+  if(id && appData.currentUser)db.ref('admin_messages/'+appData.currentUser.uid+'/'+id).update({read:true}).catch(()=>{});
+  setTimeout(renderNextAdminPrivateMessage,120);
 }
 function showAdminPrivateMessage(message){
   let el=document.getElementById('adminPrivateMessageOverlay');
   if(!el){
-    el=document.createElement('div'); el.id='adminPrivateMessageOverlay'; el.style.cssText='position:fixed;inset:0;z-index:100001;background:rgba(3,3,8,.78);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);';
+    el=document.createElement('div'); el.id='adminPrivateMessageOverlay'; el.style.cssText='position:fixed;inset:0;z-index:100001;background:rgba(3,3,8,.9);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px);';
     document.body.appendChild(el);
   }
-  el.innerHTML='<div style="width:min(520px,100%);background:linear-gradient(145deg,#11111d,#080812);border:1px solid rgba(255,215,0,.45);border-radius:24px;padding:24px;box-shadow:0 0 50px rgba(255,215,0,.12);color:white;"><div style="font-size:2rem">👑</div><h2 style="margin:8px 0;font-family:Space Grotesk;">MESSAGE DE L’ADMINISTRATEUR</h2><p style="white-space:pre-wrap;line-height:1.65;color:#ddd;">'+escapeHtml(message)+'</p><button class="btn" style="margin-top:12px;" onclick="document.getElementById(\'adminPrivateMessageOverlay\')?.remove()">FERMER</button></div>';
+  el.innerHTML='<div style="width:min(620px,100%);max-height:85vh;overflow:auto;background:linear-gradient(145deg,#11111d,#080812);border:1px solid rgba(255,215,0,.55);border-radius:26px;padding:30px;box-shadow:0 0 70px rgba(255,215,0,.16);color:white;text-align:left;"><div style="font-size:2.8rem;text-align:center">👑</div><h2 style="margin:10px 0 18px;text-align:center;font-family:Space Grotesk;">MESSAGE DE L’ADMINISTRATEUR</h2><p style="white-space:pre-wrap;line-height:1.75;color:#e4e4e7;font-size:.95rem;">'+escapeHtml(message)+'</p><button class="btn" style="margin-top:20px;width:100%;" onclick="closeAdminPrivateMessage()">FERMER LE MESSAGE</button></div>';
 }
 
 let accountControlRef=null, accountControlHandler=null;
@@ -2122,13 +2239,26 @@ async function listenGlobalSiteControl(){
     if(locked && !appData.isAdmin) showGlobalLockOverlay(v); else hideGlobalLockOverlay();
     updateAdminLockStatus(v);
     if(locked && !v.manual && Number(v.until)>Date.now()) setTimeout(()=>{ if(globalControlRef) globalControlRef.once('value').catch(()=>{}); }, Math.max(500, Number(v.until)-Date.now()+100));
-    if(v.announcement && Number(v.announcementAt||0)>=(Date.now()-24*60*60*1000) && v.announcementId!==sessionStorage.getItem('drop2027_last_global_announcement')){
-      try{sessionStorage.setItem('drop2027_last_global_announcement',String(v.announcementId||v.announcementAt));}catch(e){}
-      showToast('📢 '+String(v.announcement),'success');
+    if(v.announcement && Number(v.announcementAt||0)>=(Date.now()-24*60*60*1000) && String(v.announcementId||v.announcementAt)!==sessionStorage.getItem('drop2027_closed_global_announcement')){
+      showGlobalAnnouncement(v.announcement,String(v.announcementId||v.announcementAt));
     }
   };
   globalControlRef.on('value',globalControlHandler);
 }
+function showGlobalAnnouncement(message,announcementId){
+  if(document.getElementById('globalAnnouncementOverlay'))return;
+  window.__currentGlobalAnnouncementId=String(announcementId||'');
+  const el=document.createElement('div'); el.id='globalAnnouncementOverlay'; el.style.cssText='position:fixed;inset:0;z-index:100002;background:rgba(3,3,8,.9);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px);';
+  el.innerHTML='<div style="width:min(700px,100%);max-height:85vh;overflow:auto;background:linear-gradient(145deg,#160d27,#07070f);border:1px solid rgba(217,70,239,.65);border-radius:28px;padding:32px;box-shadow:0 0 70px rgba(217,70,239,.2);color:white;"><div style="font-size:3rem;text-align:center">📢</div><h2 style="font-family:Space Grotesk;text-align:center;margin:10px 0 20px;color:#f0abfc;">MESSAGE POUR TOUS LES JOUEURS</h2><p style="white-space:pre-wrap;line-height:1.8;color:#e4e4e7;font-size:1rem;">'+escapeHtml(message)+'</p><button class="btn" style="width:100%;margin-top:22px;" onclick="closeGlobalAnnouncement()">J’AI LU — FERMER</button></div>';
+  document.body.appendChild(el);
+}
+
+function closeGlobalAnnouncement(){
+  const id=String(window.__currentGlobalAnnouncementId||'');
+  if(id){try{sessionStorage.setItem('drop2027_closed_global_announcement',id);}catch(e){}}
+  const el=document.getElementById('globalAnnouncementOverlay');if(el)el.remove();
+}
+
 function showGlobalLockOverlay(v){
   let el=document.getElementById('globalSiteLock');
   if(!el){el=document.createElement('div');el.id='globalSiteLock';el.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(3,3,8,.97);display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:white;';document.body.appendChild(el);}
@@ -3011,6 +3141,8 @@ function openProfileSettings(){
   const panel=document.getElementById('profileSettingsPanel');
   if(panel) panel.classList.toggle('active');
   syncProfileSettings();
+  const report=document.getElementById('reportSection'); if(report) report.style.display='block';
+  loadMyReports();
 }
 function syncProfileSettings(){
   const u=appData.currentUser||{};
@@ -3910,6 +4042,7 @@ else if (gameType === 'colorswitch') runColorSwitchGame(container);
 else if (gameType === 'coincatch') runCoinCatchGame(container);
 else if (gameType === 'quicktarget') runQuickTargetGame(container);
 else if (gameType === 'safetile') runSafeTileGame(container);
+else if (gameType === 'ghostpath') runGhostPathGame(container);
 }
 
 
@@ -4193,6 +4326,15 @@ function ensureOfficialMusic(){
   }
   officialMusicReady=true;
   return audio;
+}
+
+function runGhostPathGame(c){
+  document.getElementById('gameTitle').innerText='Parcours Fantôme';
+  c.innerHTML='<div style="text-align:center;max-width:420px;width:100%;"><p id="ghostPathStatus" style="font-size:.78rem;color:var(--text-muted);margin-bottom:12px;">Regarde le chemin. Il va disparaître.</p><div id="ghostGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;max-width:300px;margin:0 auto 14px;"></div><button id="ghostStart" class="btn" onclick="beginGhostPath()">👻 AFFICHER LE CHEMIN</button></div>';
+  const grid=document.getElementById('ghostGrid');let path=[],step=0,active=false;
+  for(let i=0;i<16;i++){const b=document.createElement('button');b.className='btn btn-secondary';b.style.cssText='height:58px;padding:0;font-size:1.2rem;';b.dataset.i=i;b.innerText='·';b.onclick=()=>ghostClick(i);grid.appendChild(b);}
+  window.beginGhostPath=()=>{if(active)return;active=true;step=0;path=[];while(path.length<6){const n=Math.floor(Math.random()*16);if(!path.includes(n))path.push(n);}const status=document.getElementById('ghostPathStatus'),start=document.getElementById('ghostStart');if(start)start.style.display='none';if(status)status.innerText='👻 Mémorise les 6 cases…';path.forEach((idx,k)=>{setTimeout(()=>{const b=grid.children[idx];if(b){b.innerText='👻';b.style.boxShadow='0 0 20px var(--glow-magenta)';}if(k===path.length-1)setTimeout(()=>{Array.from(grid.children).forEach(x=>{x.innerText='?';x.style.boxShadow='';});if(status)status.innerText='À toi. Reproduis le chemin dans le même ordre.';},650);},k*420);});};
+  function ghostClick(i){if(!active)return;const b=grid.children[i];if(i!==path[step]){active=false;if(b)b.innerText='✕';return rewardPlayer(0);}if(b)b.innerText='✓';step++;if(step>=path.length){active=false;rewardPlayer(100);}}
 }
 
 function startGameMusic(){
