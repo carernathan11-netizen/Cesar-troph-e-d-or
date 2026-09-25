@@ -993,12 +993,19 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div id="adminPlayerDetails" style="margin-top:9px;"></div>
 </div>
 <div class="admin-gift-box">
-<div class="admin-gift-title">🗓️ EMPLOI DU TEMPS DU SITE — 7 JOURS / 7</div>
-<div style="font-size:.62rem;color:var(--text-muted);line-height:1.45;margin-bottom:8px;">Définis les horaires d’ouverture et de fermeture de chaque jour. Les joueurs verront automatiquement le site fermé en dehors de ces créneaux.</div>
+<div class="admin-gift-title">🗓️ HORAIRES DU SITE — 7 JOURS / 7</div>
+<div style="font-size:.64rem;color:var(--text-muted);line-height:1.55;margin-bottom:9px;">Définis précisément les heures pendant lesquelles le site est <b>OUVERT</b> pour chaque jour. En dehors de ces horaires, le site se ferme automatiquement pour les joueurs.</div>
+<div style="font-size:.62rem;color:#ffd700;line-height:1.55;margin-bottom:9px;padding:9px;border:1px solid rgba(255,215,0,.25);border-radius:10px;">💡 <b>La coche « FERMÉ »</b> signifie que le site est fermé pendant <b>toute cette journée</b>, même si des horaires sont affichés. Les champs ouverture/fermeture sont alors désactivés. Décoche-la pour rouvrir ce jour et définir ses horaires.</div>
+<div style="font-size:.6rem;color:var(--text-muted);margin-bottom:6px;">Format : <b>Ouverture</b> = heure à laquelle les joueurs peuvent entrer. <b>Fermeture</b> = heure à laquelle l’accès s’arrête. Exemple : 09:00 → 22:00 = ouvert de 9h à 22h.</div>
 <div id="adminWeeklySchedule" style="display:grid;gap:7px;"></div>
+<div style="margin-top:10px;">
+<div style="font-size:.66rem;font-weight:800;margin-bottom:5px;">📝 MESSAGE AFFICHÉ QUAND LE SITE EST FERMÉ</div>
+<textarea id="adminScheduleClosureMessage" class="input-field" rows="3" placeholder="Exemple : DROP 2027 est actuellement fermé. Le site rouvrira bientôt !" style="resize:vertical;"></textarea>
+<div style="font-size:.58rem;color:var(--text-muted);margin-top:4px;">Tu peux personnaliser librement ce texte. Il sera affiché aux joueurs pendant la fermeture, avec le compte à rebours avant la prochaine ouverture.</div>
+</div>
 <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;">
 <button class="btn" style="flex:1;" onclick="adminSaveWeeklySchedule()">💾 ENREGISTRER LES HORAIRES</button>
-<button class="btn btn-secondary" style="flex:1;" onclick="adminLoadWeeklySchedule()">🔄 ACTUALISER</button>
+<button class="btn btn-secondary" style="flex:1;" onclick="adminLoadWeeklySchedule()">🔄 RECHARGER LES HORAIRES</button>
 </div>
 <div id="adminScheduleStatus" style="font-size:.62rem;color:#ffd700;margin-top:7px;"></div>
 </div>
@@ -2393,18 +2400,85 @@ const SITE_EVENT_OPTIONS=[
 let siteScheduleRef=null, siteEventsRef=null, siteScheduleCache=null, siteEventsCache={};
 let siteScheduleTimer=null;
 function defaultSiteSchedule(){const x={};SITE_WEEK_DAYS.forEach(d=>x[d.key]={open:'09:00',close:'22:00',closed:false});return x;}
+function normalizeSiteSchedule(raw){
+ const source=(raw&&raw.days&&typeof raw.days==='object')?raw.days:(raw&&typeof raw==='object'?raw:{});
+ const out=defaultSiteSchedule();
+ SITE_WEEK_DAYS.forEach(d=>{const v=source[d.key];if(v&&typeof v==='object'){out[d.key]={open:/^\d{2}:\d{2}$/.test(String(v.open||''))?String(v.open):out[d.key].open,close:/^\d{2}:\d{2}$/.test(String(v.close||''))?String(v.close):out[d.key].close,closed:v.closed===true};}});
+ return out;
+}
+function getStoredClosureMessage(raw){return String((raw&&raw.closureMessage)||'DROP 2027 est actuellement fermé. Le site rouvrira bientôt !');}
 function renderAdminScheduleUI(data){
  const el=document.getElementById('adminWeeklySchedule'); if(!el)return;
- const sch={...defaultSiteSchedule(),...(data||{})};
- el.innerHTML=SITE_WEEK_DAYS.map(d=>{const v=sch[d.key]||{open:'09:00',close:'22:00',closed:false};return `<div style="display:grid;grid-template-columns:90px 1fr 1fr auto;gap:6px;align-items:center;padding:7px;border:1px solid var(--card-border);border-radius:12px;"><b style="font-size:.68rem;">${d.label}</b><input class="input-field sched-open" data-day="${d.key}" type="time" value="${escapeHtml(v.open||'09:00')}" ${v.closed?'disabled':''}><input class="input-field sched-close" data-day="${d.key}" type="time" value="${escapeHtml(v.close||'22:00')}" ${v.closed?'disabled':''}><label style="font-size:.6rem;display:flex;gap:4px;align-items:center;"><input type="checkbox" class="sched-closed" data-day="${d.key}" ${v.closed?'checked':''} onchange="toggleScheduleDay(${d.key},this.checked)"> fermé</label></div>`;}).join('');
+ const sch=normalizeSiteSchedule(data);
+ el.innerHTML=SITE_WEEK_DAYS.map(d=>{const v=sch[d.key]||{open:'09:00',close:'22:00',closed:false};return `<div style="display:grid;grid-template-columns:90px 1fr 1fr auto;gap:6px;align-items:center;padding:8px;border:1px solid var(--card-border);border-radius:12px;"><b style="font-size:.68rem;">${d.label}</b><div><div style="font-size:.5rem;color:var(--text-muted);margin-bottom:2px;">OUVERTURE</div><input aria-label="Ouverture ${d.label}" class="input-field sched-open" data-day="${d.key}" type="time" value="${escapeHtml(v.open)}" ${v.closed?'disabled':''}></div><div><div style="font-size:.5rem;color:var(--text-muted);margin-bottom:2px;">FERMETURE</div><input aria-label="Fermeture ${d.label}" class="input-field sched-close" data-day="${d.key}" type="time" value="${escapeHtml(v.close)}" ${v.closed?'disabled':''}></div><label style="font-size:.6rem;display:flex;gap:4px;align-items:center;white-space:nowrap;"><input type="checkbox" class="sched-closed" data-day="${d.key}" ${v.closed?'checked':''} onchange="toggleScheduleDay(${d.key},this.checked)"> FERMÉ</label></div>`;}).join('');
+ const msg=document.getElementById('adminScheduleClosureMessage'); if(msg)msg.value=getStoredClosureMessage(data);
 }
 function toggleScheduleDay(day,closed){document.querySelectorAll('.sched-open[data-day="'+day+'"],.sched-close[data-day="'+day+'"]').forEach(x=>x.disabled=closed);}
-async function adminLoadWeeklySchedule(){if(!appData.isAdmin)return;try{const snap=await db.ref('site_schedule').once('value');siteScheduleCache=snap.val()||defaultSiteSchedule();renderAdminScheduleUI(siteScheduleCache);renderAdminEvents(siteEventsCache); }catch(e){showToast('❌ Impossible de charger l’emploi du temps : '+(e.message||e),'error');}}
-async function adminSaveWeeklySchedule(){
- if(!appData.isAdmin)return; const next={};
- SITE_WEEK_DAYS.forEach(d=>{const o=document.querySelector('.sched-open[data-day="'+d.key+'"]')?.value||'09:00';const c=document.querySelector('.sched-close[data-day="'+d.key+'"]')?.value||'22:00';const closed=!!document.querySelector('.sched-closed[data-day="'+d.key+'"]')?.checked;next[d.key]={open:o,close:c,closed};});
- try{await db.ref('site_schedule').set({days:next,updatedAt:firebase.database.ServerValue.TIMESTAMP,by:appData.currentUser.uid});siteScheduleCache=next;document.getElementById('adminScheduleStatus').textContent='✅ Horaires enregistrés.';evaluateSiteSchedule();}catch(e){showToast('❌ Impossible d’enregistrer les horaires : '+(e.message||e),'error');}
+async function adminLoadWeeklySchedule(){
+ if(!appData.isAdmin)return;
+ try{
+  const snap=await db.ref('site_schedule').once('value');
+  const raw=snap.val()||{};
+  siteScheduleCache=normalizeSiteSchedule(raw);
+  siteScheduleCache.__closureMessage=getStoredClosureMessage(raw);
+  renderAdminScheduleUI(raw);
+  renderAdminEvents(siteEventsCache);
+  const st=document.getElementById('adminScheduleStatus');if(st)st.textContent='✅ Horaires chargés depuis Firebase.';
+ }catch(e){showToast('❌ Impossible de charger l’emploi du temps : '+(e.message||e),'error');}
 }
+async function adminSaveWeeklySchedule(){
+ if(!appData.isAdmin)return;
+ const next=normalizeSiteSchedule({days:{}});
+ SITE_WEEK_DAYS.forEach(d=>{const o=document.querySelector('.sched-open[data-day="'+d.key+'"]')?.value||'09:00';const c=document.querySelector('.sched-close[data-day="'+d.key+'"]')?.value||'22:00';const closed=!!document.querySelector('.sched-closed[data-day="'+d.key+'"]')?.checked;next[d.key]={open:o,close:c,closed};});
+ const closureMessage=(document.getElementById('adminScheduleClosureMessage')?.value||'').trim()||'DROP 2027 est actuellement fermé. Le site rouvrira bientôt !';
+ try{
+  await db.ref('site_schedule').update({days:next,closureMessage,updatedAt:firebase.database.ServerValue.TIMESTAMP,by:appData.currentUser.uid});
+  const verify=await db.ref('site_schedule').once('value');
+  const saved=verify.val()||{};
+  const savedDays=normalizeSiteSchedule(saved);
+  if(JSON.stringify(savedDays)!==JSON.stringify(next)||getStoredClosureMessage(saved)!==closureMessage)throw new Error('Firebase n’a pas confirmé les horaires enregistrés.');
+  siteScheduleCache=savedDays;siteScheduleCache.__closureMessage=closureMessage;
+  const st=document.getElementById('adminScheduleStatus');if(st)st.textContent='✅ Horaires sauvegardés dans Firebase et vérifiés. Ils resteront après fermeture/rechargement du site.';
+  evaluateSiteSchedule();
+  showToast('💾 Horaires sauvegardés et vérifiés.','success');
+ }catch(e){showToast('❌ Impossible d’enregistrer les horaires : '+(e.message||e),'error');}
+}
+function populateEventOptions(){const s=document.getElementById('adminEventType');if(!s)return;s.innerHTML=SITE_EVENT_OPTIONS.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');}
+async function adminAddScheduledEvent(){
+ if(!appData.isAdmin)return;const type=document.getElementById('adminEventType')?.value||'custom';const title=(document.getElementById('adminEventTitle')?.value||'').trim();const start=new Date(document.getElementById('adminEventStart')?.value||'').getTime();const end=new Date(document.getElementById('adminEventEnd')?.value||'').getTime();const message=(document.getElementById('adminEventMessage')?.value||'').trim();
+ if(!title)return showToast('❌ Donne un nom à l’événement.','error');if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return showToast('❌ Les dates de l’événement sont invalides.','error');
+ const id='event_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);const opt=SITE_EVENT_OPTIONS.find(x=>x[0]===type);const payload={type,title,icon:(opt?.[1]||'⭐').split(' ')[0],start,end,message,createdAt:firebase.database.ServerValue.TIMESTAMP,by:appData.currentUser.uid};
+ try{await db.ref('site_events/'+id).set(payload);document.getElementById('adminEventTitle').value='';document.getElementById('adminEventMessage').value='';showToast('🎪 Événement ajouté à l’emploi du temps.','success');}catch(e){showToast('❌ Impossible d’ajouter l’événement : '+(e.message||e),'error');}
+}
+function renderAdminEvents(data){const el=document.getElementById('adminEventsList');if(!el)return;const rows=Object.entries(data||{}).sort((a,b)=>Number(a[1]?.start||0)-Number(b[1]?.start||0));el.innerHTML=rows.length?rows.map(([id,e])=>`<div style="padding:10px;border:1px solid var(--card-border);border-radius:12px;margin-bottom:7px;"><b style="font-size:.7rem;">${escapeHtml(e.icon||'⭐')} ${escapeHtml(e.title||'Événement')}</b><div style="font-size:.6rem;color:var(--text-muted);margin-top:4px;">${new Date(Number(e.start)).toLocaleString('fr-FR')} → ${new Date(Number(e.end)).toLocaleString('fr-FR')}</div>${e.message?`<div style="font-size:.64rem;margin-top:4px;">${escapeHtml(e.message)}</div>`:''}<button class="btn btn-danger" style="margin-top:7px;width:100%;" onclick="adminDeleteScheduledEvent('${id}')">🗑️ SUPPRIMER</button></div>`).join(''):'<div style="font-size:.65rem;color:var(--text-muted);">Aucun événement programmé.</div>';}
+async function adminDeleteScheduledEvent(id){if(!appData.isAdmin)return;try{await db.ref('site_events/'+id).remove();showToast('🗑️ Événement supprimé.','success');}catch(e){showToast('❌ Suppression impossible : '+(e.message||e),'error');}}
+function listenSiteSchedule(){if(siteScheduleRef)siteScheduleRef.off();siteScheduleRef=db.ref('site_schedule');siteScheduleRef.on('value',snap=>{const raw=snap.val()||{};siteScheduleCache=normalizeSiteSchedule(raw);siteScheduleCache.__closureMessage=getStoredClosureMessage(raw);if(appData.isAdmin)renderAdminScheduleUI(raw);evaluateSiteSchedule();});}
+function getNextSiteOpening(now,sch){
+ const base=new Date(now);base.setSeconds(0,0);
+ for(let offset=0;offset<8;offset++){
+  const d=new Date(base);d.setDate(base.getDate()+offset);const day=d.getDay();const v=sch[day];if(!v||v.closed)continue;
+  const [oh,om]=String(v.open||'09:00').split(':').map(Number);const candidate=new Date(d);candidate.setHours(oh,om,0,0);
+  if(candidate>now)return candidate;
+ }
+ return null;
+}
+function formatSiteCountdown(ms){const total=Math.max(0,Math.floor(ms/1000));const days=Math.floor(total/86400);const hours=Math.floor((total%86400)/3600);const mins=Math.floor((total%3600)/60);const secs=total%60;const parts=[];if(days)parts.push(days+'j');if(hours||days)parts.push(hours+'h');parts.push(mins+'min');parts.push(secs+'s');return parts.join(' ');}
+function evaluateSiteSchedule(){
+ if(appData.isAdmin)return;
+ const sch=normalizeSiteSchedule(siteScheduleCache);if(!sch)return;
+ const now=new Date();const day=now.getDay();const v=sch[day];
+ let inside=false,nextOpen=null;
+ if(v&&!v.closed){const [oh,om]=String(v.open||'09:00').split(':').map(Number);const [ch,cm]=String(v.close||'22:00').split(':').map(Number);const open=oh*60+om,close=ch*60+cm,hm=now.getHours()*60+now.getMinutes();inside=close>open?hm>=open&&hm<close:(hm>=open||hm<close);if(!inside)nextOpen=getNextSiteOpening(now,sch);}
+ if(v&&v.closed)nextOpen=getNextSiteOpening(now,sch);
+ if(!inside){showScheduledClosure(getStoredClosureMessage({closureMessage:siteScheduleCache?.__closureMessage}),nextOpen);}else hideScheduledClosure();
+}
+function showScheduledClosure(reason,nextOpen){
+ let el=document.getElementById('siteScheduleClosure');if(!el){el=document.createElement('div');el.id='siteScheduleClosure';el.style.cssText='position:fixed;inset:0;z-index:99998;background:rgba(3,3,8,.98);display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:white;';document.body.appendChild(el);}
+ const update=()=>{const now=new Date();const target=nextOpen||getNextSiteOpening(now,normalizeSiteSchedule(siteScheduleCache));const countdown=target?formatSiteCountdown(target-now.getTime()):'prochainement';el.innerHTML=`<div style="max-width:560px;border:1px solid rgba(217,70,239,.55);border-radius:24px;padding:30px 22px;background:linear-gradient(145deg,rgba(25,10,35,.96),rgba(6,6,14,.98));"><div style="font-size:3rem">🌙</div><h2 style="font-family:Space Grotesk;margin:10px 0;color:#f0abfc;">DROP 2027 FERMÉ</h2><p style="color:#d4d4d8;line-height:1.6;white-space:pre-wrap;">${escapeHtml(reason)}</p><div style="margin-top:16px;font-size:.62rem;color:#a1a1aa;">PROCHAINE OUVERTURE</div><div id="siteScheduleCountdown" style="margin-top:5px;font-size:1.35rem;font-weight:900;color:#fff;">${countdown}</div></div>`;};
+ update();if(el.__countdownTimer)clearInterval(el.__countdownTimer);el.__countdownTimer=setInterval(update,1000);
+}
+function hideScheduledClosure(){const el=document.getElementById('siteScheduleClosure');if(el){if(el.__countdownTimer)clearInterval(el.__countdownTimer);el.remove();}}
+function startSiteScheduleClock(){if(siteScheduleTimer)clearInterval(siteScheduleTimer);siteScheduleTimer=setInterval(evaluateSiteSchedule,15000);evaluateSiteSchedule();}
 function populateEventOptions(){const s=document.getElementById('adminEventType');if(!s)return;s.innerHTML=SITE_EVENT_OPTIONS.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');}
 async function adminAddScheduledEvent(){
  if(!appData.isAdmin)return;const type=document.getElementById('adminEventType')?.value||'custom';const title=(document.getElementById('adminEventTitle')?.value||'').trim();const start=new Date(document.getElementById('adminEventStart')?.value||'').getTime();const end=new Date(document.getElementById('adminEventEnd')?.value||'').getTime();const message=(document.getElementById('adminEventMessage')?.value||'').trim();
