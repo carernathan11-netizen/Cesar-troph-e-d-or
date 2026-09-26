@@ -863,6 +863,8 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
   <div class="settings-row"><span>📱 Plateforme</span><button class="btn btn-secondary" style="width:auto;padding:7px 12px;font-size:.65rem;" onclick="ensureDeviceMode();syncProfileSettings()">CHOISIR</button></div>
   <div class="settings-actions">
     <button class="btn btn-secondary" onclick="copyFriendId()">📋 COPIER MON ID</button>
+    <button class="btn btn-secondary" onclick="openMyAdminMessages()">💬 MES MESSAGES ADMIN</button>
+    <button class="btn btn-secondary" onclick="refreshMyAccountData()">🔄 ACTUALISER MES DONNÉES</button>
     <button class="btn btn-danger" onclick="logoutUser()">🚪 SE DÉCONNECTER</button>
   </div>
 </div>
@@ -1052,8 +1054,12 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <input id="adminMessageTarget" class="input-field" placeholder="ID joueur : #DROP-UID" style="margin-bottom:7px;">
 <textarea id="adminMessageText" class="input-field" placeholder="Écris ton message…" rows="4" style="margin-bottom:7px;resize:vertical;"></textarea>
 <button class="btn btn-secondary" onclick="adminSendPrivateMessage()">💬 ENVOYER LE MESSAGE</button>
-<button class="btn btn-danger" style="margin-top:7px;" onclick="adminDeletePlayerMessages()">🗑️ SUPPRIMER LES MESSAGES DE CE JOUEUR</button>
-<div id="adminMessageDeleteHint" style="font-size:.6rem;color:var(--text-muted);margin-top:6px;">La suppression retire les messages déjà envoyés à ce joueur.</div>
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;">
+<button class="btn btn-secondary" style="flex:1;" onclick="adminLoadPlayerMessages()">📨 VOIR LES MESSAGES</button>
+<button class="btn btn-danger" style="flex:1;" onclick="adminDeletePlayerMessages()">🗑️ TOUT SUPPRIMER</button>
+</div>
+<div id="adminPlayerMessagesList" style="margin-top:8px;max-height:320px;overflow:auto;"></div>
+<div id="adminMessageDeleteHint" style="font-size:.6rem;color:var(--text-muted);margin-top:6px;">Tu peux maintenant supprimer un message précis ou tous les messages de ce joueur.</div>
 </div>
 </div>
 
@@ -1951,14 +1957,18 @@ async function submitPlayerReport(){
   const reportId='report_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
   const payload={reporterUid:appData.currentUser.uid,reporterName:appData.currentUser.username||'Joueur',reporterFriendId:appData.friendId||'',category,categoryLabel:REPORT_CATEGORIES[category]||'📌 Autre',target:target.slice(0,100),text:textValue.slice(0,1500),status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
   try{
-    const updates={};
-    updates['reports/'+reportId]=payload;
-    updates['player_reports/'+appData.currentUser.uid+'/'+reportId]=payload;
-    await withTimeout(db.ref().update(updates),10000,'Firebase a refusé le signalement.');
+    // Écrit directement sur les deux branches autorisées. Les règles Firebase vérifient que le joueur est bien l'auteur.
+    await withTimeout(db.ref('reports/'+reportId).set(payload),10000,'Firebase a refusé la création du signalement.');
+    try{
+      await withTimeout(db.ref('player_reports/'+appData.currentUser.uid+'/'+reportId).set(payload),10000,'Firebase a refusé l’enregistrement de ton historique.');
+    }catch(historyErr){
+      // Le signalement global existe déjà : on prévient sans prétendre que tout a échoué.
+      console.warn('Historique du signalement non enregistré:',historyErr);
+    }
     const ta=document.getElementById('reportText'),tg=document.getElementById('reportTarget');if(ta)ta.value='';if(tg)tg.value='';
     showToast('🚨 Signalement envoyé à l’administrateur.','success');
     loadMyReports();
-  }catch(e){showToast('❌ Signalement non envoyé : '+(e.message||e),'error');}
+  }catch(e){showToast('❌ Signalement non envoyé : '+(e.message||e),'error');console.error('Signalement DROP 2027:',e);}
 }
 function listenPlayerReports(){
   if(playerReportsRef)playerReportsRef.off();
@@ -2194,6 +2204,39 @@ async function adminGiftCreditsToAll(){
     showToast('🎁 '+amount.toLocaleString('fr-FR')+' crédits envoyés à '+count+' joueur'+(count>1?'s':'')+'.','success');
   }catch(err){showToast('❌ Cadeau collectif impossible : '+(err.message||err),'error');}
 }
+
+async function openMyAdminMessages(){
+  if(!appData.currentUser)return;
+  let el=document.getElementById('myAdminMessagesOverlay');
+  if(!el){el=document.createElement('div');el.id='myAdminMessagesOverlay';el.style.cssText='position:fixed;inset:0;z-index:100002;background:rgba(3,3,8,.94);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(10px);';document.body.appendChild(el);}
+  el.innerHTML=`<div style="width:min(680px,100%);max-height:88vh;overflow:auto;background:linear-gradient(145deg,#11111d,#080812);border:1px solid rgba(255,215,0,.45);border-radius:24px;padding:22px;color:white;"><h2 style="font-family:Space Grotesk;margin:0 0 8px;">💬 MES MESSAGES ADMIN</h2><p style="font-size:.7rem;color:#a1a1aa;line-height:1.5;">Retrouve ici les messages privés reçus de l’administrateur. Tu peux les marquer comme lus ou les supprimer de ta boîte.</p><div id="myAdminMessagesList">Chargement…</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;"><button class="btn btn-secondary" style="flex:1;" onclick="markAllMyAdminMessagesRead()">✅ TOUT MARQUER LU</button><button class="btn btn-danger" style="flex:1;" onclick="deleteAllMyAdminMessages()">🗑️ TOUT SUPPRIMER</button><button class="btn" style="width:100%;" onclick="document.getElementById('myAdminMessagesOverlay')?.remove()">FERMER</button></div></div>`;
+  await renderMyAdminMessages();
+}
+async function renderMyAdminMessages(){
+  const el=document.getElementById('myAdminMessagesList');if(!el||!appData.currentUser)return;
+  try{const snap=await withTimeout(db.ref('admin_messages/'+appData.currentUser.uid).once('value'),8000,'Firebase ne répond pas pour les messages.');const rows=Object.entries(snap.val()||{}).sort((a,b)=>Number(b[1]?.createdAt||0)-Number(a[1]?.createdAt||0));
+    if(!rows.length){el.innerHTML='<div style="padding:16px;text-align:center;color:#a1a1aa;font-size:.75rem;">Aucun message administrateur.</div>';return;}
+    el.innerHTML=rows.map(([id,m])=>`<div style="padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:14px;margin-top:8px;background:rgba(255,255,255,.025);"><div style="display:flex;justify-content:space-between;gap:8px;"><b style="font-size:.72rem;">👑 Administrateur</b><span style="font-size:.6rem;color:#a1a1aa;">${m.createdAt?new Date(Number(m.createdAt)).toLocaleString('fr-FR'):''}</span></div><div style="white-space:pre-wrap;line-height:1.55;font-size:.72rem;margin-top:7px;">${escapeHtml(m.text||'')}</div><div style="display:flex;gap:7px;margin-top:9px;"><button class="btn btn-secondary" style="flex:1;" onclick="markMyAdminMessageRead('${id}')">${m.read?'✓ LU':'📖 MARQUER LU'}</button><button class="btn btn-danger" style="flex:1;" onclick="deleteMyAdminMessage('${id}')">🗑️ SUPPRIMER</button></div></div>`).join('');
+  }catch(e){el.innerHTML='<div style="color:#fca5a5;font-size:.7rem;">Impossible de charger les messages : '+escapeHtml(e.message||String(e))+'</div>';}
+}
+async function markMyAdminMessageRead(id){if(!appData.currentUser||!id)return;try{await db.ref('admin_messages/'+appData.currentUser.uid+'/'+id+'/read').set(true);await renderMyAdminMessages();}catch(e){showToast('❌ Impossible de marquer le message : '+(e.message||e),'error');}}
+async function markAllMyAdminMessagesRead(){if(!appData.currentUser)return;try{const snap=await db.ref('admin_messages/'+appData.currentUser.uid).once('value');const updates={};Object.keys(snap.val()||{}).forEach(id=>updates[id+'/read']=true);if(Object.keys(updates).length)await db.ref('admin_messages/'+appData.currentUser.uid).update(updates);await renderMyAdminMessages();showToast('✅ Messages marqués comme lus.','success');}catch(e){showToast('❌ Impossible : '+(e.message||e),'error');}}
+async function deleteMyAdminMessage(id){if(!appData.currentUser||!id)return;if(!confirm('Supprimer ce message de ta boîte ?'))return;try{await db.ref('admin_messages/'+appData.currentUser.uid+'/'+id).remove();await renderMyAdminMessages();showToast('🗑️ Message supprimé.','success');}catch(e){showToast('❌ Suppression impossible : '+(e.message||e),'error');}}
+async function deleteAllMyAdminMessages(){if(!appData.currentUser)return;if(!confirm('Supprimer tous tes messages administrateur ?'))return;try{await db.ref('admin_messages/'+appData.currentUser.uid).remove();await renderMyAdminMessages();showToast('🗑️ Tous les messages ont été supprimés.','success');}catch(e){showToast('❌ Suppression impossible : '+(e.message||e),'error');}}
+async function refreshMyAccountData(){
+  if(!appData.currentUser)return;
+  try{await loadAppData();updateUI();renderFriendsUI();loadMyReports();showToast('🔄 Données du compte actualisées.','success');}catch(e){showToast('❌ Actualisation impossible : '+(e.message||e),'error');}
+}
+
+async function adminLoadPlayerMessages(){
+  if(!appData.isAdmin)return;const target=adminTargetUid(document.getElementById('adminMessageTarget')?.value);const el=document.getElementById('adminPlayerMessagesList');
+  if(!target)return showToast('❌ ID joueur invalide. Utilise #DROP-UID.','error');if(!el)return;el.innerHTML='<div style="font-size:.65rem;color:var(--text-muted);">Chargement…</div>';
+  try{const snap=await withTimeout(db.ref('admin_messages/'+target).once('value'),8000,'Firebase ne répond pas pour les messages.');const rows=Object.entries(snap.val()||{}).sort((a,b)=>Number(b[1]?.createdAt||0)-Number(a[1]?.createdAt||0));
+    if(!rows.length){el.innerHTML='<div style="font-size:.65rem;color:var(--text-muted);">Aucun message pour ce joueur.</div>';return;}
+    el.innerHTML=rows.map(([id,m])=>`<div style="padding:9px;border:1px solid var(--card-border);border-radius:12px;margin-top:6px;"><div style="font-size:.58rem;color:var(--text-muted);">${m.createdAt?new Date(Number(m.createdAt)).toLocaleString('fr-FR'):''} • ${m.read?'LU':'NON LU'}</div><div style="font-size:.68rem;white-space:pre-wrap;margin-top:5px;">${escapeHtml(m.text||'')}</div><button class="btn btn-danger" style="margin-top:7px;width:100%;" onclick="adminDeleteOnePlayerMessage('${target}','${id}')">🗑️ SUPPRIMER CE MESSAGE</button></div>`).join('');
+  }catch(e){el.innerHTML='<div style="color:#fca5a5;font-size:.65rem;">Impossible de charger : '+escapeHtml(e.message||String(e))+'</div>';}
+}
+async function adminDeleteOnePlayerMessage(uid,id){if(!appData.isAdmin||!uid||!id)return;if(!confirm('Supprimer uniquement ce message ?'))return;try{await withTimeout(db.ref('admin_messages/'+uid+'/'+id).remove(),10000,'Firebase a refusé la suppression.');showToast('🗑️ Message supprimé.','success');adminLoadPlayerMessages();}catch(e){showToast('❌ Suppression impossible : '+(e.message||e),'error');}}
 
 async function adminDeletePlayerMessages(){
   if(!appData.isAdmin)return;
