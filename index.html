@@ -472,6 +472,39 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
  .tutorial-panel{bottom:max(10px,env(safe-area-inset-bottom,10px));padding:13px;border-radius:18px;max-height:31vh}
  .tutorial-title{font-size:.95rem}.tutorial-text{font-size:.64rem;line-height:1.45}.tutorial-btn{min-width:190px}
 }
+
+/* ===== FIN DE SAISON / SAISON 2026 ===== */
+/* ===== INDICE HALLOWEEN — COMPTE À REBOURS SAISON 1 ===== */
+.season-countdown-bar{position:relative;overflow:hidden;border-color:rgba(255,94,0,.42)!important;background:radial-gradient(circle at 50% -80%,rgba(255,90,0,.22),transparent 55%),linear-gradient(180deg,#090208 0%,#16050a 55%,#050208 100%)!important;box-shadow:0 0 26px rgba(255,68,0,.18),inset 0 -1px 0 rgba(255,145,0,.22)!important;animation:seasonHorrorPulse 3.2s ease-in-out infinite;}
+.season-countdown-bar::before{content:'☾  🕷️  🕸️  ☠️  🕯️  🎃  🕯️  ☠️  🕸️  🕷️  ☾';position:absolute;inset:0;display:flex;align-items:center;justify-content:space-around;white-space:nowrap;font-size:clamp(.8rem,3vw,1.25rem);letter-spacing:10px;opacity:.08;pointer-events:none;animation:seasonCobwebDrift 16s linear infinite;}
+.season-countdown-bar::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 5px,rgba(255,255,255,.018) 6px 7px);mix-blend-mode:screen;opacity:.7;}
+.season-countdown-inner{position:relative;z-index:2;}
+.season-countdown-label{color:#ff8a3d!important;text-shadow:0 0 8px rgba(255,69,0,.75),0 0 20px rgba(255,0,0,.28);animation:seasonFlicker 4.5s infinite;}
+.season-countdown-value{color:#ffe8c7!important;text-shadow:0 0 8px rgba(255,100,0,.75),0 0 22px rgba(255,0,0,.35)!important;animation:seasonCountdownGlow 2s ease-in-out infinite;}
+.season-countdown-sub{color:#c9a9a0!important;}
+.season-countdown-bar.season-finished{animation:seasonHorrorPulseFast .8s ease-in-out infinite;}
+@keyframes seasonHorrorPulse{0%,100%{filter:brightness(.96)}50%{filter:brightness(1.08)}}
+@keyframes seasonHorrorPulseFast{0%,100%{filter:brightness(.8)}50%{filter:brightness(1.3)}}
+@keyframes seasonFlicker{0%,18%,20%,62%,64%,100%{opacity:1}19%,63%{opacity:.42}64.5%{opacity:.85}65%{opacity:.55}}
+@keyframes seasonCountdownGlow{0%,100%{transform:scale(1);letter-spacing:1px}50%{transform:scale(1.015);letter-spacing:1.8px}}
+@keyframes seasonCobwebDrift{0%{transform:translateX(-3%)}50%{transform:translateX(3%)}100%{transform:translateX(-3%)}}
+@media(max-width:600px){.season-countdown-label{font-size:.48rem!important;letter-spacing:1.3px!important}.season-countdown-sub{font-size:.43rem!important}}
+.season-countdown-bar{position:relative;z-index:40;width:100%;border-bottom:1px solid rgba(217,70,239,.22);background:linear-gradient(90deg,rgba(8,6,18,.96),rgba(30,8,45,.92),rgba(8,6,18,.96));box-shadow:0 0 22px rgba(217,70,239,.08),inset 0 -1px 0 rgba(6,182,212,.08)}
+.season-countdown-inner{max-width:980px;margin:0 auto;padding:7px 12px 8px;text-align:center}.season-countdown-label{font-size:.52rem;letter-spacing:2px;font-weight:900;color:#67e8f9}.season-countdown-value{margin-top:2px;font-family:'Space Grotesk',sans-serif;font-size:.92rem;font-weight:900;letter-spacing:1px;color:#f5d0fe;text-shadow:0 0 12px rgba(217,70,239,.35)}.season-countdown-sub{margin-top:2px;font-size:.48rem;color:#8f8ba0}
+.season-end-overlay{position:fixed!important;inset:0!important;z-index:600000!important;display:none;align-items:center;justify-content:center;padding:18px;overflow:hidden;background:radial-gradient(circle at 50% 42%,rgba(217,70,239,.15),transparent 32%),radial-gradient(circle at 50% 55%,rgba(6,182,212,.10),transparent 45%),rgba(3,2,9,.975);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}.season-end-overlay.active{display:flex!important;animation:seasonOverlayIn .65s ease-out both}
+.season-end-particles,.season-end-particles:before,.season-end-particles:after{position:absolute;inset:-20%;content:"";pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,.75) 0 1px,transparent 1.5px),radial-gradient(circle,rgba(217,70,239,.65) 0 1px,transparent 1.5px),radial-gradient(circle,rgba(6,182,212,.65) 0 1px,transparent 1.5px);background-size:83px 97px,131px 113px,157px 149px;animation:seasonStars 16s linear infinite;opacity:.42}.season-end-particles:before{transform:rotate(23deg);animation-duration:22s;opacity:.28}.season-end-particles:after{transform:rotate(-19deg);animation-duration:28s;opacity:.22}
+.season-end-box{position:relative;width:min(520px,100%);padding:34px 24px 30px;text-align:center;border:1px solid rgba(217,70,239,.48);border-radius:28px;background:linear-gradient(145deg,rgba(18,10,29,.96),rgba(7,7,16,.98));box-shadow:0 0 80px rgba(217,70,239,.14),0 0 34px rgba(6,182,212,.08),inset 0 0 40px rgba(255,255,255,.025);animation:seasonBoxFloat 2.8s ease-in-out infinite alternate}.season-end-icon{font-size:4rem;margin-bottom:8px;filter:drop-shadow(0 0 18px rgba(217,70,239,.65));animation:seasonIconPulse 1.5s ease-in-out infinite alternate}.season-end-kicker{font-size:.56rem;letter-spacing:3px;color:#67e8f9;font-weight:900}.season-end-box h2{margin:8px 0 10px;font-family:'Space Grotesk',sans-serif;font-size:1.45rem;line-height:1.08;color:#f5d0fe;text-shadow:0 0 18px rgba(217,70,239,.35)}.season-end-box p{margin:0 auto 18px;max-width:390px;font-size:.7rem;line-height:1.55;color:#aaa5b7}.season-end-box strong{display:block;margin-top:14px;font-size:.82rem;color:#fff;text-shadow:0 0 14px rgba(255,255,255,.2)}.season-end-box small{display:block;margin-top:9px;font-size:.57rem;line-height:1.45;color:#777286}.season-end-orbit{position:absolute;inset:0;pointer-events:none;animation:seasonOrbit 9s linear infinite}.season-end-orbit span{position:absolute;color:#f0abfc;text-shadow:0 0 12px rgba(217,70,239,.8)}.season-end-orbit span:nth-child(1){top:17%;left:8%}.season-end-orbit span:nth-child(2){top:72%;right:8%}.season-end-orbit span:nth-child(3){bottom:11%;left:22%}.season-end-loader{display:flex;justify-content:center;gap:8px;margin:10px 0}.season-end-loader span{width:8px;height:8px;border-radius:50%;background:#f0abfc;box-shadow:0 0 12px rgba(217,70,239,.8);animation:seasonDots 1s ease-in-out infinite}.season-end-loader span:nth-child(2){animation-delay:.16s}.season-end-loader span:nth-child(3){animation-delay:.32s}.binder-tab[data-season-locked="1"]{opacity:.58;border-color:rgba(217,70,239,.22)!important}
+@keyframes seasonOverlayIn{from{opacity:0}to{opacity:1}}@keyframes seasonStars{from{transform:translate3d(0,0,0) rotate(0deg)}to{transform:translate3d(5%,7%,0) rotate(360deg)}}@keyframes seasonBoxFloat{from{transform:translateY(0)}to{transform:translateY(-7px)}}@keyframes seasonIconPulse{from{transform:scale(1);filter:drop-shadow(0 0 10px rgba(217,70,239,.45))}to{transform:scale(1.08);filter:drop-shadow(0 0 25px rgba(6,182,212,.7))}}@keyframes seasonOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes seasonDots{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-7px);opacity:1}}@media(max-width:600px){.season-countdown-inner{padding:6px 8px 7px}.season-countdown-value{font-size:.78rem;letter-spacing:.5px}.season-countdown-sub{font-size:.43rem}.season-end-box{padding:30px 18px 26px;border-radius:24px}.season-end-icon{font-size:3.4rem}.season-end-box h2{font-size:1.25rem}.season-end-box strong{font-size:.75rem}}
+
+/* ===== FIN DE SAISON — AMBIANCE TERRIFIANTE ===== */
+.season-end-overlay{background:radial-gradient(circle at 50% 38%,rgba(92,8,8,.28),transparent 35%),linear-gradient(180deg,rgba(3,1,5,.985),rgba(10,2,7,.995))!important;}
+.season-end-overlay::before{content:'☠️  🕷️  🕸️  🎃  🕯️  🕸️  🕷️  ☠️';position:absolute;inset:7% 0 auto;text-align:center;font-size:clamp(1.1rem,5vw,2rem);letter-spacing:12px;opacity:.16;animation:seasonCobwebDrift 9s ease-in-out infinite;}
+.season-end-box{border-color:rgba(255,75,20,.42)!important;background:radial-gradient(circle at 50% 0%,rgba(117,20,5,.22),transparent 42%),linear-gradient(145deg,rgba(17,4,12,.98),rgba(4,3,8,.99))!important;box-shadow:0 0 90px rgba(255,55,0,.12),0 0 25px rgba(0,0,0,.8),inset 0 0 45px rgba(130,0,0,.08)!important;}
+.season-end-icon{filter:drop-shadow(0 0 20px rgba(255,90,0,.7))!important;animation:seasonIconPulse 1.5s ease-in-out infinite,seasonPumpkin 4s ease-in-out infinite!important;}
+.season-end-kicker{color:#ff7138!important;text-shadow:0 0 10px rgba(255,50,0,.55)!important;animation:seasonFlicker 3.8s infinite;}
+.season-end-box h2{color:#ffe9df!important;text-shadow:0 0 12px rgba(255,60,0,.3)!important;}
+.season-end-box strong{color:#ffb38e!important;text-shadow:0 0 10px rgba(255,60,0,.45)!important;}
+@keyframes seasonPumpkin{0%,100%{transform:scale(1) rotate(-1deg)}50%{transform:scale(1.06) rotate(1deg)}}
 </style>
 </head>
 <body>
@@ -495,6 +528,19 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
   </div>
 </div>
 <div id="authTransition" class="auth-transition" aria-hidden="true"><div class="auth-transition-core"><div class="auth-transition-title" id="authTransitionTitle">LE MONDE RÉEL SE DÉCONNECTE</div><div class="auth-transition-text" id="authTransitionText">Une autre version de DROP 2027 vient de s'ouvrir.</div></div><div class="auth-transition-explosion"></div></div>
+<div id="seasonEndOverlay" class="season-end-overlay" aria-hidden="true">
+  <div class="season-end-particles" aria-hidden="true"></div>
+  <div class="season-end-box">
+    <div class="season-end-orbit"><span>✦</span><span>✦</span><span>✦</span></div>
+    <div class="season-end-icon">🎃</div>
+    <div class="season-end-kicker">☠️ SAISON 1 — INTERNET EN PLS TERMINÉE ☠️</div>
+    <h2>LA NOUVELLE SAISON<br>ARRIVE</h2>
+    <p>Le compte à rebours est terminé. Quelque chose se prépare derrière DROP...</p>
+    <div class="season-end-loader"><span></span><span></span><span></span></div>
+    <strong>La nouvelle saison arrive dans quelques minutes !</strong>
+    <small>Le serveur est en attente. Ce qui arrive ensuite reste volontairement caché.</small>
+  </div>
+</div>
 <div id="tutorialOverlay" class="tutorial-overlay tutorial-darken" aria-hidden="true"><div id="tutorialHighlight" class="tutorial-highlight" style="display:none"></div><div id="tutorialArrow" class="tutorial-arrow" style="display:none">👇</div><div class="tutorial-panel"><div class="tutorial-step" id="tutorialStep">ÉTAPE 1 / 8</div><div class="tutorial-title" id="tutorialTitle">BIENVENUE</div><div class="tutorial-text" id="tutorialText"></div><button class="btn tutorial-btn" id="tutorialAction" onclick="tutorialAction()">CONTINUER</button></div></div>
 
 <div id="deviceModeModal" aria-hidden="true">
@@ -596,6 +642,13 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="pill"><span>🪙</span><span id="creditVal">0</span></div>
 </div>
 </header>
+<div id="seasonCountdownBar" class="season-countdown-bar" aria-live="polite">
+  <div class="season-countdown-inner">
+    <div class="season-countdown-label">🎃☠️ LA SAISON 1 — INTERNET EN PLS — S’ÉTEINT DANS... ☠️🎃</div>
+    <div id="seasonCountdownValue" class="season-countdown-value">-- J -- H -- MIN -- S</div>
+    <div class="season-countdown-sub">🕯️ Le 5 octobre approche. Après ça... quelque chose arrivera. 🕸️</div>
+  </div>
+</div>
 <audio id="customMusicAudio" loop preload="auto" style="display:none"></audio>
 
 <main class="screen-container">
@@ -664,6 +717,7 @@ z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px);
 <div class="binder-tab" onclick="switchCategory('fillesreloues', this)">👩‍🎓 Filles Inoubliables</div>
 <div class="binder-tab" onclick="switchCategory('mecsrelous', this)">👨‍🎓 Mecs Inoubliables</div>
 <div class="binder-tab" onclick="switchCategory('irlcat', this)">🌐 Internet en PLS</div>
+<div class="binder-tab" id="mysteryBinderTab" onclick="switchCategory('mystere', this)">❓ Mystère</div>
 <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
 </div>
 
@@ -1546,6 +1600,9 @@ irlcat: [
 {id:2011,name:'Connexion Par Télépathie',emoji:'🧠',price:5600,unlocked:false,tradeable:true,rarity:'ultra'},
 {id:2012,name:'Internet A Décidé de Ne Plus Exister',emoji:'🌐',price:8000,unlocked:false,tradeable:true,rarity:'ultra'}
 ],
+mystere: [
+{id:4001,name:'Carte Mystère — SAISON 2',emoji:'❔',price:0,unlocked:false,tradeable:false,rarity:'ultra',seasonMystery:true}
+],
 boutique: [
 {id:3001,name:'Badge VIP DROP',emoji:'🏅',price:200,unlocked:false,tradeable:false,rarity:'rare'},
 {id:3002,name:'Carte Collectionneur',emoji:'🗂️',price:500,unlocked:false,tradeable:false,rarity:'rare'},
@@ -1561,7 +1618,7 @@ boutique: [
 
 let activeCategory = 'starter';
 const NEW_CARD_IDS = new Set([2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,1900,1902,1903,1904,1905,1906,1907,1908,1909,1910,1911,1912,1921,1922,1923,1924,1925,1926,1927,1928,1929,1930,1931,1932,601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,901,902,903,904,905,906,907,908,909,910,911,912,913,914,915,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1101,1102,1103,1104,1105,1106,1107,1108,1201,1202,1203,1204,1205,1206,1207,1208,1301,1302,1303,1304,1305,1306,1307,1308,1401,1402,1403,1404,1405,1406,1407,1408,1501,1502,1503,1504,1505,1506,1507,1508,1601,1602,1603,1604,1605,1606,1607,1608,1701,1702,1703,1704,1705,1706,1707,1708,1801,1802,1803,1804,1805,1806,1807,1808]);
-const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',fillesreloues:'👩‍🎓 Filles Inoubliables',mecsrelous:'👨‍🎓 Mecs Inoubliables',irlcat:'🌐 Internet en PLS',boutique:'🛍️ Boutique',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
+const CATEGORY_LABELS = {tiktok:'📱 TikTok Trends',memes:'🎭 Pop Culture & Mèmes',gaming:'🎮 Gaming & Tech',football:'⚽ Football',cinema:'🎬 Cinéma',space:'🚀 Espace',animals:'🐾 Animaux',food:'🍕 Food',bureaucratie:'📄 Bureaucratie',objetsinutiles:'🪨 Objets Inutiles',vacancescatastrophe:'🏖️ Vacances Catastrophe',internetbizarre:'🌐 Internet Bizarre',cantine:'🍟 Cantine',lycee:'🏫 Vie au lycée',grosfail:'💀 Gros Fails',objetsmaudits:'🧿 Objets Maudits',situations:'😵 Situations Gênantes',mauvaisesidees:'💡 Mauvaises Idées',parents:'👨‍👩‍👦 Parents',transports:'🚌 Transports Maudits',reunion:'💻 Réunions',fillesreloues:'👩‍🎓 Filles Inoubliables',mecsrelous:'👨‍🎓 Mecs Inoubliables',irlcat:'🌐 Internet en PLS',mystere:'❓ Mystère',boutique:'🛍️ Boutique',starter:'🧩 Départ',secret:'⚡ Ultra Rares'};
 function canonicalCardRarity(cat, item) {
   // Les cartes de la catégorie Ultra Rares sont toujours ultra rares,
   // même si une ancienne sauvegarde les avait enregistrées comme common.
@@ -1738,6 +1795,7 @@ try {
 appData.isAdmin = data.isAdmin === true || isAdminEmail;
 appData.catalogs = normalizeCatalogs(data.catalogs);
 ensureStarterCards();
+applyMysterySeasonState();
 if (appData.isAdmin) {
   Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(c => c.unlocked = true));
   applyAdminMode(true);
@@ -2160,14 +2218,24 @@ async function adminGiftCard(){
   const card=findCardById(id);
   if(!target)return showToast('❌ ID joueur invalide. Utilise #DROP-UID.','error');
   if(!card)return showToast('❌ Carte introuvable.','error');
-  const giftId='gift_card_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
-  const gift={kind:'admin_card_gift',senderUid:appData.currentUser.uid,senderName:'Administrateur',receiverUid:target,receiverName:'Joueur',offeredCardId:Number(card.id),wantedCardId:0,offeredCard:tradeCardSnapshot(card),wantedCard:{id:0,name:'CADEAU ADMINISTRATEUR',emoji:'👑',rarity:'common'},status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
+  if(card.seasonMystery===true && !isSeasonEnded())return showToast('🔒 La carte Mystère reste bloquée jusqu’à la fin du compte à rebours.','error');
   try{
-    await withTimeout(db.ref('trade_inbox/'+target+'/'+giftId).set(gift),8000,'Firebase a refusé le cadeau.');
-    await withTimeout(db.ref('trade_outbox/'+appData.currentUser.uid+'/'+giftId).set(gift),8000,'Firebase a refusé la confirmation du cadeau.');
+    const u=await adminGetUser(target);
+    if(!u)throw new Error('Joueur introuvable.');
+    const catalogs=normalizeCatalogs(u.catalogs||CATALOGS);
+    let found=null;
+    Object.keys(catalogs).forEach(cat=>(catalogs[cat]||[]).forEach(c=>{if(Number(c.id)===id)found=c;}));
+    if(!found)throw new Error('Cette carte n’existe plus dans le catalogue.');
+    if(found.unlocked)return showToast('ℹ️ Ce joueur possède déjà cette carte.','error');
+    found.unlocked=true;
+    await adminUpdateUser(target,{catalogs});
     document.getElementById('adminGiftTarget').value='';
-    showToast('👑 Carte envoyée au joueur. Elle reste dans ton classeur.','success');
-  }catch(err){showToast('❌ Cadeau non envoyé : '+(err&&err.message?err.message:'erreur Firebase'),'error');}
+    showToast('👑 '+found.emoji+' '+found.name+' a été donnée directement au joueur.','success');
+    adminInspectPlayer(target);
+  }catch(err){
+    console.error('Don carte admin:',err);
+    showToast('❌ Carte non donnée : '+(err?.code?err.code+' — ':'')+(err?.message||err),'error');
+  }
 }
 
 async function adminGiftCredits(){
@@ -2176,19 +2244,20 @@ async function adminGiftCredits(){
   const amount=Math.floor(Number(document.getElementById('adminCreditAmount')?.value));
   if(!target)return showToast('❌ ID joueur invalide. Utilise #DROP-UID.','error');
   if(!Number.isFinite(amount)||amount<1)return showToast('❌ Montant de crédits invalide.','error');
-  const giftId='gift_credits_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
-  const gift={kind:'admin_credit_gift',senderUid:appData.currentUser.uid,senderName:'Administrateur',receiverUid:target,receiverName:'Joueur',offeredCardId:0,wantedCardId:0,offeredCard:{id:0,name:'CRÉDITS ADMINISTRATEUR',emoji:'🪙',rarity:'common'},wantedCard:{id:0,name:'CADEAU ADMINISTRATEUR',emoji:'👑',rarity:'common'},creditAmount:amount,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
   try{
-    // Boîte d’échange historique + boîte cadeau dédiée : le joueur voit l’offre
-    // même si un ancien écran n’affiche pas encore trade_inbox.
-    const updates={};
-    updates['trade_inbox/'+target+'/'+giftId]=gift;
-    updates['trade_outbox/'+appData.currentUser.uid+'/'+giftId]=gift;
-    updates['admin_gift_inbox/'+target+'/'+giftId]=gift;
-    await withTimeout(db.ref().update(updates),12000,'Firebase a refusé le cadeau.');
-    document.getElementById('adminCreditTarget').value=''; document.getElementById('adminCreditAmount').value='';
-    showToast('👑 Offre de crédits envoyée au joueur.','success');
-  }catch(err){showToast('❌ Cadeau non envoyé : '+(err&&err.message?err.message:'erreur Firebase'),'error');}
+    const u=await adminGetUser(target);
+    if(!u)throw new Error('Joueur introuvable.');
+    const current=Math.max(0,Number(u.credits)||0);
+    const next=current+amount;
+    await adminUpdateUser(target,{credits:next});
+    document.getElementById('adminCreditTarget').value='';
+    document.getElementById('adminCreditAmount').value='';
+    showToast('👑 +'+amount.toLocaleString('fr-FR')+' crédits ajoutés directement au joueur.','success');
+    adminInspectPlayer(target);
+  }catch(err){
+    console.error('Don crédits admin:',err);
+    showToast('❌ Crédits non donnés : '+(err?.code?err.code+' — ':'')+(err?.message||err),'error');
+  }
 }
 
 async function adminGiftCreditsToAll(){
@@ -3077,8 +3146,16 @@ function renderCatalogGrid() {
    div.className='catalog-card '+(unlocked?'owned':'locked')+' rarity-'+rarity; div.style.animationDelay=(Math.min(index,11)*45)+'ms';
    if(unlocked){div.setAttribute('role','button');div.tabIndex=0;div.onclick=()=>openCardStory(item,categoryKey);div.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openCardStory(item,categoryKey);}};}
    const displayName=item.name; const displayEmoji=item.emoji;
-   div.innerHTML='<div class="emoji">'+displayEmoji+'</div><div class="item-name">'+displayName+'</div><div style="font-size:.55rem;color:var(--text-muted);font-weight:800;letter-spacing:1px;">'+rarityLabel+(item.tradeable?' • ÉCHANGEABLE':' • NON ÉCHANGEABLE')+'</div><div class="item-price">'+(item.price===0?'GRATUITE':item.price+' 🪙')+'</div><button class="btn btn-secondary" style="padding:6px;font-size:0.7rem;margin-top:8px;">📖 Histoire</button>';
-   const btn=div.querySelector('button'); btn.onclick=e=>{e.stopPropagation();openCardStory(item,categoryKey);};
+   const mysteryLocked=item.seasonMystery===true && !isSeasonEnded();
+   const mysteryWaiting=item.seasonMystery===true && isSeasonEnded() && !item.unlocked;
+   if(mysteryLocked){
+     div.innerHTML='<div class="emoji">🔒</div><div class="item-name">CARTE MYSTÈRE</div><div style="font-size:.55rem;color:var(--glow-cyan);font-weight:900;letter-spacing:1px;">🔒 BLOQUÉE JUSQU’À LA FIN DU COMPTE À REBOURS</div><div class="item-price">???</div><div style="font-size:.6rem;color:var(--text-muted);margin-top:8px;">Le contenu de cette carte reste inconnu.</div>';
+   } else if(mysteryWaiting){
+     div.innerHTML='<div class="emoji">❔</div><div class="item-name">CARTE MYSTÈRE</div><div style="font-size:.55rem;color:#f0abfc;font-weight:900;letter-spacing:1px;">🔓 CATÉGORIE DÉBLOQUÉE</div><div class="item-price">???</div><div style="font-size:.6rem;color:var(--text-muted);margin-top:8px;">La carte sera révélée avec la nouvelle saison.</div>';
+   } else {
+     div.innerHTML='<div class="emoji">'+displayEmoji+'</div><div class="item-name">'+displayName+'</div><div style="font-size:.55rem;color:var(--text-muted);font-weight:800;letter-spacing:1px;">'+rarityLabel+(item.tradeable?' • ÉCHANGEABLE':' • NON ÉCHANGEABLE')+'</div><div class="item-price">'+(item.price===0?'GRATUITE':item.price+' 🪙')+'</div><button class="btn btn-secondary" style="padding:6px;font-size:0.7rem;margin-top:8px;">📖 Histoire</button>';
+     const btn=div.querySelector('button'); btn.onclick=e=>{e.stopPropagation();openCardStory(item,categoryKey);};
+   }
    grid.appendChild(div);
  });
 }
@@ -3162,14 +3239,14 @@ let pool = [];
 Object.keys(appData.catalogs).forEach(cat => {
   if (cat === 'starter') return;
   (appData.catalogs[cat] || []).forEach(i => {
-    if (!i.unlocked && i.tradeable !== false && !i.modeExclusive && wantedRarities.includes(i.rarity || 'common')) pool.push(i);
+    if (!i.unlocked && i.tradeable !== false && !i.modeExclusive && !(i.seasonMystery===true && !isSeasonEnded()) && wantedRarities.includes(i.rarity || 'common')) pool.push(i);
   });
 });
 // DROP Administrateur est volontairement verrouillé jusqu'au tout dernier drop.
 // Il ne peut apparaître que lorsqu'il ne reste plus aucune autre carte de DROP à obtenir.
 const allRemaining = [];
 Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(i => {
-  if(!i.unlocked && i.tradeable !== false && !i.modeExclusive) allRemaining.push(i);
+  if(!i.unlocked && i.tradeable !== false && !i.modeExclusive && !(i.seasonMystery===true && !isSeasonEnded())) allRemaining.push(i);
 }));
 const adminDrop = allRemaining.find(i => Number(i.id) === 2000);
 const nonAdminRemaining = allRemaining.filter(i => Number(i.id) !== 2000);
@@ -4824,6 +4901,21 @@ function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;',
 const __dropOriginalOpenRandomDrop = openRandomDrop;openRandomDrop=function(isFree=false){const wasDropping=isDropping;const result=__dropOriginalOpenRandomDrop.apply(this,arguments);const started=!wasDropping&&isDropping;if(started)setTimeout(()=>worldAction('drop',1),1200);return result;};
 const __dropOriginalRewardPlayer = rewardPlayer;rewardPlayer=function(amount){const result=__dropOriginalRewardPlayer.apply(this,arguments);worldAction('game',1);return result;};
 
+/* ===== SAISON 2026 : COMPTE À REBOURS ===== */
+const DROP_SEASON_END_MS = new Date('2026-10-05T09:00:00+02:00').getTime();
+let seasonCountdownTimer=null;
+let seasonEndedState=false;
+function isSeasonEnded(){return Date.now()>=DROP_SEASON_END_MS;}
+function applyMysterySeasonState(){
+  const card=appData.catalogs?.mystere?.find(c=>Number(c.id)===4001);
+  if(card && card.seasonMystery===true && !isSeasonEnded()) card.unlocked=false;
+  const tab=document.getElementById('mysteryBinderTab');
+  if(tab){const ended=isSeasonEnded();tab.dataset.seasonLocked=ended?'0':'1';tab.innerHTML=ended?'❓ Mystère':'🔒 Mystère';}
+}
+function formatSeasonCountdown(ms){const total=Math.max(0,Math.floor(ms/1000));const days=Math.floor(total/86400);const hours=Math.floor((total%86400)/3600);const mins=Math.floor((total%3600)/60);const secs=total%60;return String(days).padStart(2,'0')+' J  '+String(hours).padStart(2,'0')+' H  '+String(mins).padStart(2,'0')+' MIN  '+String(secs).padStart(2,'0')+' S';}
+function showSeasonEndOverlay(){const overlay=document.getElementById('seasonEndOverlay');if(!overlay)return;if(!appData.currentUser||appData.isAdmin)return;overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';seasonEndedState=true;applyMysterySeasonState();}
+function updateSeasonCountdown(){const bar=document.getElementById('seasonCountdownBar'),value=document.getElementById('seasonCountdownValue'),ms=DROP_SEASON_END_MS-Date.now();if(ms>0){if(value)value.textContent=formatSeasonCountdown(ms);applyMysterySeasonState();if(activeCategory==='mystere')renderCatalogGrid();}else{if(value)value.textContent='00 J  00 H  00 MIN  00 S';if(bar){bar.classList.add('season-finished');const label=bar.querySelector('.season-countdown-label');if(label)label.textContent='☠️ SAISON 1 — INTERNET EN PLS — TERMINÉE ☠️';}applyMysterySeasonState();if(activeCategory==='mystere')renderCatalogGrid();if(!seasonEndedState)showSeasonEndOverlay();}}
+function startSeasonCountdown(){if(seasonCountdownTimer)clearInterval(seasonCountdownTimer);updateSeasonCountdown();seasonCountdownTimer=setInterval(updateSeasonCountdown,1000);}
 /* ===== AUTH GATE ===== */
 let gateAuthMode='login';
 let authBootReleased=false;
@@ -4834,7 +4926,7 @@ function showAuthGate(){const g=document.getElementById('authGate');if(g){g.clas
 function hideAuthGate(){const g=document.getElementById('authGate');if(g){g.classList.remove('active');g.setAttribute('aria-hidden','true');}}
 function playGateExplosion(){try{playEntryExplosion();document.getElementById('viewport').classList.add('auth-world-shake');setTimeout(()=>document.getElementById('viewport').classList.remove('auth-world-shake'),1300);}catch(e){}}
 function runAuthTransition(isRegister){const t=document.getElementById('authTransition');if(!t)return;document.getElementById('authTransitionTitle').textContent=isRegister?'LE MONDE RÉEL EST TERMINÉ':'LE MONDE RÉEL SE DÉCONNECTE';document.getElementById('authTransitionText').textContent=isRegister?'Une fois inscrit, tu ne regarderas plus DROP de la même façon. Bienvenue dans ton nouveau monde.':'Connexion confirmée. Les couleurs changent. DROP 2027 s’ouvre maintenant.';t.classList.add('active','shake');playGateExplosion();setTimeout(()=>{t.classList.remove('active','shake');document.getElementById('viewport').classList.add('world-entered');setTimeout(()=>document.getElementById('viewport').classList.remove('world-entered'),1800);},1450);}
-async function handleGateAuth(e){e.preventDefault();if(authLoading)return;const btn=document.getElementById('gateAuthSubmit'),email=document.getElementById('gateAuthEmail').value.trim().toLowerCase(),pass=document.getElementById('gateAuthPass').value,username=document.getElementById('gateAuthUsername').value.trim();if(!email||!pass)return showToast('❌ E-mail et mot de passe requis.','error');if(gateAuthMode==='register'&&pass.length<6)return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.','error');authLoading=true;btn.disabled=true;btn.innerText=gateAuthMode==='register'?'CRÉATION...':'CONNEXION...';try{if(gateAuthMode==='login'){try{sessionStorage.setItem('drop2027_explicit_login','1');}catch(e){} const c=await withTimeout(auth.signInWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');await loadFirebaseUserProfile(c.user);hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(false);}else{try{sessionStorage.removeItem('drop2027_return_party');sessionStorage.setItem('drop2027_new_registration','1');}catch(e){} window.__justRegistered=true; window.__pendingNewPlayerTutorial=true; const c=await withTimeout(auth.createUserWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');const u=c.user,fId=generateFriendCode(u.uid),initialCatalogs=normalizeCatalogs(CATALOGS);initialCatalogs.starter.forEach(x=>x.unlocked=true);const isAdminEmail=email==='carer.nathan11@gmail.com';if(isAdminEmail)Object.keys(initialCatalogs).forEach(cat=>initialCatalogs[cat].forEach(i=>i.unlocked=true));const initialData={username:username||email.split('@')[0],credits:isAdminEmail?999999999:500,friendId:fId,friends:[],isAdmin:isAdminEmail,catalogs:initialCatalogs,redeemedCodes:[],dailyGames:{},hubTasks:{date:'',done:{}},freeDrops:0,worldData:{event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0}};appData.currentUser={email:u.email||email,username:initialData.username,uid:u.uid};appData.credits=initialData.credits;appData.friendId=fId;appData.friends=[];appData.isAdmin=isAdminEmail;appData.catalogs=initialCatalogs;appData.redeemedCodes=[];appData.dailyGames={};appData.hubTasks={date:'',done:{}};appData.freeDrops=0;appData.worldData=initialData.worldData;updateUI();db.ref('users/'+u.uid).set(initialData).catch(err=>console.warn('Profil inscription:',err));listenToTrades();listenToFriendRequests();saveAppData();try{sessionStorage.setItem('drop2027_new_registration','1');sessionStorage.removeItem('drop2027_return_party');}catch(e){}window.__justRegistered=true;hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(true);window.__pendingNewPlayerTutorial=true;setTimeout(startNewPlayerCelebration,1500);}}catch(err){try{if(gateAuthMode==='login')sessionStorage.removeItem('drop2027_explicit_login');}catch(e){}console.error('GATE AUTH ERROR:',err);showToast('❌ '+firebaseAuthErrorMessage(err),'error');}finally{authLoading=false;btn.disabled=false;btn.innerText=gateAuthMode==='register'?"S'INSCRIRE":'SE CONNECTER';}}
+async function handleGateAuth(e){e.preventDefault();if(authLoading)return;const btn=document.getElementById('gateAuthSubmit'),email=document.getElementById('gateAuthEmail').value.trim().toLowerCase(),pass=document.getElementById('gateAuthPass').value,username=document.getElementById('gateAuthUsername').value.trim();if(!email||!pass)return showToast('❌ E-mail et mot de passe requis.','error');if(gateAuthMode==='register'&&pass.length<6)return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.','error');authLoading=true;btn.disabled=true;btn.innerText=gateAuthMode==='register'?'CRÉATION...':'CONNEXION...';try{if(gateAuthMode==='login'){try{sessionStorage.setItem('drop2027_explicit_login','1');}catch(e){} const c=await withTimeout(auth.signInWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');await loadFirebaseUserProfile(c.user);hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(false);}else{try{sessionStorage.removeItem('drop2027_return_party');sessionStorage.setItem('drop2027_new_registration','1');}catch(e){} window.__justRegistered=true; window.__pendingNewPlayerTutorial=true; const c=await withTimeout(auth.createUserWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');const u=c.user,fId=generateFriendCode(u.uid),initialCatalogs=normalizeCatalogs(CATALOGS);initialCatalogs.starter.forEach(x=>x.unlocked=true);const isAdminEmail=email==='carer.nathan11@gmail.com';if(isAdminEmail)Object.keys(initialCatalogs).forEach(cat=>initialCatalogs[cat].forEach(i=>i.unlocked=true));const initialData={username:username||email.split('@')[0],credits:isAdminEmail?999999999:500,friendId:fId,friends:[],isAdmin:isAdminEmail,catalogs:initialCatalogs,redeemedCodes:[],dailyGames:{},hubTasks:{date:'',done:{}},freeDrops:0,worldData:{event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0}};appData.currentUser={email:u.email||email,username:initialData.username,uid:u.uid};appData.credits=initialData.credits;appData.friendId=fId;appData.friends=[];appData.isAdmin=isAdminEmail;appData.catalogs=initialCatalogs;appData.redeemedCodes=[];applyMysterySeasonState();appData.dailyGames={};appData.hubTasks={date:'',done:{}};appData.freeDrops=0;appData.worldData=initialData.worldData;updateUI();db.ref('users/'+u.uid).set(initialData).catch(err=>console.warn('Profil inscription:',err));listenToTrades();listenToFriendRequests();saveAppData();try{sessionStorage.setItem('drop2027_new_registration','1');sessionStorage.removeItem('drop2027_return_party');}catch(e){}window.__justRegistered=true;hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(true);window.__pendingNewPlayerTutorial=true;setTimeout(startNewPlayerCelebration,1500);}}catch(err){try{if(gateAuthMode==='login')sessionStorage.removeItem('drop2027_explicit_login');}catch(e){}console.error('GATE AUTH ERROR:',err);showToast('❌ '+firebaseAuthErrorMessage(err),'error');}finally{authLoading=false;btn.disabled=false;btn.innerText=gateAuthMode==='register'?"S'INSCRIRE":'SE CONNECTER';}}
 function ensureAuthGate(){if(!authStateReady)return;if(auth.currentUser||appData.currentUser){hideAuthGate();releaseAuthBoot();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);return;}releaseAuthBoot();showAuthGate();}
 
 /* ===== GUIDED TUTORIAL ===== */
@@ -4888,4 +4980,5 @@ function tutorialAction(){
  tutorialIndex++;showTutorialStep();
 }
 function startGuidedTutorial(){if(!appData.currentUser)return;try{if(localStorage.getItem('drop2027_guided_tutorial_'+appData.currentUser.uid)==='1')return;}catch(e){}const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);tutorialIndex=0;tutorialReadyToContinue=false;setTimeout(showTutorialStep,700);}
+startSeasonCountdown();
 </script>
