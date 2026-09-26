@@ -1957,18 +1957,24 @@ async function submitPlayerReport(){
   const reportId='report_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
   const payload={reporterUid:appData.currentUser.uid,reporterName:appData.currentUser.username||'Joueur',reporterFriendId:appData.friendId||'',category,categoryLabel:REPORT_CATEGORIES[category]||'📌 Autre',target:target.slice(0,100),text:textValue.slice(0,1500),status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP};
   try{
-    // Écrit directement sur les deux branches autorisées. Les règles Firebase vérifient que le joueur est bien l'auteur.
+    // Le signalement global est la source principale. Son écriture ne dépend volontairement PAS
+    // de l'état d'ouverture du site : le support doit rester utilisable même pendant une fermeture.
     await withTimeout(db.ref('reports/'+reportId).set(payload),10000,'Firebase a refusé la création du signalement.');
+    // L'historique personnel est secondaire : s'il est refusé par les règles déployées,
+    // le signalement global reste quand même envoyé à l'administrateur.
     try{
       await withTimeout(db.ref('player_reports/'+appData.currentUser.uid+'/'+reportId).set(payload),10000,'Firebase a refusé l’enregistrement de ton historique.');
     }catch(historyErr){
-      // Le signalement global existe déjà : on prévient sans prétendre que tout a échoué.
       console.warn('Historique du signalement non enregistré:',historyErr);
     }
     const ta=document.getElementById('reportText'),tg=document.getElementById('reportTarget');if(ta)ta.value='';if(tg)tg.value='';
     showToast('🚨 Signalement envoyé à l’administrateur.','success');
     loadMyReports();
-  }catch(e){showToast('❌ Signalement non envoyé : '+(e.message||e),'error');console.error('Signalement DROP 2027:',e);}
+  }catch(e){
+    const code=e?.code||'';
+    console.error('Signalement DROP 2027:',e);
+    showToast('❌ Signalement non envoyé : '+(code?code+' — ':'')+(e.message||e),'error');
+  }
 }
 function listenPlayerReports(){
   if(playerReportsRef)playerReportsRef.off();
