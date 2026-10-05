@@ -2059,6 +2059,30 @@ appData.hubTasks = {date:'', done:{}};
 appData.worldData = {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0};
 }
 
+async function recoverPlayerCards(uid, firebaseCatalogs){
+  // Recovery only: never removes cards. We combine every available source.
+  let merged = mergeCatalogsPreservingPlayerData(firebaseCatalogs || {});
+  const unlockIds = new Set();
+  try {
+    const cached = JSON.parse(localStorage.getItem('drop2027_profile_' + uid) || 'null');
+    if (cached && cached.catalogs) {
+      const cachedMerged = mergeCatalogsPreservingPlayerData(cached.catalogs);
+      Object.values(cachedMerged).flat().forEach(card => { if (card && card.unlocked === true) unlockIds.add(String(card.id)); });
+    }
+  } catch (_) {}
+  try {
+    const publicSnap = await withTimeout(db.ref('public_collections/' + uid).once('value'), 5000, '');
+    const pub = publicSnap.val() || {};
+    Object.keys(pub).forEach(k => {
+      if (/^\d+$/.test(String(k)) && pub[k] && pub[k].id !== undefined) unlockIds.add(String(pub[k].id));
+    });
+  } catch (_) {}
+  Object.keys(merged).forEach(cat => (merged[cat] || []).forEach(card => {
+    if (unlockIds.has(String(card.id))) card.unlocked = true;
+  }));
+  return merged;
+}
+
 function mergeCatalogsPreservingPlayerData(storedCatalogs){
   const defaults=normalizeCatalogs(CATALOGS);
   if(!storedCatalogs || typeof storedCatalogs!=='object') return defaults;
@@ -2158,7 +2182,7 @@ try {
   console.warn('Amitiés partagées:', friendErr);
 }
 appData.isAdmin = data.isAdmin === true || isAdminEmail;
-appData.catalogs = mergeCatalogsPreservingPlayerData(data.catalogs);
+appData.catalogs = await recoverPlayerCards(user.uid, data.catalogs);
 ensureStarterCards();
 applyMysterySeasonState();
 if (appData.isAdmin) {
@@ -2173,7 +2197,8 @@ appData.freeDrops = Math.max(0, Number(data.freeDrops) || 0);
 appData.worldData = (data.worldData && typeof data.worldData === 'object') ? data.worldData : {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween-2026-v4'};
  appData.halloweenArcade=(data.halloweenArcade&&typeof data.halloweenArcade==='object')?data.halloweenArcade:{};
 ensureWorldData();
-await persistWorldResetIfNeeded();
+// World reset is isolated. Never write a profile-wide reset here.
+appData.__worldResetNeeded=false;
 appData.worldData.event = Math.max(0, Number(appData.worldData.event)||0);
 appData.worldData.secrets = Array.isArray(appData.worldData.secrets)?appData.worldData.secrets:[];
 appData.worldData.zones = Array.isArray(appData.worldData.zones)?appData.worldData.zones:[];
@@ -2229,7 +2254,7 @@ appData.credits = (cached && cached.credits !== undefined && cached.credits !== 
 appData.friendId = cached.friendId || fallbackFriendId;
 appData.friends = Array.isArray(cached.friends) ? cached.friends : [];
 appData.isAdmin = cached.isAdmin === true || isAdminEmail;
-appData.catalogs = mergeCatalogsPreservingPlayerData(cached.catalogs || appData.catalogs);
+appData.catalogs = await recoverPlayerCards(user.uid, cached.catalogs || appData.catalogs);
 ensureStarterCards();
 if (appData.isAdmin) applyAdminMode(true);
 appData.redeemedCodes = Array.isArray(cached.redeemedCodes) ? cached.redeemedCodes : [];
