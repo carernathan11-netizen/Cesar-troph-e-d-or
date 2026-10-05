@@ -667,6 +667,27 @@ body.halloween-season .screen.active{animation:drop47Screen .28s ease-out}
 @media(max-width:620px){.season-spotlight{grid-template-columns:1fr}.season-spotlight-card{padding:12px}.season-spotlight-title{font-size:.9rem}.binder-tab.halloween-tab{order:-2!important;min-width:150px}.binder-tab.october-rose-tab{order:-1!important}}
 </style>
 
+<style id="update50-halloween-world-css">
+/* UPDATE 50 — WORLD HALLOWEEN : exploration, secrets et chronique */
+.world-halloween-exploration,.world-halloween-secrets,.world-halloween-chronicle{position:relative;overflow:hidden;border-color:rgba(245,158,11,.28)!important;background:radial-gradient(circle at 90% 0%,rgba(245,158,11,.12),transparent 30%),radial-gradient(circle at 10% 100%,rgba(127,29,29,.12),transparent 35%),linear-gradient(145deg,rgba(22,8,10,.97),rgba(8,6,11,.99))!important;box-shadow:inset 0 0 35px rgba(127,29,29,.08),0 0 24px rgba(245,158,11,.04)}
+.world-halloween-exploration:before,.world-halloween-secrets:before,.world-halloween-chronicle:before{position:absolute;right:12px;top:4px;font-size:3rem;opacity:.07;pointer-events:none;animation:world50Float 4s ease-in-out infinite}
+.world-halloween-exploration:before{content:'🕸️'}.world-halloween-secrets:before{content:'👁️'}.world-halloween-chronicle:before{content:'📜'}
+.world-halloween-exploration .card-title,.world-halloween-secrets .card-title,.world-halloween-chronicle .card-title{color:#fbbf24;text-shadow:0 0 12px rgba(245,158,11,.18)}
+.world-halloween-exploration .world-zone{border-color:rgba(245,158,11,.16);background:linear-gradient(145deg,rgba(38,13,12,.8),rgba(12,7,11,.92));box-shadow:inset 0 0 18px rgba(127,29,29,.07)}
+.world-halloween-exploration .world-zone:hover{border-color:rgba(245,158,11,.5);box-shadow:0 0 18px rgba(245,158,11,.09)}
+.world-halloween-exploration .world-zone .zone-status{color:#fbbf24}.world-halloween-exploration .world-zone h4{color:#f5e7c6}.world-halloween-exploration .world-zone span{color:#a9a0a4}
+.world-halloween-secrets .secret-item{border-color:rgba(245,158,11,.18);background:linear-gradient(145deg,rgba(35,10,16,.7),rgba(10,7,12,.88));box-shadow:inset 0 0 14px rgba(127,29,29,.08)}
+.world-halloween-secrets .secret-item.locked{opacity:.58}.world-halloween-secrets .secret-item h4{color:#f1dfbd}.world-halloween-secrets .secret-item b{filter:drop-shadow(0 0 7px rgba(245,158,11,.2))}
+.world-halloween-chronicle .lore-entry{border-left-color:#f59e0b;background:linear-gradient(90deg,rgba(127,29,29,.16),rgba(20,7,12,.2));box-shadow:inset 0 0 16px rgba(127,29,29,.06)}
+.world-halloween-chronicle .lore-entry b{color:#fbbf24}.world-halloween-chronicle .lore-entry p{color:#b9aeb0}
+.binder-tab.starter-mini-tab{min-width:86px!important;padding:7px 9px!important;font-size:.58rem!important;opacity:.9;transform:scale(.92);transform-origin:left center}
+.binder-tab.season1-main-tab{border-color:rgba(245,158,11,.28)!important;background:linear-gradient(145deg,rgba(28,14,14,.72),rgba(12,9,13,.9))!important}
+.binder-tab.halloween-main-tab{border-color:rgba(245,158,11,.75)!important;background:linear-gradient(145deg,rgba(80,25,8,.78),rgba(31,8,15,.9))!important;color:#ffd166!important;box-shadow:0 0 18px rgba(245,158,11,.18),inset 0 0 16px rgba(127,29,29,.12);font-weight:900;animation:world50Glow 2.5s ease-in-out infinite}
+.binder-tab.october-main-tab{border-color:rgba(244,114,182,.5)!important;background:linear-gradient(145deg,rgba(57,13,35,.7),rgba(24,9,22,.85))!important;color:#f9b2d8!important;box-shadow:0 0 12px rgba(244,114,182,.1);font-weight:900}
+.binder-tab.blockus-main-tab{border-color:rgba(148,163,184,.32)!important;background:linear-gradient(145deg,rgba(27,31,40,.7),rgba(12,13,18,.9))!important;color:#cbd5e1!important}
+@keyframes world50Float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(5px) rotate(3deg)}}
+@keyframes world50Glow{0%,100%{box-shadow:0 0 14px rgba(245,158,11,.12),inset 0 0 12px rgba(127,29,29,.1)}50%{box-shadow:0 0 24px rgba(245,158,11,.25),inset 0 0 18px rgba(127,29,29,.16)}}
+</style>
 </head>
 <body>
 <!-- DROP 2027 UPDATE 44 — SAISON 2 HALLOWEEN PLAYABLE -->
@@ -877,7 +898,11 @@ body.halloween-season .screen.active{animation:drop47Screen .28s ease-out}
 </div>
 
 <div class="binder-tabs">
-<div class="binder-tab active" onclick="switchCategory('starter', this)">🧩 Départ</div>
+<div class="binder-tab starter-mini-tab active" onclick="switchCategory('starter', this)">🧩 Départ</div>
+<div class="binder-tab season1-main-tab season1-locked-tab" onclick="switchCategory('irlcat', this)">🌐 Saison 1 — Internet en PLS <span class="drop46-s1">SAISON 1</span></div>
+<div class="binder-tab halloween-tab halloween-main-tab" onclick="switchCategory('halloween', this)">🎃 Saison 2 — Halloween <span class="drop46-badge">SAISON 2</span></div>
+<div class="binder-tab october-rose-tab october-main-tab" onclick="switchCategory('octobrerose', this)">🎀 Octobre Rose</div>
+<div class="binder-tab blockus-main-tab" onclick="switchCategory('blockus', this)">🚧 Blockus</div>
 <div class="binder-tab" onclick="switchCategory('__owned', this)">💎 Mes cartes</div>
 <div class="binder-tab" onclick="switchCategory('tiktok', this)">📱 TikTok Trends</div>
 <div class="binder-tab" onclick="switchCategory('memes', this)">🎭 Pop Culture & Mèmes</div>
@@ -900,13 +925,8 @@ body.halloween-season .screen.active{animation:drop47Screen .28s ease-out}
 <div class="binder-tab" onclick="switchCategory('parents', this)">👨‍👩‍👦 Parents</div>
 <div class="binder-tab" onclick="switchCategory('transports', this)">🚌 Transports Maudits</div>
 <div class="binder-tab" onclick="switchCategory('reunion', this)">💻 Réunions</div>
-
 <div class="binder-tab" onclick="switchCategory('fillesreloues', this)">👩‍🎓 Filles Inoubliables</div>
 <div class="binder-tab" onclick="switchCategory('mecsrelous', this)">👨‍🎓 Mecs Inoubliables</div>
-<div class="binder-tab season1-locked-tab" onclick="switchCategory('irlcat', this)">🌐 Internet en PLS <span class="drop46-s1">SAISON 1</span></div>
-<div class="binder-tab halloween-tab" onclick="switchCategory('halloween', this)">🎃 Halloween <span class="drop46-badge">SAISON 2</span></div>
-<div class="binder-tab" onclick="switchCategory('blockus', this)">🚧 Blockus</div>
-<div class="binder-tab october-rose-tab" onclick="switchCategory('octobrerose', this)">🎀 Octobre Rose</div>
 <div class="binder-tab" onclick="switchCategory('secret', this)">⚡ Ultra Rares</div>
 </div>
 
@@ -1063,14 +1083,14 @@ body.halloween-season .screen.active{animation:drop47Screen .28s ease-out}
   <button class="btn btn-secondary" onclick="contributeToWorldEvent()">🎃 PARTICIPER AU WORLD HALLOWEEN</button>
 </div>
 
-<div class="glass-card">
-  <div class="card-title"><span>🗺️ DROP WORLD</span><span>EXPLORATION</span></div>
+<div class="glass-card world-halloween-exploration">
+  <div class="card-title"><span>🎃 DROP WORLD — HALLOWEEN</span><span>EXPLORATION</span></div>
   <div class="world-map" id="worldMap"></div>
 </div>
 
-<div class="glass-card">
-  <div class="card-title"><span>🔐 DÉCOUVERTES SECRÈTES</span><span id="secretCount">0 / 6</span></div>
-  <p class="world-muted">Certaines découvertes n'apparaissent qu'après des actions précises. Elles ne remplacent pas ton classeur, elles ajoutent une couche de mystère au monde.</p>
+<div class="glass-card world-halloween-secrets">
+  <div class="card-title"><span>👁️ DÉCOUVERTES SECRÈTES — HALLOWEEN</span><span id="secretCount">0 / 6</span></div>
+  <p class="world-muted">Certaines découvertes n’apparaissent qu’après des actions précises. Cette saison, les secrets semblent avoir été contaminés par Halloween. Elles ne remplacent pas ton classeur : elles ajoutent une couche de mystère au monde.</p>
   <div class="secret-grid" id="secretGrid"></div>
 </div>
 
@@ -1085,8 +1105,8 @@ body.halloween-season .screen.active{animation:drop47Screen .28s ease-out}
   <div class="drop-identity" id="dropIdentity"></div>
 </div>
 
-<div class="glass-card">
-  <div class="card-title"><span>📖 CHRONIQUE DE DROP</span><span id="worldLoreCount">0 / 5</span></div>
+<div class="glass-card world-halloween-chronicle">
+  <div class="card-title"><span>📖 CHRONIQUE DE DROP — NUIT D’HALLOWEEN</span><span id="worldLoreCount">0 / 5</span></div>
   <div class="world-lore" id="worldLore"></div>
 </div>
 </section>
@@ -2400,7 +2420,7 @@ async function adminResetFullAccount(){
     updates['users/'+uid+'/dailyGames']={};
     updates['users/'+uid+'/hubTasks']={};
     updates['users/'+uid+'/worldData']={event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0};
-    updates['public_collections/'+uid]={worldEvent:{contribution:0,lastParticipation:''}};
+    updates['public_collections/'+uid]={worldEvent:{contribution:0,lastParticipation:''},worldEventSeason2:{season:'s2-halloween',contribution:0,lastParticipation:''}};
 
     const friends=friendsSnap.val()||{};
     Object.keys(friends).forEach(fid=>{ updates['friendships/'+fid+'/'+uid]=null; });
@@ -5062,12 +5082,18 @@ const DROP_WORLD_LORE=[
  ['INCIDENT 04','La carte du monde affiche maintenant une zone sans nom.']
 ];
 function ensureWorldData(){
- if(!appData.worldData||typeof appData.worldData!=='object')appData.worldData={event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0};
+ if(!appData.worldData||typeof appData.worldData!=='object')appData.worldData={event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween'};
  appData.worldData.records={...{drops:0,games:0,discoveries:0},...(appData.worldData.records||{})};
  appData.worldData.secrets=Array.isArray(appData.worldData.secrets)?appData.worldData.secrets:[];
  appData.worldData.zones=Array.isArray(appData.worldData.zones)?appData.worldData.zones:[];
  appData.worldData.lore=Array.isArray(appData.worldData.lore)?appData.worldData.lore:[];
  appData.worldData.eventLastParticipation=String(appData.worldData.eventLastParticipation||''); appData.worldData.globalContribution=Math.max(0,Number(appData.worldData.globalContribution)||0);
+ if(appData.worldData.worldEventSeason!=='s2-halloween'){
+   appData.worldData.worldEventSeason='s2-halloween';
+   appData.worldData.eventLastParticipation='';
+   appData.worldData.globalContribution=0;
+   window.__dropGlobalEvent=0;
+ }
  return appData.worldData;
 }
 function worldAction(kind='action',amount=1){
@@ -5094,7 +5120,7 @@ async function loadGlobalWorldEvent(){
  try{
    const snap=await withTimeout(db.ref('public_collections').once('value'),7000,'Impossible de charger la progression mondiale.');
    const all=snap.val()||{}; let total=0;
-   Object.keys(all).forEach(uid=>{const v=all[uid]&&all[uid].worldEvent; if(v){total+=Math.max(0,Number(v.contribution)||0); if(appData.currentUser&&uid===appData.currentUser.uid){const w=ensureWorldData();w.eventLastParticipation=String(v.lastParticipation||'');w.globalContribution=Math.max(0,Number(v.contribution)||0);}}});
+   Object.keys(all).forEach(uid=>{const v=all[uid]&&all[uid].worldEventSeason2; if(v&&String(v.season||'')==='s2-halloween'){total+=Math.max(0,Number(v.contribution)||0); if(appData.currentUser&&uid===appData.currentUser.uid){const w=ensureWorldData();w.eventLastParticipation=String(v.lastParticipation||'');w.globalContribution=Math.max(0,Number(v.contribution)||0);}}});
    window.__dropGlobalEvent=Math.min(1000,total);
    renderWorld();
  }catch(e){console.warn('Événement mondial:',e);}
@@ -5112,11 +5138,12 @@ async function contributeToWorldEvent(){
  const w=ensureWorldData(),today=getLocalDayKey();
  if(w.eventLastParticipation===today)return showToast('⏳ Tu as déjà participé aujourd’hui. Reviens demain pour contribuer à nouveau.','error');
  worldContributionBusy=true;
- const ref=db.ref('public_collections/'+appData.currentUser.uid+'/worldEvent');
+ const ref=db.ref('public_collections/'+appData.currentUser.uid+'/worldEventSeason2');
  ref.transaction(v=>{
    const current=(v&&typeof v==='object')?v:{};
+   if(String(current.season||'')!=='s2-halloween')return {season:'s2-halloween',contribution:10,lastParticipation:today};
    if(String(current.lastParticipation||'')===today)return;
-   return {contribution:Math.min(1000,Math.max(0,Number(current.contribution)||0)+10),lastParticipation:today};
+   return {season:'s2-halloween',contribution:Math.min(1000,Math.max(0,Number(current.contribution)||0)+10),lastParticipation:today};
  }).then(async result=>{
    if(!result.committed){
      w.eventLastParticipation=today;renderWorld();
@@ -5183,7 +5210,7 @@ function showAuthGate(){const g=document.getElementById('authGate');if(g){g.clas
 function hideAuthGate(){const g=document.getElementById('authGate');if(g){g.classList.remove('active');g.setAttribute('aria-hidden','true');}}
 function playGateExplosion(){try{playEntryExplosion();document.getElementById('viewport').classList.add('auth-world-shake');setTimeout(()=>document.getElementById('viewport').classList.remove('auth-world-shake'),1300);}catch(e){}}
 function runAuthTransition(isRegister){const t=document.getElementById('authTransition');if(!t)return;document.getElementById('authTransitionTitle').textContent=isRegister?'LE MONDE RÉEL EST TERMINÉ':'LE MONDE RÉEL SE DÉCONNECTE';document.getElementById('authTransitionText').textContent=isRegister?'Une fois inscrit, tu ne regarderas plus DROP de la même façon. Bienvenue dans ton nouveau monde.':'Connexion confirmée. Les couleurs changent. DROP 2027 s’ouvre maintenant.';t.classList.add('active','shake');playGateExplosion();setTimeout(()=>{t.classList.remove('active','shake');document.getElementById('viewport').classList.add('world-entered');setTimeout(()=>document.getElementById('viewport').classList.remove('world-entered'),1800);},1450);}
-async function handleGateAuth(e){e.preventDefault();if(authLoading)return;const btn=document.getElementById('gateAuthSubmit'),email=document.getElementById('gateAuthEmail').value.trim().toLowerCase(),pass=document.getElementById('gateAuthPass').value,username=document.getElementById('gateAuthUsername').value.trim();if(!email||!pass)return showToast('❌ E-mail et mot de passe requis.','error');if(gateAuthMode==='register'&&pass.length<6)return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.','error');authLoading=true;btn.disabled=true;btn.innerText=gateAuthMode==='register'?'CRÉATION...':'CONNEXION...';try{if(gateAuthMode==='login'){try{sessionStorage.setItem('drop2027_explicit_login','1');}catch(e){} const c=await withTimeout(auth.signInWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');await loadFirebaseUserProfile(c.user);hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(false);}else{try{sessionStorage.removeItem('drop2027_return_party');sessionStorage.setItem('drop2027_new_registration','1');}catch(e){} window.__justRegistered=true; window.__pendingNewPlayerTutorial=true; const c=await withTimeout(auth.createUserWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');const u=c.user,fId=generateFriendCode(u.uid),initialCatalogs=normalizeCatalogs(CATALOGS);initialCatalogs.starter.forEach(x=>x.unlocked=true);const isAdminEmail=email==='carer.nathan11@gmail.com';if(isAdminEmail)Object.keys(initialCatalogs).forEach(cat=>initialCatalogs[cat].forEach(i=>i.unlocked=true));const initialData={username:username||email.split('@')[0],credits:isAdminEmail?999999999:500,friendId:fId,friends:[],isAdmin:isAdminEmail,catalogs:initialCatalogs,redeemedCodes:[],dailyGames:{},hubTasks:{date:'',done:{}},freeDrops:0,worldData:{event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0}};appData.currentUser={email:u.email||email,username:initialData.username,uid:u.uid};appData.credits=initialData.credits;appData.friendId=fId;appData.friends=[];appData.isAdmin=isAdminEmail;appData.catalogs=initialCatalogs;appData.redeemedCodes=[];applyMysterySeasonState();appData.dailyGames={};appData.hubTasks={date:'',done:{}};appData.freeDrops=0;appData.worldData=initialData.worldData;updateUI();db.ref('users/'+u.uid).set(initialData).catch(err=>console.warn('Profil inscription:',err));listenToTrades();listenToFriendRequests();saveAppData();try{sessionStorage.setItem('drop2027_new_registration','1');sessionStorage.removeItem('drop2027_return_party');}catch(e){}window.__justRegistered=true;hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(true);window.__pendingNewPlayerTutorial=true;setTimeout(startNewPlayerCelebration,1500);}}catch(err){try{if(gateAuthMode==='login')sessionStorage.removeItem('drop2027_explicit_login');}catch(e){}console.error('GATE AUTH ERROR:',err);showToast('❌ '+firebaseAuthErrorMessage(err),'error');}finally{authLoading=false;btn.disabled=false;btn.innerText=gateAuthMode==='register'?"S'INSCRIRE":'SE CONNECTER';}}
+async function handleGateAuth(e){e.preventDefault();if(authLoading)return;const btn=document.getElementById('gateAuthSubmit'),email=document.getElementById('gateAuthEmail').value.trim().toLowerCase(),pass=document.getElementById('gateAuthPass').value,username=document.getElementById('gateAuthUsername').value.trim();if(!email||!pass)return showToast('❌ E-mail et mot de passe requis.','error');if(gateAuthMode==='register'&&pass.length<6)return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.','error');authLoading=true;btn.disabled=true;btn.innerText=gateAuthMode==='register'?'CRÉATION...':'CONNEXION...';try{if(gateAuthMode==='login'){try{sessionStorage.setItem('drop2027_explicit_login','1');}catch(e){} const c=await withTimeout(auth.signInWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');await loadFirebaseUserProfile(c.user);hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(false);}else{try{sessionStorage.removeItem('drop2027_return_party');sessionStorage.setItem('drop2027_new_registration','1');}catch(e){} window.__justRegistered=true; window.__pendingNewPlayerTutorial=true; const c=await withTimeout(auth.createUserWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');const u=c.user,fId=generateFriendCode(u.uid),initialCatalogs=normalizeCatalogs(CATALOGS);initialCatalogs.starter.forEach(x=>x.unlocked=true);const isAdminEmail=email==='carer.nathan11@gmail.com';if(isAdminEmail)Object.keys(initialCatalogs).forEach(cat=>initialCatalogs[cat].forEach(i=>i.unlocked=true));const initialData={username:username||email.split('@')[0],credits:isAdminEmail?999999999:500,friendId:fId,friends:[],isAdmin:isAdminEmail,catalogs:initialCatalogs,redeemedCodes:[],dailyGames:{},hubTasks:{date:'',done:{}},freeDrops:0,worldData:{event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween'}};appData.currentUser={email:u.email||email,username:initialData.username,uid:u.uid};appData.credits=initialData.credits;appData.friendId=fId;appData.friends=[];appData.isAdmin=isAdminEmail;appData.catalogs=initialCatalogs;appData.redeemedCodes=[];applyMysterySeasonState();appData.dailyGames={};appData.hubTasks={date:'',done:{}};appData.freeDrops=0;appData.worldData=initialData.worldData;updateUI();db.ref('users/'+u.uid).set(initialData).catch(err=>console.warn('Profil inscription:',err));listenToTrades();listenToFriendRequests();saveAppData();try{sessionStorage.setItem('drop2027_new_registration','1');sessionStorage.removeItem('drop2027_return_party');}catch(e){}window.__justRegistered=true;hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(true);window.__pendingNewPlayerTutorial=true;setTimeout(startNewPlayerCelebration,1500);}}catch(err){try{if(gateAuthMode==='login')sessionStorage.removeItem('drop2027_explicit_login');}catch(e){}console.error('GATE AUTH ERROR:',err);showToast('❌ '+firebaseAuthErrorMessage(err),'error');}finally{authLoading=false;btn.disabled=false;btn.innerText=gateAuthMode==='register'?"S'INSCRIRE":'SE CONNECTER';}}
 function ensureAuthGate(){if(!authStateReady)return;if(auth.currentUser||appData.currentUser){hideAuthGate();releaseAuthBoot();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);return;}releaseAuthBoot();showAuthGate();}
 
 /* ===== GUIDED TUTORIAL ===== */
@@ -5284,8 +5311,8 @@ const DROP40_HALLOWEEN_MUSIC_DATA_URL="data:audio/mpeg;base64,SUQzAwAAAAAvMUdFT0
   }
   function addTab(){
     const tabs=document.querySelector('.binder-tabs'); if(!tabs||tabs.querySelector('[data-drop40="halloween"]')||tabs.querySelector('.halloween-tab')) return;
-    const t=document.createElement('div'); t.className='binder-tab'; t.dataset.drop40='halloween'; t.innerHTML='🎃 Halloween <span class="drop40-badge">SAISON 2</span>'; t.onclick=()=>switchCategory('halloween',t); tabs.appendChild(t);
-    [['blockus','🚧 Blockus'],['octobrerose','🎀 Octobre Rose']].forEach(([key,label])=>{if(tabs.querySelector('[data-drop47="'+key+'"]'))return;const x=document.createElement('div');x.className='binder-tab '+(key==='octobrerose'?'october-rose-tab':'');x.dataset.drop47=key;x.textContent=label;x.onclick=()=>switchCategory(key,x);tabs.appendChild(x);});
+    const t=document.createElement('div'); t.className='binder-tab halloween-tab halloween-main-tab'; t.dataset.drop40='halloween'; t.innerHTML='🎃 Halloween <span class="drop40-badge">SAISON 2</span>'; t.onclick=()=>switchCategory('halloween',t); tabs.appendChild(t);
+    [['blockus','🚧 Blockus'],['octobrerose','🎀 Octobre Rose']].forEach(([key,label])=>{if(tabs.querySelector('[data-drop47="'+key+'"]'))return;const x=document.createElement('div');x.className='binder-tab '+(key==='octobrerose'?'october-rose-tab october-main-tab':'blockus-main-tab');x.dataset.drop47=key;x.textContent=label;x.onclick=()=>switchCategory(key,x);tabs.appendChild(x);});
   }
   function fmt(ms){
     const total=Math.max(0,Math.floor(ms/1000)),d=Math.floor(total/86400),h=Math.floor(total%86400/3600),m=Math.floor(total%3600/60),s=total%60;
