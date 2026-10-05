@@ -715,6 +715,29 @@ body.halloween-season .auth-transition::before{background:radial-gradient(circle
 body.halloween-season .auth-transition-title{color:#f5e7c6;text-shadow:0 0 22px rgba(127,29,29,.95),0 0 55px rgba(245,158,11,.22)!important}
 body.halloween-season .auth-transition-text{color:#b9aaa5!important}
 body.halloween-season .auth-transition-explosion{background:#7f1d1d!important;box-shadow:0 0 30px #7f1d1d,0 0 90px #f59e0b,0 0 170px rgba(127,29,29,.75)!important}
+
+/* UPDATE 53 — OCTOBRE ROSE : catégorie entièrement rose */
+.binder-panel.rose-category-active .card,
+.rose-category-active .catalog-card,
+.rose-category-active .collection-card{border-color:rgba(244,114,182,.48)!important;background:linear-gradient(145deg,rgba(70,12,43,.78),rgba(30,8,25,.92))!important;box-shadow:0 0 22px rgba(244,114,182,.12),inset 0 0 18px rgba(244,114,182,.04)!important}
+
+/* UPDATE 53 — HORROR ENTRY CINEMA */
+.entry-cinema.horror-entry{background:radial-gradient(circle at 50% 42%,rgba(90,0,12,.22),rgba(0,0,0,.97) 58%),#020104!important;overflow:hidden}
+.entry-cinema.horror-entry:before{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,60,60,.035) 4px 5px);animation:horrorScan 1.1s steps(2) infinite;pointer-events:none}
+.entry-cinema.horror-entry .entry-content{position:relative;z-index:3;animation:horrorBreath 2.8s ease-in-out infinite}
+.horror-eye{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%) scale(.2);width:190px;height:105px;border:3px solid rgba(255,255,255,.8);border-radius:50% 50% 48% 48%;box-shadow:0 0 30px rgba(255,30,30,.8),0 0 100px rgba(120,0,0,.55);opacity:0;animation:horrorEyeReveal 4.8s ease-in-out forwards;z-index:2}
+.horror-eye:before{content:"";position:absolute;left:50%;top:50%;width:58px;height:58px;transform:translate(-50%,-50%);border-radius:50%;background:#150000;border:3px solid #ff3030;box-shadow:0 0 25px #ff2020;animation:horrorPupil 1.2s ease-in-out infinite}
+.horror-eye:after{content:"";position:absolute;left:50%;top:50%;width:10px;height:72px;transform:translate(-50%,-50%);border-radius:50%;background:#050000;box-shadow:0 0 8px #ff3030}
+.horror-shadow{position:absolute;left:50%;bottom:-30px;transform:translateX(-50%);width:145px;height:300px;background:radial-gradient(ellipse at 50% 20%,#000 0 23%,transparent 24%),radial-gradient(ellipse at 50% 58%,#000 0 44%,transparent 45%);filter:blur(1px);opacity:0;animation:horrorShadow 6s ease-in-out 1.2s forwards;z-index:1}
+.horror-whisper{position:absolute;left:50%;top:69%;transform:translateX(-50%);width:90%;text-align:center;color:#d8a4a4;letter-spacing:3px;font-size:.62rem;text-shadow:0 0 12px rgba(255,0,0,.65);opacity:0;animation:horrorWhisper 7s ease-in-out forwards;z-index:4}
+.horror-glitch{animation:horrorGlitch .13s steps(2) infinite!important}
+@keyframes horrorEyeReveal{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-8deg)}20%{opacity:.08}42%{opacity:.9;transform:translate(-50%,-50%) scale(1) rotate(2deg)}52%{opacity:.18;transform:translate(-50%,-50%) scale(1.04)}60%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:.72;transform:translate(-50%,-50%) scale(.92)}}
+@keyframes horrorPupil{0%,100%{transform:translate(-50%,-50%) scaleY(1)}50%{transform:translate(-38%,-50%) scaleY(1.18)}}
+@keyframes horrorShadow{0%{opacity:0;transform:translateX(-50%) scale(.7)}30%{opacity:.72}55%{opacity:.25;transform:translateX(-46%) scale(1.04)}80%{opacity:.65;transform:translateX(-54%) scale(.96)}100%{opacity:.9;transform:translateX(-50%) scale(1)}}
+@keyframes horrorWhisper{0%,35%{opacity:0}45%{opacity:.8}60%{opacity:.18}72%{opacity:.75}100%{opacity:.9}}
+@keyframes horrorScan{0%{transform:translateY(-8%)}100%{transform:translateY(8%)}}
+@keyframes horrorBreath{0%,100%{filter:brightness(.8)}50%{filter:brightness(1.12)}}
+@keyframes horrorGlitch{0%{transform:translate(0)}25%{transform:translate(3px,-1px)}50%{transform:translate(-2px,2px)}75%{transform:translate(1px,1px)}100%{transform:translate(0)}}
 </style>
 </head>
 <body>
@@ -787,7 +810,10 @@ body.halloween-season .auth-transition-explosion{background:#7f1d1d!important;bo
 <span id="toastMsg">Message</span>
 </div>
 
-<div id="entryCinema" class="entry-cinema" aria-hidden="true">
+<div id="entryCinema" class="entry-cinema horror-entry" aria-hidden="true">
+  <div class="horror-eye" aria-hidden="true"></div>
+  <div class="horror-shadow" aria-hidden="true"></div>
+  <div class="horror-whisper" aria-hidden="true">NE REGARDE PAS DERRIÈRE TOI.</div>
   <div class="entry-scan"></div>
   <div class="entry-content">
     <div id="entryLogo" class="entry-logo">DROP 2027</div>
@@ -928,10 +954,10 @@ body.halloween-season .auth-transition-explosion{background:#7f1d1d!important;bo
 <div class="binder-tabs">
 <div class="binder-tab mes-cartes-main-tab active" onclick="switchCategory('__owned', this)">💎 Mes cartes</div>
 <div class="binder-tab starter-mini-tab" onclick="switchCategory('starter', this)">🧩 Départ</div>
-<div class="binder-tab season1-main-tab season1-locked-tab" onclick="switchCategory('irlcat', this)">🌐 Saison 1 — Internet en PLS <span class="drop46-s1">TERMINÉE</span></div>
-<div class="binder-tab halloween-tab halloween-main-tab" onclick="switchCategory('halloween', this)">🎃 Saison 2 — Halloween <span class="drop46-badge">EN COURS</span></div>
-<div class="binder-tab blockus-main-tab" onclick="switchCategory('blockus', this)">🚧 Blockus</div>
+<div class="binder-tab season1-main-tab season1-locked-tab" onclick="switchCategory('irlcat', this)">🌐 Saison 1 — Internet en PLS <span class="drop46-s1">SAISON TERMINÉE</span></div>
+<div class="binder-tab halloween-tab halloween-main-tab" onclick="switchCategory('halloween', this)">🎃 Saison 2 — Halloween <span class="drop46-badge">SAISON EN COURS</span></div>
 <div class="binder-tab october-rose-tab october-main-tab" onclick="switchCategory('octobrerose', this)">🎀 Octobre Rose</div>
+<div class="binder-tab blockus-main-tab" onclick="switchCategory('blockus', this)">🚧 Blockus</div>
 <div class="binder-tab" onclick="switchCategory('tiktok', this)">📱 TikTok Trends</div>
 <div class="binder-tab" onclick="switchCategory('memes', this)">🎭 Pop Culture & Mèmes</div>
 <div class="binder-tab" onclick="switchCategory('gaming', this)">🎮 Gaming & Tech</div>
@@ -2033,6 +2059,24 @@ appData.hubTasks = {date:'', done:{}};
 appData.worldData = {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0};
 }
 
+function mergeCatalogsPreservingPlayerData(storedCatalogs){
+  const defaults=normalizeCatalogs(CATALOGS);
+  if(!storedCatalogs || typeof storedCatalogs!=='object') return defaults;
+  const out={};
+  const keys=new Set([...Object.keys(defaults),...Object.keys(storedCatalogs)]);
+  keys.forEach(cat=>{
+    const def=Array.isArray(defaults[cat])?defaults[cat]:[];
+    const stored=Array.isArray(storedCatalogs[cat])?storedCatalogs[cat]:[];
+    const byId=new Map(stored.map(c=>[String(c.id),c]));
+    out[cat]=def.map(d=>{
+      const old=byId.get(String(d.id));
+      return old ? {...d,...old,unlocked:old.unlocked===true} : {...d};
+    });
+    stored.forEach(old=>{if(!out[cat].some(c=>String(c.id)===String(old.id)))out[cat].push({...old});});
+  });
+  return out;
+}
+
 async function loadFirebaseUserProfile(user) {
 if (!user) {
 resetLocalUserState();
@@ -2091,7 +2135,7 @@ userRef.set(data).catch(err => console.warn('Création profil DB:', err));
 }
 
 appData.currentUser.username = data.username || appData.currentUser.username;
-appData.credits = Number(data.credits) || 0;
+appData.credits = (data && data.credits !== undefined && data.credits !== null) ? Number(data.credits) : 500;
 const storedFriendId = data.friendId || '';
 // Les anciens comptes avaient #DROP-XXXXXXXX. On les migre automatiquement
 // vers #DROP-<UID complet>, qui permet maintenant l'envoi direct des demandes.
@@ -2114,7 +2158,7 @@ try {
   console.warn('Amitiés partagées:', friendErr);
 }
 appData.isAdmin = data.isAdmin === true || isAdminEmail;
-appData.catalogs = normalizeCatalogs(data.catalogs);
+appData.catalogs = mergeCatalogsPreservingPlayerData(data.catalogs);
 ensureStarterCards();
 applyMysterySeasonState();
 if (appData.isAdmin) {
@@ -2126,10 +2170,10 @@ appData.redeemedCodes = Array.isArray(data.redeemedCodes) ? data.redeemedCodes :
 appData.dailyGames = (data.dailyGames && typeof data.dailyGames === 'object') ? data.dailyGames : {};
 appData.hubTasks = (data.hubTasks && typeof data.hubTasks === 'object') ? data.hubTasks : {date:'', done:{}};
 appData.freeDrops = Math.max(0, Number(data.freeDrops) || 0);
-appData.worldData = (data.worldData && typeof data.worldData === 'object') ? data.worldData : {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween-2026-v3'};
+appData.worldData = (data.worldData && typeof data.worldData === 'object') ? data.worldData : {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween-2026-v4'};
  appData.halloweenArcade=(data.halloweenArcade&&typeof data.halloweenArcade==='object')?data.halloweenArcade:{};
 ensureWorldData();
-persistWorldResetIfNeeded();
+await persistWorldResetIfNeeded();
 appData.worldData.event = Math.max(0, Number(appData.worldData.event)||0);
 appData.worldData.secrets = Array.isArray(appData.worldData.secrets)?appData.worldData.secrets:[];
 appData.worldData.zones = Array.isArray(appData.worldData.zones)?appData.worldData.zones:[];
@@ -2181,11 +2225,11 @@ try {
 const cached = JSON.parse(localStorage.getItem('drop2027_profile_' + user.uid) || 'null');
 if (cached) {
 appData.currentUser.username = cached.username || appData.currentUser.username;
-appData.credits = Number(cached.credits) || 0;
+appData.credits = (cached && cached.credits !== undefined && cached.credits !== null) ? Number(cached.credits) : 500;
 appData.friendId = cached.friendId || fallbackFriendId;
 appData.friends = Array.isArray(cached.friends) ? cached.friends : [];
 appData.isAdmin = cached.isAdmin === true || isAdminEmail;
-appData.catalogs = normalizeCatalogs(cached.catalogs || appData.catalogs);
+appData.catalogs = mergeCatalogsPreservingPlayerData(cached.catalogs || appData.catalogs);
 ensureStarterCards();
 if (appData.isAdmin) applyAdminMode(true);
 appData.redeemedCodes = Array.isArray(cached.redeemedCodes) ? cached.redeemedCodes : [];
@@ -2469,8 +2513,8 @@ async function adminResetFullAccount(){
     updates['users/'+uid+'/redeemedCodes']=[];
     updates['users/'+uid+'/dailyGames']={};
     updates['users/'+uid+'/hubTasks']={};
-    updates['users/'+uid+'/worldData']={event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween-2026-v3'};
-    updates['public_collections/'+uid]={worldEvent:{contribution:0,lastParticipation:''},worldEventSeason2:{season:'s2-halloween-2026',contribution:0,lastParticipation:''},worldEventSeason2_v3:{season:'s2-halloween-2026-v3',contribution:0,lastParticipation:''}};
+    updates['users/'+uid+'/worldData']={event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween-2026-v4'};
+    updates['public_collections/'+uid]={worldEvent:{contribution:0,lastParticipation:''},worldEventSeason2:{season:'s2-halloween-2026',contribution:0,lastParticipation:''},worldEventSeason2_v4:{season:'s2-halloween-2026-v4',contribution:0,lastParticipation:''}};
 
     const friends=friendsSnap.val()||{};
     Object.keys(friends).forEach(fid=>{ updates['friendships/'+fid+'/'+uid]=null; });
@@ -3092,6 +3136,7 @@ setPresenceAction('Ouvre '+id);
 
 function switchCategory(catKey, tabBtn) {
  if(catKey==='mystere') return;
+ const collection=document.getElementById('scr-collection'); if(collection) collection.classList.toggle('rose-category-active', catKey==='octobrerose');
  activeCategory = catKey;
  document.querySelectorAll('.binder-tab').forEach(t => t.classList.remove('active'));
  if(tabBtn) tabBtn.classList.add('active');
@@ -5042,8 +5087,9 @@ function getUnlockedCards(){const arr=[];Object.keys(appData.catalogs||{}).forEa
 function startEntryAnimation(seconds,first){
  const overlay=document.getElementById('entryCinema');if(!overlay)return;
  if(entryTimerHandle)clearInterval(entryTimerHandle); stopEntryMusic();
- overlay.classList.add('active');overlay.dataset.locked='1';
+ overlay.classList.add('active','horror-entry');overlay.dataset.locked='1';
  const logo=document.getElementById('entryLogo'),sub=document.getElementById('entrySub'),panel=document.getElementById('entryPanel'),bar=document.getElementById('entryProgressBar'),timer=document.getElementById('entryTimer');
+ const heye=overlay.querySelector('.horror-eye'),hshadow=overlay.querySelector('.horror-shadow'),hwhisper=overlay.querySelector('.horror-whisper'); [heye,hshadow,hwhisper].forEach(el=>{if(el){el.style.animation='none';void el.offsetWidth;el.style.animation='';}});
  logo.classList.remove('entry-logo-explode');let elapsed=0;
  sub.innerText=first?'BIENVENUE DANS DROP 2027':'';
  const cards=getUnlockedCards();
@@ -5063,7 +5109,9 @@ function startEntryAnimation(seconds,first){
  entryTimerHandle=setInterval(()=>{
   elapsed++;bar.style.width=(elapsed/seconds*100)+'%';timer.innerText=Math.max(0,seconds-elapsed)+'s';
   if(first)renderFirstSlide();
-  if(elapsed>=seconds){clearInterval(entryTimerHandle);entryTimerHandle=null;stopEntryMusic();overlay.classList.remove('active');overlay.dataset.locked='0';setTimeout(showLaunchRecap,220);}
+  if(elapsed===1){overlay.classList.add('horror-glitch');playEntryCrack();setTimeout(()=>overlay.classList.remove('horror-glitch'),220);}
+  if(elapsed===Math.max(2,Math.floor(seconds/2))){overlay.classList.add('horror-glitch');playEntryCrack();setTimeout(()=>overlay.classList.remove('horror-glitch'),180);}
+  if(elapsed>=seconds){clearInterval(entryTimerHandle);entryTimerHandle=null;stopEntryMusic();overlay.classList.remove('active','horror-glitch');overlay.dataset.locked='0';setTimeout(showLaunchRecap,220);}
  },1000);
 }
 
@@ -5072,7 +5120,7 @@ function bootEntrySequence(){
   if (window.__launchSequenceRunning) return;
   window.__launchSequenceRunning=true;
   const isNewPlayer=!!window.__pendingNewPlayerTutorial;
-  startEntryAnimation(isNewPlayer?20:1,isNewPlayer);
+  startEntryAnimation(isNewPlayer?20:6,isNewPlayer);
 }
 function getLaunchCollectionCards(){
  return getUnlockedCards().sort((a,b)=>Number(a.id)-Number(b.id));
@@ -5108,8 +5156,8 @@ function closeWeeklyNews(){
 
 
 /* ===== DROP WORLD ENGINE ===== */
-const DROP_WORLD_SEASON_KEY='s2-halloween-2026-v3';
-const DROP_WORLD_GLOBAL_EVENT_KEY='worldEventSeason2_v3';
+const DROP_WORLD_SEASON_KEY='s2-halloween-2026-v4';
+const DROP_WORLD_GLOBAL_EVENT_KEY='worldEventSeason2_v4';
 const DROP_WORLD_GLOBAL_GOAL=100;
 const DROP_WORLD_ZONES=[
  {id:'graveyard',icon:'🪦',name:'CIMETIÈRE DROP',desc:'Les tombes portent des noms qui n’appartiennent à personne.',unlock:0},
@@ -5155,10 +5203,18 @@ function ensureWorldData(){
  if(!appData.halloweenArcade||typeof appData.halloweenArcade!=='object')appData.halloweenArcade={};
  return appData.worldData;
 }
-function persistWorldResetIfNeeded(){
- if(appData.__worldResetNeeded && appData.currentUser){
-   appData.__worldResetNeeded=false;
-   saveAppData();
+async function persistWorldResetIfNeeded(){
+ if(!appData.__worldResetNeeded || !appData.currentUser) return;
+ appData.__worldResetNeeded=false;
+ try{
+   const uid=appData.currentUser.uid;
+   await db.ref('users/'+uid).update({
+     worldData: appData.worldData,
+     halloweenArcade: appData.halloweenArcade || {}
+   });
+ }catch(e){
+   console.warn('Reset World Halloween non sauvegardé:',e);
+   appData.__worldResetNeeded=true;
  }
 }
 function worldAction(kind='action',amount=1){
@@ -5275,7 +5331,7 @@ function showAuthGate(){const g=document.getElementById('authGate');if(g){g.clas
 function hideAuthGate(){const g=document.getElementById('authGate');if(g){g.classList.remove('active');g.setAttribute('aria-hidden','true');}}
 function playGateExplosion(){try{playEntryExplosion();document.getElementById('viewport').classList.add('auth-world-shake');setTimeout(()=>document.getElementById('viewport').classList.remove('auth-world-shake'),1300);}catch(e){}}
 function runAuthTransition(isRegister){const t=document.getElementById('authTransition');if(!t)return;document.getElementById('authTransitionTitle').textContent=isRegister?'LE MONDE RÉEL EST TERMINÉ':'LE MONDE RÉEL SE DÉCONNECTE';document.getElementById('authTransitionText').textContent=isRegister?'Une fois inscrit, tu ne regarderas plus DROP de la même façon. Bienvenue dans ton nouveau monde.':'Connexion confirmée. Les couleurs changent. DROP 2027 s’ouvre maintenant.';t.classList.add('active','shake');playGateExplosion();setTimeout(()=>{t.classList.remove('active','shake');document.getElementById('viewport').classList.add('world-entered');setTimeout(()=>document.getElementById('viewport').classList.remove('world-entered'),1800);},1450);}
-async function handleGateAuth(e){e.preventDefault();if(authLoading)return;const btn=document.getElementById('gateAuthSubmit'),email=document.getElementById('gateAuthEmail').value.trim().toLowerCase(),pass=document.getElementById('gateAuthPass').value,username=document.getElementById('gateAuthUsername').value.trim();if(!email||!pass)return showToast('❌ E-mail et mot de passe requis.','error');if(gateAuthMode==='register'&&pass.length<6)return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.','error');authLoading=true;btn.disabled=true;btn.innerText=gateAuthMode==='register'?'CRÉATION...':'CONNEXION...';try{if(gateAuthMode==='login'){try{sessionStorage.setItem('drop2027_explicit_login','1');}catch(e){} const c=await withTimeout(auth.signInWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');await loadFirebaseUserProfile(c.user);hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(false);}else{try{sessionStorage.removeItem('drop2027_return_party');sessionStorage.setItem('drop2027_new_registration','1');}catch(e){} window.__justRegistered=true; window.__pendingNewPlayerTutorial=true; const c=await withTimeout(auth.createUserWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');const u=c.user,fId=generateFriendCode(u.uid),initialCatalogs=normalizeCatalogs(CATALOGS);initialCatalogs.starter.forEach(x=>x.unlocked=true);const isAdminEmail=email==='carer.nathan11@gmail.com';if(isAdminEmail)Object.keys(initialCatalogs).forEach(cat=>initialCatalogs[cat].forEach(i=>i.unlocked=true));const initialData={username:username||email.split('@')[0],credits:isAdminEmail?999999999:500,friendId:fId,friends:[],isAdmin:isAdminEmail,catalogs:initialCatalogs,redeemedCodes:[],dailyGames:{},hubTasks:{date:'',done:{}},freeDrops:0,halloweenArcade:{},worldData:{event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween-2026-v3'}};appData.currentUser={email:u.email||email,username:initialData.username,uid:u.uid};appData.credits=initialData.credits;appData.friendId=fId;appData.friends=[];appData.isAdmin=isAdminEmail;appData.catalogs=initialCatalogs;appData.redeemedCodes=[];applyMysterySeasonState();appData.dailyGames={};appData.hubTasks={date:'',done:{}};appData.freeDrops=0;appData.worldData=initialData.worldData;updateUI();db.ref('users/'+u.uid).set(initialData).catch(err=>console.warn('Profil inscription:',err));listenToTrades();listenToFriendRequests();saveAppData();try{sessionStorage.setItem('drop2027_new_registration','1');sessionStorage.removeItem('drop2027_return_party');}catch(e){}window.__justRegistered=true;hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(true);window.__pendingNewPlayerTutorial=true;setTimeout(startNewPlayerCelebration,1500);}}catch(err){try{if(gateAuthMode==='login')sessionStorage.removeItem('drop2027_explicit_login');}catch(e){}console.error('GATE AUTH ERROR:',err);showToast('❌ '+firebaseAuthErrorMessage(err),'error');}finally{authLoading=false;btn.disabled=false;btn.innerText=gateAuthMode==='register'?"S'INSCRIRE":'SE CONNECTER';}}
+async function handleGateAuth(e){e.preventDefault();if(authLoading)return;const btn=document.getElementById('gateAuthSubmit'),email=document.getElementById('gateAuthEmail').value.trim().toLowerCase(),pass=document.getElementById('gateAuthPass').value,username=document.getElementById('gateAuthUsername').value.trim();if(!email||!pass)return showToast('❌ E-mail et mot de passe requis.','error');if(gateAuthMode==='register'&&pass.length<6)return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.','error');authLoading=true;btn.disabled=true;btn.innerText=gateAuthMode==='register'?'CRÉATION...':'CONNEXION...';try{if(gateAuthMode==='login'){try{sessionStorage.setItem('drop2027_explicit_login','1');}catch(e){} const c=await withTimeout(auth.signInWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');await loadFirebaseUserProfile(c.user);hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(false);}else{try{sessionStorage.removeItem('drop2027_return_party');sessionStorage.setItem('drop2027_new_registration','1');}catch(e){} window.__justRegistered=true; window.__pendingNewPlayerTutorial=true; const c=await withTimeout(auth.createUserWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');const u=c.user,fId=generateFriendCode(u.uid),initialCatalogs=normalizeCatalogs(CATALOGS);initialCatalogs.starter.forEach(x=>x.unlocked=true);const isAdminEmail=email==='carer.nathan11@gmail.com';if(isAdminEmail)Object.keys(initialCatalogs).forEach(cat=>initialCatalogs[cat].forEach(i=>i.unlocked=true));const initialData={username:username||email.split('@')[0],credits:isAdminEmail?999999999:500,friendId:fId,friends:[],isAdmin:isAdminEmail,catalogs:initialCatalogs,redeemedCodes:[],dailyGames:{},hubTasks:{date:'',done:{}},freeDrops:0,halloweenArcade:{},worldData:{event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween-2026-v4'}};appData.currentUser={email:u.email||email,username:initialData.username,uid:u.uid};appData.credits=initialData.credits;appData.friendId=fId;appData.friends=[];appData.isAdmin=isAdminEmail;appData.catalogs=initialCatalogs;appData.redeemedCodes=[];applyMysterySeasonState();appData.dailyGames={};appData.hubTasks={date:'',done:{}};appData.freeDrops=0;appData.worldData=initialData.worldData;updateUI();db.ref('users/'+u.uid).set(initialData).catch(err=>console.warn('Profil inscription:',err));listenToTrades();listenToFriendRequests();saveAppData();try{sessionStorage.setItem('drop2027_new_registration','1');sessionStorage.removeItem('drop2027_return_party');}catch(e){}window.__justRegistered=true;hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(true);window.__pendingNewPlayerTutorial=true;setTimeout(startNewPlayerCelebration,1500);}}catch(err){try{if(gateAuthMode==='login')sessionStorage.removeItem('drop2027_explicit_login');}catch(e){}console.error('GATE AUTH ERROR:',err);showToast('❌ '+firebaseAuthErrorMessage(err),'error');}finally{authLoading=false;btn.disabled=false;btn.innerText=gateAuthMode==='register'?"S'INSCRIRE":'SE CONNECTER';}}
 function ensureAuthGate(){if(!authStateReady)return;if(auth.currentUser||appData.currentUser){hideAuthGate();releaseAuthBoot();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);return;}releaseAuthBoot();showAuthGate();}
 
 /* ===== GUIDED TUTORIAL ===== */
@@ -5377,7 +5433,7 @@ const DROP40_HALLOWEEN_MUSIC_DATA_URL="data:audio/mpeg;base64,SUQzAwAAAAAvMUdFT0
   function addTab(){
     const tabs=document.querySelector('.binder-tabs'); if(!tabs||tabs.querySelector('[data-drop40="halloween"]')||tabs.querySelector('.halloween-tab')) return;
     const t=document.createElement('div'); t.className='binder-tab halloween-tab halloween-main-tab'; t.dataset.drop40='halloween'; t.innerHTML='🎃 Halloween <span class="drop40-badge">SAISON 2</span>'; t.onclick=()=>switchCategory('halloween',t); tabs.appendChild(t);
-    [['blockus','🚧 Blockus'],['octobrerose','🎀 Octobre Rose']].forEach(([key,label])=>{if(tabs.querySelector('[data-drop47="'+key+'"]'))return;const x=document.createElement('div');x.className='binder-tab '+(key==='octobrerose'?'october-rose-tab october-main-tab':'blockus-main-tab');x.dataset.drop47=key;x.textContent=label;x.onclick=()=>switchCategory(key,x);tabs.appendChild(x);});
+    [['octobrerose','🎀 Octobre Rose'],['blockus','🚧 Blockus']].forEach(([key,label])=>{if(tabs.querySelector('[data-drop47="'+key+'"]'))return;const x=document.createElement('div');x.className='binder-tab '+(key==='octobrerose'?'october-rose-tab october-main-tab':'blockus-main-tab');x.dataset.drop47=key;x.textContent=label;x.onclick=()=>switchCategory(key,x);tabs.appendChild(x);});
   }
   function fmt(ms){
     const total=Math.max(0,Math.floor(ms/1000)),d=Math.floor(total/86400),h=Math.floor(total%86400/3600),m=Math.floor(total%3600/60),s=total%60;
