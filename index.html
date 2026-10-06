@@ -9,13 +9,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
 
 <!-- FIREBASE SDKs (v9 Compatibilité Temps réel et Auth) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
 /* ===== UI SOUND LAYER ===== */
 function playUiSound(kind='click'){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();const now=ctx.currentTime;const o=ctx.createOscillator(),g=ctx.createGain();o.type=kind==='success'?'triangle':'sine';o.frequency.setValueAtTime(kind==='success'?620:310,now);o.frequency.exponentialRampToValueAtTime(kind==='success'?880:240,now+.11);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(kind==='success'?.045:.025,now+.015);g.gain.exponentialRampToValueAtTime(.0001,now+.13);o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+.15);}catch(e){}}
 document.addEventListener('click',e=>{const b=e.target.closest('button,.nav-item,.binder-tab,.auth-tab');if(!b)return;if(b.id==='spinWheelBtn')return;playUiSound(b.classList.contains('btn-secondary')?'success':'click');},{passive:true});
 </script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
 :root {
@@ -748,6 +749,17 @@ body.halloween-season .auth-transition-explosion{background:#7f1d1d!important;bo
 
 <div class="app-viewport" id="viewport">
 <div id="authBoot" class="auth-boot" aria-hidden="false"><div class="auth-boot-box"><div class="auth-boot-title">☁️ Vérification du monde réel...</div><div class="auth-boot-text">DROP vérifie ta session avant d'ouvrir la porte.</div></div></div>
+<script>
+setTimeout(function(){
+  var b=document.getElementById('authBoot');
+  var g=document.getElementById('authGate');
+  if(b && !b.classList.contains('hidden')){
+    b.classList.add('hidden');
+    b.setAttribute('aria-hidden','true');
+    if(g && !window.authStateReady) { g.classList.add('active'); g.setAttribute('aria-hidden','false'); }
+  }
+},3500);
+</script>
 <div id="authGate" class="auth-gate" aria-hidden="true">
   <div class="real-world-sky" aria-hidden="true"><span class="sky-cloud cloud-a"></span><span class="sky-cloud cloud-b"></span><span class="sky-cloud cloud-c"></span><span class="sky-cloud cloud-d"></span><span class="sky-sun"></span></div>
   <div class="auth-gate-box">
@@ -2302,7 +2314,7 @@ return true;
 
 // La session Firebase est restaurée automatiquement.
 let authStateReady = false;
-auth.onAuthStateChanged(async (user) => {
+auth.onAuthStateChanged((user) => {
 if (authLoading && !user) return;
 if (!user) {
 if(accountControlRef && accountControlHandler)accountControlRef.off('value',accountControlHandler);
@@ -2316,15 +2328,25 @@ releaseAuthBoot();
 ensureAuthGate();
 return;
 }
+
 authStateReady = true;
-await loadFirebaseUserProfile(user);
-releaseAuthBoot();
-hideAuthGate();
-// Toute session authentifiée arrive toujours sur la page DROP.
-const homeNav = document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');
-switchTab('scr-home', homeNav || null);
-listenGlobalWorldEvent();
-listenGlobalSiteControl();
+// L'ancien système ouvrait immédiatement l'application après la validation
+// de la session. On garde exactement ce comportement : la DB ne peut plus
+// retenir l'écran de démarrage. Le profil est hydraté en arrière-plan.
+try {
+  const profilePromise = loadFirebaseUserProfile(user);
+  releaseAuthBoot();
+  hideAuthGate();
+  const homeNav = document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');
+  switchTab('scr-home', homeNav || null);
+  Promise.resolve(profilePromise).catch(err => console.warn('Chargement profil en arrière-plan:', err));
+} catch (err) {
+  console.error('AUTH PROFILE BOOT:', err);
+  releaseAuthBoot();
+  hideAuthGate();
+  const homeNav = document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');
+  switchTab('scr-home', homeNav || null);
+}
 });
 
 function generateFriendCode(uid) {
@@ -5390,8 +5412,17 @@ function showAuthGate(){const g=document.getElementById('authGate');if(g){g.clas
 function hideAuthGate(){const g=document.getElementById('authGate');if(g){g.classList.remove('active');g.setAttribute('aria-hidden','true');}}
 function playGateExplosion(){try{playEntryExplosion();document.getElementById('viewport').classList.add('auth-world-shake');setTimeout(()=>document.getElementById('viewport').classList.remove('auth-world-shake'),1300);}catch(e){}}
 function runAuthTransition(isRegister){const t=document.getElementById('authTransition');if(!t)return;document.getElementById('authTransitionTitle').textContent=isRegister?'LE MONDE RÉEL EST TERMINÉ':'LE MONDE RÉEL SE DÉCONNECTE';document.getElementById('authTransitionText').textContent=isRegister?'Une fois inscrit, tu ne regarderas plus DROP de la même façon. Bienvenue dans ton nouveau monde.':'Connexion confirmée. Les couleurs changent. DROP 2027 s’ouvre maintenant.';t.classList.add('active','shake');playGateExplosion();setTimeout(()=>{t.classList.remove('active','shake');document.getElementById('viewport').classList.add('world-entered');setTimeout(()=>document.getElementById('viewport').classList.remove('world-entered'),1800);},1450);}
-async function handleGateAuth(e){e.preventDefault();if(authLoading)return;const btn=document.getElementById('gateAuthSubmit'),email=document.getElementById('gateAuthEmail').value.trim().toLowerCase(),pass=document.getElementById('gateAuthPass').value,username=document.getElementById('gateAuthUsername').value.trim();if(!email||!pass)return showToast('❌ E-mail et mot de passe requis.','error');if(gateAuthMode==='register'&&pass.length<6)return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.','error');authLoading=true;btn.disabled=true;btn.innerText=gateAuthMode==='register'?'CRÉATION...':'CONNEXION...';try{if(gateAuthMode==='login'){try{sessionStorage.setItem('drop2027_explicit_login','1');}catch(e){} const c=await withTimeout(auth.signInWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');await loadFirebaseUserProfile(c.user);hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(false);}else{try{sessionStorage.removeItem('drop2027_return_party');sessionStorage.setItem('drop2027_new_registration','1');}catch(e){} window.__justRegistered=true; window.__pendingNewPlayerTutorial=true; const c=await withTimeout(auth.createUserWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');const u=c.user,fId=generateFriendCode(u.uid),initialCatalogs=normalizeCatalogs(CATALOGS);initialCatalogs.starter.forEach(x=>x.unlocked=true);const isAdminEmail=email==='carer.nathan11@gmail.com';if(isAdminEmail)Object.keys(initialCatalogs).forEach(cat=>initialCatalogs[cat].forEach(i=>i.unlocked=true));const initialData={username:username||email.split('@')[0],credits:isAdminEmail?999999999:500,friendId:fId,friends:[],isAdmin:isAdminEmail,catalogs:initialCatalogs,redeemedCodes:[],dailyGames:{},hubTasks:{date:'',done:{}},freeDrops:0,halloweenArcade:{},worldData:{event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween-2026-v4'}};appData.currentUser={email:u.email||email,username:initialData.username,uid:u.uid};appData.credits=initialData.credits;appData.friendId=fId;appData.friends=[];appData.isAdmin=isAdminEmail;appData.catalogs=initialCatalogs;appData.redeemedCodes=[];applyMysterySeasonState();appData.dailyGames={};appData.hubTasks={date:'',done:{}};appData.freeDrops=0;appData.worldData=initialData.worldData;updateUI();db.ref('users/'+u.uid).set(initialData).catch(err=>console.warn('Profil inscription:',err));listenToTrades();listenToFriendRequests();saveAppData();try{sessionStorage.setItem('drop2027_new_registration','1');sessionStorage.removeItem('drop2027_return_party');}catch(e){}window.__justRegistered=true;hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(true);window.__pendingNewPlayerTutorial=true;setTimeout(startNewPlayerCelebration,1500);}}catch(err){try{if(gateAuthMode==='login')sessionStorage.removeItem('drop2027_explicit_login');}catch(e){}console.error('GATE AUTH ERROR:',err);showToast('❌ '+firebaseAuthErrorMessage(err),'error');}finally{authLoading=false;btn.disabled=false;btn.innerText=gateAuthMode==='register'?"S'INSCRIRE":'SE CONNECTER';}}
+async function handleGateAuth(e){e.preventDefault();if(authLoading)return;const btn=document.getElementById('gateAuthSubmit'),email=document.getElementById('gateAuthEmail').value.trim().toLowerCase(),pass=document.getElementById('gateAuthPass').value,username=document.getElementById('gateAuthUsername').value.trim();if(!email||!pass)return showToast('❌ E-mail et mot de passe requis.','error');if(gateAuthMode==='register'&&pass.length<6)return showToast('❌ Le mot de passe doit contenir au moins 6 caractères.','error');authLoading=true;btn.disabled=true;btn.innerText=gateAuthMode==='register'?'CRÉATION...':'CONNEXION...';try{if(gateAuthMode==='login'){try{sessionStorage.setItem('drop2027_explicit_login','1');}catch(e){} const c=await withTimeout(auth.signInWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(false);}else{try{sessionStorage.removeItem('drop2027_return_party');sessionStorage.setItem('drop2027_new_registration','1');}catch(e){} window.__justRegistered=true; window.__pendingNewPlayerTutorial=true; const c=await withTimeout(auth.createUserWithEmailAndPassword(email,pass),12000,'Firebase Authentication ne répond pas.');const u=c.user,fId=generateFriendCode(u.uid),initialCatalogs=normalizeCatalogs(CATALOGS);initialCatalogs.starter.forEach(x=>x.unlocked=true);const isAdminEmail=email==='carer.nathan11@gmail.com';if(isAdminEmail)Object.keys(initialCatalogs).forEach(cat=>initialCatalogs[cat].forEach(i=>i.unlocked=true));const initialData={username:username||email.split('@')[0],credits:isAdminEmail?999999999:500,friendId:fId,friends:[],isAdmin:isAdminEmail,catalogs:initialCatalogs,redeemedCodes:[],dailyGames:{},hubTasks:{date:'',done:{}},freeDrops:0,halloweenArcade:{},worldData:{event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0,worldEventSeason:'s2-halloween-2026-v4'}};appData.currentUser={email:u.email||email,username:initialData.username,uid:u.uid};appData.credits=initialData.credits;appData.friendId=fId;appData.friends=[];appData.isAdmin=isAdminEmail;appData.catalogs=initialCatalogs;appData.redeemedCodes=[];applyMysterySeasonState();appData.dailyGames={};appData.hubTasks={date:'',done:{}};appData.freeDrops=0;appData.worldData=initialData.worldData;updateUI();db.ref('users/'+u.uid).set(initialData).catch(err=>console.warn('Profil inscription:',err));listenToTrades();listenToFriendRequests();saveAppData();try{sessionStorage.setItem('drop2027_new_registration','1');sessionStorage.removeItem('drop2027_return_party');}catch(e){}window.__justRegistered=true;hideAuthGate();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);runAuthTransition(true);window.__pendingNewPlayerTutorial=true;setTimeout(startNewPlayerCelebration,1500);}}catch(err){try{if(gateAuthMode==='login')sessionStorage.removeItem('drop2027_explicit_login');}catch(e){}console.error('GATE AUTH ERROR:',err);showToast('❌ '+firebaseAuthErrorMessage(err),'error');}finally{authLoading=false;btn.disabled=false;btn.innerText=gateAuthMode==='register'?"S'INSCRIRE":'SE CONNECTER';}}
 function ensureAuthGate(){if(!authStateReady)return;if(auth.currentUser||appData.currentUser){hideAuthGate();releaseAuthBoot();const homeNav=document.querySelector('.nav-item[data-tutorial-tab="scr-home"]');switchTab('scr-home',homeNav||null);return;}releaseAuthBoot();showAuthGate();}
+
+// Filet de sécurité mobile : même si Firebase met anormalement longtemps à
+// restaurer une session, l'écran de vérification ne peut pas rester bloqué.
+setTimeout(()=>{
+  if(!authBootReleased && !authStateReady){
+    releaseAuthBoot();
+    showAuthGate();
+  }
+},3500);
 
 /* ===== GUIDED TUTORIAL ===== */
 const TUTORIAL_STEPS=[
