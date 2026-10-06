@@ -741,7 +741,7 @@ body.halloween-season .auth-transition-explosion{background:#7f1d1d!important;bo
 </style>
 </head>
 <body>
-<!-- DROP 2027 UPDATE 55 — STABLE LOADING / BUG REPORT -->
+<!-- DROP 2027 UPDATE 44 — SAISON 2 HALLOWEEN PLAYABLE -->
 
 <div id="drop40Flash" class="drop40-flash"></div><div id="drop40Whisper" class="drop40-whisper"></div>
 
@@ -1997,6 +1997,8 @@ function ensureStarterCards() {
   appData.catalogs.starter.forEach(c => c.unlocked = true);
   if (appData.isAdmin) Object.keys(appData.catalogs).forEach(cat => (appData.catalogs[cat] || []).forEach(c => c.unlocked = true));
 }
+let profileReady = false;
+let profileSaveQueue = Promise.resolve();
 let appData = {
 credits: 0,
 redeemedCodes: [],
@@ -2033,7 +2035,6 @@ toast.classList.remove('show');
 // AUTHENTIFICATION ROBUSTE : l'authentification ne doit JAMAIS être bloquée par la base de données.
 let authLoading = false;
 let profileLoadToken = 0;
-let profileDataReady = false;
 
 function withTimeout(promise, ms, label) {
 return Promise.race([
@@ -2047,7 +2048,6 @@ reject(err);
 }
 
 function resetLocalUserState() {
-profileDataReady = false;
 const report=document.getElementById('reportSection'); if(report) report.style.display='none';
 appData.currentUser = null;
 appData.credits = 0;
@@ -2104,6 +2104,7 @@ function mergeCatalogsPreservingPlayerData(storedCatalogs){
 }
 
 async function loadFirebaseUserProfile(user) {
+profileReady = false;
 if (!user) {
 resetLocalUserState();
 updateUI();
@@ -2111,7 +2112,6 @@ return false;
 }
 
 const token = ++profileLoadToken;
-profileDataReady = false;
 const isAdminEmail = (user.email || '').toLowerCase() === 'carer.nathan11@gmail.com';
 const fallbackFriendId = generateFriendCode(user.uid);
 
@@ -2128,7 +2128,8 @@ appData.friends = [];
 appData.isAdmin = isAdminEmail;
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = [];
-// Ne jamais afficher ni sauvegarder un catalogue provisoire avant le profil réel.
+updateUI();
+
 try {
 const userRef = db.ref('users/' + user.uid);
 const snapshot = await withTimeout(userRef.once('value'), 5000, 'La base de données Firebase ne répond pas.');
@@ -2207,6 +2208,20 @@ appData.worldData.zones = Array.isArray(appData.worldData.zones)?appData.worldDa
 appData.worldData.lore = Array.isArray(appData.worldData.lore)?appData.worldData.lore:[];
 appData.worldData.records = {...{drops:0,games:0,discoveries:0},...(appData.worldData.records||{})};
 personalizePlayerCard();
+try {
+  const cachedFinal = JSON.parse(localStorage.getItem('drop2027_profile_' + user.uid) || 'null');
+  if (cachedFinal && cachedFinal.catalogs) {
+    appData.catalogs = mergeCatalogsPreservingPlayerData(cachedFinal.catalogs);
+    Object.keys(appData.catalogs).forEach(cat => {
+      const current = appData.catalogs[cat] || [];
+      const cached = Array.isArray(cachedFinal.catalogs[cat]) ? cachedFinal.catalogs[cat] : [];
+      const byId = Object.fromEntries(cached.map(c => [String(c.id), c]));
+      current.forEach(c => { if (byId[String(c.id)]?.unlocked === true) c.unlocked = true; });
+    });
+  }
+} catch (_) {}
+ensureStarterCards();
+profileReady = true;
 // Réindexe immédiatement les cartes échangeables existantes pour les amis.
 syncPublicCollection();
 
@@ -2216,7 +2231,6 @@ if (needsFriendIdMigration) {
     .catch(err => console.warn('Migration ID ami:', err));
 }
 
-profileDataReady = true;
 listenToTrades();
 listenToFriendRequests();
 listenAdminMessages();
@@ -2264,14 +2278,10 @@ appData.redeemedCodes = Array.isArray(cached.redeemedCodes) ? cached.redeemedCod
 appData.dailyGames = (cached.dailyGames && typeof cached.dailyGames === 'object') ? cached.dailyGames : {};
 appData.hubTasks = (cached.hubTasks && typeof cached.hubTasks === 'object') ? cached.hubTasks : {date:'', done:{}};
 appData.worldData = (cached.worldData && typeof cached.worldData === 'object') ? cached.worldData : {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0};
-profileDataReady = true;
+ensureStarterCards();
+profileReady = true;
 updateUI();
 } } catch (_) {}
-if (!profileDataReady) {
-  ensureStarterCards();
-  profileDataReady = true;
-  updateUI();
-}
 
 // Surtout : NE PAS faire auth.signOut() ici. L'identité Firebase est valide.
 // L'utilisateur reste connecté même si la DB est temporairement inaccessible.
@@ -2368,24 +2378,39 @@ try{
 }catch(err){console.warn('Collection publique:',err);}
 }
 function saveAppData() {
-if (appData.currentUser && profileDataReady) {
-const userData = {
-credits: appData.credits,
-catalogs: appData.catalogs,
-friends: appData.friends,
-friendId: appData.friendId,
-isAdmin: appData.isAdmin,
-redeemedCodes: appData.redeemedCodes,
-dailyGames: appData.dailyGames,
-hubTasks: appData.hubTasks,
-freeDrops: appData.freeDrops || 0,
-worldData: appData.worldData || {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0}, halloweenArcade: appData.halloweenArcade || {}
-};
-db.ref('users/' + appData.currentUser.uid).update(userData).catch(err => console.warn('Sauvegarde profil:', err));
-syncPublicCollection();
+  if (!appData.currentUser || !profileReady) return;
+  const uid = appData.currentUser.uid;
+  profileSaveQueue = profileSaveQueue.then(async () => {
+    try {
+      const serverSnap = await withTimeout(db.ref('users/' + uid).once('value'), 7000, 'Firebase ne répond pas pendant la sauvegarde.');
+      const server = serverSnap.val() || {};
+      const mergedCatalogs = mergeCatalogsPreservingPlayerData(server.catalogs || {});
+      Object.keys(mergedCatalogs).forEach(cat => {
+        const localCards = Array.isArray(appData.catalogs?.[cat]) ? appData.catalogs[cat] : [];
+        const byId = Object.fromEntries(localCards.map(c => [String(c.id), c]));
+        (mergedCatalogs[cat] || []).forEach(c => {
+          const local = byId[String(c.id)];
+          if (local) {
+            if (local.unlocked === true) c.unlocked = true;
+            if (local.tradeable !== undefined) c.tradeable = local.tradeable;
+          }
+        });
+      });
+      appData.catalogs = mergedCatalogs;
+      ensureStarterCards();
+      const userData = {
+        credits: appData.credits, catalogs: appData.catalogs, friends: appData.friends, friendId: appData.friendId,
+        isAdmin: appData.isAdmin, redeemedCodes: appData.redeemedCodes, dailyGames: appData.dailyGames, hubTasks: appData.hubTasks,
+        freeDrops: appData.freeDrops || 0, worldData: appData.worldData || {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0},
+        halloweenArcade: appData.halloweenArcade || {}
+      };
+      await db.ref('users/' + uid).update(userData);
+      try { localStorage.setItem('drop2027_profile_' + uid, JSON.stringify({username:appData.currentUser.username,credits:appData.credits,friendId:appData.friendId,friends:appData.friends,isAdmin:appData.isAdmin,catalogs:appData.catalogs,redeemedCodes:appData.redeemedCodes,dailyGames:appData.dailyGames,hubTasks:appData.hubTasks,worldData:appData.worldData,halloweenArcade:appData.halloweenArcade||{}})); } catch (_) {}
+      await syncPublicCollection();
+    } catch (err) { console.warn('Sauvegarde profil protégée:', err); }
+  }).catch(err => console.warn('File de sauvegarde profil:', err));
 }
 updateUI();
-}
 
 function applyAdminMode(active) {
   const vp=document.getElementById('viewport');
@@ -3948,7 +3973,6 @@ function playWelcomeMelody(){
   try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();const notes=[261.63,329.63,392,523.25,659.25,523.25,392,493.88,587.33,783.99];let i=0;const play=()=>{const now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=notes[i%notes.length];g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.11,now+.05);g.gain.exponentialRampToValueAtTime(.0001,now+.65);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+.75);i++;};play();window.__welcomeMelodyTimer=setInterval(play,700);setTimeout(()=>{if(window.__welcomeMelodyTimer){clearInterval(window.__welcomeMelodyTimer);window.__welcomeMelodyTimer=null;}},8500);}catch(e){}
 }
 const DROP_NEWS=[
-['05/10/2026','🛠️ BUGS MAÎTRISÉS — DROP 2027 PASSE EN MAINTENANCE','Une série de bugs a été identifiée et traitée, notamment autour du chargement des profils et de la récupération des cartes. Les cartes de chaque joueur sont désormais chargées avant l’ouverture du jeu afin d’éviter qu’un état provisoire ne puisse remplacer sa collection. Si un bug apparaît encore, ouvre **Espace compte → Paramètres → Signalement** et indique précisément ce qui s’est passé. Chaque signalement aide à isoler les derniers problèmes.'],
 ['03/10/2026','🎃 LA NOUVELLE SAISON HALLOWEEN EST ARRIVÉE','La Saison 2 Halloween est officiellement ouverte sur DROP 2027. Le site passe en ambiance Halloween avec une catégorie dédiée, des cartes de saison, le WORLD HALLOWEEN et les activités de l’événement.'],
 ['03/10/2026','🎀 DROP SOUTIENT OCTOBRE ROSE','Une nouvelle catégorie Octobre Rose rejoint le classeur de DROP 2027 pour mettre en avant la sensibilisation, le soutien et la solidarité autour de cette campagne.'],
 ['24/09/2026','🚧 DROP 2027 est toujours en développement','DROP 2027 continue d’être construit et testé. Il reste encore des bugs, des problèmes d’affichage et des comportements à corriger. Si quelque chose ne fonctionne pas comme prévu, ce n’est pas forcément toi : le jeu est encore en développement. Merci aux joueurs qui testent, signalent les bugs et participent à son évolution.'],
@@ -3973,7 +3997,7 @@ const DROP_NEWS=[
 ['05/09/2026','📚 “Mes cartes” simplifie la collection','Les cartes déjà possédées peuvent être retrouvées plus rapidement sans parcourir toutes les catégories.'],
 ['04/09/2026','🚀 DROP 2027 continue sa construction','Le projet évolue version après version, avec une règle simple : ajouter des choses sans casser les anciennes. Une ambition presque révolutionnaire.']
 ];
-function renderNews(){const g=document.getElementById('newsGrid');if(!g)return;g.innerHTML=DROP_NEWS.map((n,i)=>`<article class="news-item ${i===0?'featured halloween-news':i===1?'featured rose-news':''}"><div class="news-date">${n[0]}</div><h4>${n[1]}</h4><p>${String(n[2]).replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')}</p></article>`).join('');}
+function renderNews(){const g=document.getElementById('newsGrid');if(!g)return;g.innerHTML=DROP_NEWS.map((n,i)=>`<article class="news-item ${i===0?'featured halloween-news':i===1?'featured rose-news':''}"><div class="news-date">${n[0]}</div><h4>${n[1]}</h4><p>${n[2]}</p></article>`).join('');}
 function startNewPlayerCelebration(){
  const overlay=document.getElementById('welcomeExperience'),bar=document.getElementById('welcomeProgress'),time=document.getElementById('welcomeTime'),text=document.getElementById('welcomeText'),particles=document.getElementById('welcomeParticles');
  if(!overlay)return; overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');
