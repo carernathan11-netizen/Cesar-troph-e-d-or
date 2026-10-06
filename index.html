@@ -741,7 +741,7 @@ body.halloween-season .auth-transition-explosion{background:#7f1d1d!important;bo
 </style>
 </head>
 <body>
-<!-- DROP 2027 UPDATE 44 — SAISON 2 HALLOWEEN PLAYABLE -->
+<!-- DROP 2027 UPDATE 55 — STABLE LOADING / BUG REPORT -->
 
 <div id="drop40Flash" class="drop40-flash"></div><div id="drop40Whisper" class="drop40-whisper"></div>
 
@@ -2033,6 +2033,7 @@ toast.classList.remove('show');
 // AUTHENTIFICATION ROBUSTE : l'authentification ne doit JAMAIS être bloquée par la base de données.
 let authLoading = false;
 let profileLoadToken = 0;
+let profileDataReady = false;
 
 function withTimeout(promise, ms, label) {
 return Promise.race([
@@ -2046,6 +2047,7 @@ reject(err);
 }
 
 function resetLocalUserState() {
+profileDataReady = false;
 const report=document.getElementById('reportSection'); if(report) report.style.display='none';
 appData.currentUser = null;
 appData.credits = 0;
@@ -2109,6 +2111,7 @@ return false;
 }
 
 const token = ++profileLoadToken;
+profileDataReady = false;
 const isAdminEmail = (user.email || '').toLowerCase() === 'carer.nathan11@gmail.com';
 const fallbackFriendId = generateFriendCode(user.uid);
 
@@ -2125,8 +2128,7 @@ appData.friends = [];
 appData.isAdmin = isAdminEmail;
 appData.catalogs = JSON.parse(JSON.stringify(CATALOGS));
 appData.redeemedCodes = [];
-updateUI();
-
+// Ne jamais afficher ni sauvegarder un catalogue provisoire avant le profil réel.
 try {
 const userRef = db.ref('users/' + user.uid);
 const snapshot = await withTimeout(userRef.once('value'), 5000, 'La base de données Firebase ne répond pas.');
@@ -2214,6 +2216,7 @@ if (needsFriendIdMigration) {
     .catch(err => console.warn('Migration ID ami:', err));
 }
 
+profileDataReady = true;
 listenToTrades();
 listenToFriendRequests();
 listenAdminMessages();
@@ -2261,8 +2264,14 @@ appData.redeemedCodes = Array.isArray(cached.redeemedCodes) ? cached.redeemedCod
 appData.dailyGames = (cached.dailyGames && typeof cached.dailyGames === 'object') ? cached.dailyGames : {};
 appData.hubTasks = (cached.hubTasks && typeof cached.hubTasks === 'object') ? cached.hubTasks : {date:'', done:{}};
 appData.worldData = (cached.worldData && typeof cached.worldData === 'object') ? cached.worldData : {event:0,secrets:[],zones:[],lore:[],totalActions:0,records:{drops:0,games:0,discoveries:0},eventLastParticipation:'',globalContribution:0};
+profileDataReady = true;
 updateUI();
 } } catch (_) {}
+if (!profileDataReady) {
+  ensureStarterCards();
+  profileDataReady = true;
+  updateUI();
+}
 
 // Surtout : NE PAS faire auth.signOut() ici. L'identité Firebase est valide.
 // L'utilisateur reste connecté même si la DB est temporairement inaccessible.
@@ -2359,7 +2368,7 @@ try{
 }catch(err){console.warn('Collection publique:',err);}
 }
 function saveAppData() {
-if (appData.currentUser) {
+if (appData.currentUser && profileDataReady) {
 const userData = {
 credits: appData.credits,
 catalogs: appData.catalogs,
@@ -3939,6 +3948,7 @@ function playWelcomeMelody(){
   try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window.__dropAudio||new AC();window.__dropAudio=ctx;if(ctx.state==='suspended')ctx.resume();const notes=[261.63,329.63,392,523.25,659.25,523.25,392,493.88,587.33,783.99];let i=0;const play=()=>{const now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=notes[i%notes.length];g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.11,now+.05);g.gain.exponentialRampToValueAtTime(.0001,now+.65);o.connect(g);g.connect(ctx.destination);o.start();o.stop(now+.75);i++;};play();window.__welcomeMelodyTimer=setInterval(play,700);setTimeout(()=>{if(window.__welcomeMelodyTimer){clearInterval(window.__welcomeMelodyTimer);window.__welcomeMelodyTimer=null;}},8500);}catch(e){}
 }
 const DROP_NEWS=[
+['05/10/2026','🛠️ BUGS MAÎTRISÉS — DROP 2027 PASSE EN MAINTENANCE','Une série de bugs a été identifiée et traitée, notamment autour du chargement des profils et de la récupération des cartes. Les cartes de chaque joueur sont désormais chargées avant l’ouverture du jeu afin d’éviter qu’un état provisoire ne puisse remplacer sa collection. Si un bug apparaît encore, ouvre **Espace compte → Paramètres → Signalement** et indique précisément ce qui s’est passé. Chaque signalement aide à isoler les derniers problèmes.'],
 ['03/10/2026','🎃 LA NOUVELLE SAISON HALLOWEEN EST ARRIVÉE','La Saison 2 Halloween est officiellement ouverte sur DROP 2027. Le site passe en ambiance Halloween avec une catégorie dédiée, des cartes de saison, le WORLD HALLOWEEN et les activités de l’événement.'],
 ['03/10/2026','🎀 DROP SOUTIENT OCTOBRE ROSE','Une nouvelle catégorie Octobre Rose rejoint le classeur de DROP 2027 pour mettre en avant la sensibilisation, le soutien et la solidarité autour de cette campagne.'],
 ['24/09/2026','🚧 DROP 2027 est toujours en développement','DROP 2027 continue d’être construit et testé. Il reste encore des bugs, des problèmes d’affichage et des comportements à corriger. Si quelque chose ne fonctionne pas comme prévu, ce n’est pas forcément toi : le jeu est encore en développement. Merci aux joueurs qui testent, signalent les bugs et participent à son évolution.'],
@@ -3963,7 +3973,7 @@ const DROP_NEWS=[
 ['05/09/2026','📚 “Mes cartes” simplifie la collection','Les cartes déjà possédées peuvent être retrouvées plus rapidement sans parcourir toutes les catégories.'],
 ['04/09/2026','🚀 DROP 2027 continue sa construction','Le projet évolue version après version, avec une règle simple : ajouter des choses sans casser les anciennes. Une ambition presque révolutionnaire.']
 ];
-function renderNews(){const g=document.getElementById('newsGrid');if(!g)return;g.innerHTML=DROP_NEWS.map((n,i)=>`<article class="news-item ${i===0?'featured halloween-news':i===1?'featured rose-news':''}"><div class="news-date">${n[0]}</div><h4>${n[1]}</h4><p>${n[2]}</p></article>`).join('');}
+function renderNews(){const g=document.getElementById('newsGrid');if(!g)return;g.innerHTML=DROP_NEWS.map((n,i)=>`<article class="news-item ${i===0?'featured halloween-news':i===1?'featured rose-news':''}"><div class="news-date">${n[0]}</div><h4>${n[1]}</h4><p>${String(n[2]).replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')}</p></article>`).join('');}
 function startNewPlayerCelebration(){
  const overlay=document.getElementById('welcomeExperience'),bar=document.getElementById('welcomeProgress'),time=document.getElementById('welcomeTime'),text=document.getElementById('welcomeText'),particles=document.getElementById('welcomeParticles');
  if(!overlay)return; overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');
